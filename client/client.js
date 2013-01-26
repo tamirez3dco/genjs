@@ -308,6 +308,8 @@ function init() {
 	container.appendChild(renderer.domElement);
 	camera = new THREE.PerspectiveCamera(70, $(container).width() / $(container).height(), 1, 1000);
 	camera.position.z = 100;
+	camera.position.y = -200;
+	camera.position.x = 10;
 	scene = new THREE.Scene();
 	controls = new THREE.OrbitControls(camera, container);
 	controls.addEventListener('change', render);

@@ -8,12 +8,8 @@
 </body>
 
 <template name="page">
-  <div class="container fill">
-    <div class="row">
-      <div class="span1"> </div>
-
-      <div class="span12">
-        <div class="header row">
+  <div class="container-fluid fill">
+        <div class="header row-fluid">
           <div class="span10">
         	{{> programHeader }}
           </div>
@@ -24,7 +20,7 @@
           </div>
         </div>
         
-		 <div class="row fill">
+		 <div style="height: 95%; position: relative; padding-bottom: 0px;padding-top: 0px;" class="row-fluid fill">
 		 	<div class="span5 fill">
 				{{> blockly }}
 			</div>
@@ -35,15 +31,12 @@
 				{{> programs }}
 			</div>
 		</div>
-
-      <div class="span1"> </div>
-    </div>
   </div>
 </template>
 
 <template name="blockly">
 	{{#constant}}
-        <div style="height: 620px;" class="fill" id="blockly-container">
+        <div class="fill" id="blockly-container">
         </div>
         {{/constant}}
 </template>
@@ -71,7 +64,7 @@
 <template name="viewport">
   <div class="viewport fill">
   	{{#constant}}
-  	<div style="height: 620px;" id="viewer3d-container"></div>
+  	<div class="fill" id="viewer3d-container"></div>
   	{{/constant}}
   </div>
 </template>
