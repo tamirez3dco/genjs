@@ -1,0 +1,77 @@
+<head>
+  <title>genjs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  {{> page}}
+</body>
+
+<template name="page">
+  <div class="container fill">
+    <div class="row">
+      <div class="span1"> </div>
+
+      <div class="span12">
+        <div class="header row">
+          <div class="span10">
+        	{{> programHeader }}
+          </div>
+          <div class="span2">
+            <div style="float: right">
+              {{loginButtons align="right"}}
+            </div>
+          </div>
+        </div>
+        
+		 <div class="row fill">
+		 	<div class="span5 fill">
+				{{> blockly }}
+			</div>
+			<div class="span5 fill">
+				{{> viewport }}
+			</div>
+			<div class="span2">
+				{{> programs }}
+			</div>
+		</div>
+
+      <div class="span1"> </div>
+    </div>
+  </div>
+</template>
+
+<template name="blockly">
+	{{#constant}}
+        <div style="height: 620px;" class="fill" id="blockly-container">
+        </div>
+        {{/constant}}
+</template>
+
+<template name="programs">
+  <div class="programs well well-small">
+    <div class="muted"><b>Programs</b></div>
+    {{#each programs}}
+    	{{> program }}
+    {{/each}}
+  </div>
+</template>
+
+<template name="program">
+  <div class="program {{selected}}">
+    <span class="title">{{title}}</span>
+    <i class="icon-remove-circle pull-right"></i>  
+  </div>
+</template>
+
+<template name="programHeader">
+	<input class="programTitle" type="text" value="{{programTitle}}" placeholder="{{programTitle}}" />
+</template>
+
+<template name="viewport">
+  <div class="viewport fill">
+  	{{#constant}}
+  	<div style="height: 620px;" id="viewer3d-container"></div>
+  	{{/constant}}
+  </div>
+</template>
