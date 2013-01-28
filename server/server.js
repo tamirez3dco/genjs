@@ -1,4 +1,11 @@
+Meteor.startup(function() {
+	// code to run on server at startup
+});
+
 Meteor.publish("programs", function () {
-  return Programs.find(
-    {$or: [{"public": true}, {invited: this.userId}, {owner: this.userId}]});
+  return allPrograms();
+});
+
+Meteor.publish("program-names", function () {
+  return programNames();
 });

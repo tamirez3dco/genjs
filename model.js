@@ -23,38 +23,21 @@ Programs = new Meteor.Collection("programs");
 
 Programs.allow({
   insert: function (userId, program) {
-    return false; // no cowboy inserts -- use createParty method
+    return true; 
   },
   update: function (userId, programs, fields, modifier) {
-    return _.all(programs, function (program) {
-      return true;
-      if (userId !== program.owner)
-        return false; // not the owner
-
-      return true;
-    });
+  	return true;
   },
   remove: function (userId, programs) {
   	return true;
-    return ! _.any(programs, function (program) {
-     if (userId !== program.owner)
-        return false; // not the owner
-
-      return true;
-    });
   }
 });
-
 
 Meteor.methods({
   createProgram: function (options) {
     options = options || {};
     return Programs.insert({
-      owner: this.userId,
-      title: options.title,
-      description: options.description,
-      public: !! options.public,
-      invited: [],
+      name: options.name,
       xml: options.xml
     });
   }
