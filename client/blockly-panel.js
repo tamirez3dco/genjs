@@ -35,25 +35,31 @@ Ext.define('GEN.ui.blockly.Panel', {
 					Blockly.inject(document.getElementById('blockly-inner'), {
 						path : '/blockly/'
 					});
-					
+
 					Ext.fly(document.getElementById('blockly-inner')).on('blocklyWorkspaceChange', function() {
 						var xml = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
 						xml = Blockly.Xml.domToText(xml);
 						if(xml == self.xml)
-							return;	
+							return;
 						self.xml = xml;
 
 						var program = Session.get("currentProgram");
 						if(_.isUndefined(program)) {
 							console.log('create new program');
-							Meteor.call('createProgram', {
+							program = Programs.insert({
 								name : 'New Program',
 								xml : xml
-							}, function(error, program) {
-								if(!error) {
-									Session.set("currentProgram", program);
-								}
 							});
+							Session.set("currentProgram", program);
+							/*	Meteor.call('createProgram', {
+							 name : 'New Program',
+							 xml : xml
+							 }, function(error, program) {
+							 if(!error) {
+							 console.log('set current');
+							 //Session.set("currentProgram", program);
+							 }
+							 });*/
 						} else {
 							console.log('update program');
 							Programs.update(program, {
@@ -67,8 +73,9 @@ Ext.define('GEN.ui.blockly.Panel', {
 				single : true
 			}
 		});
-		
+
 		Meteor.autorun(function() {
+			console.log('here...');
 			var current = Session.get("currentProgram");
 			if(_.isUndefined(current))
 				return;

@@ -55,6 +55,5 @@ Meteor.startup(function() {
 	});
 	Meteor.autosubscribe(function() {
 		Meteor.subscribe("programs");
-		Meteor.subscribe("program-names");
 	});
 });

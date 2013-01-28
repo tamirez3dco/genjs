@@ -3,9 +3,5 @@ Meteor.startup(function() {
 });
 
 Meteor.publish("programs", function () {
-  return allPrograms();
-});
-
-Meteor.publish("program-names", function () {
-  return programNames();
+  return Programs.find();
 });

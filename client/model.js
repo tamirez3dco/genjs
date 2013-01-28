@@ -15,13 +15,13 @@ Ext.define('GEN.model.Program', {
 		this.callParent(arguments);
 		var self = this;
 		Meteor.autorun(function() {
+			'autorun rec'
 			var p = Programs.findOne(self.getData()._id);
 			//TODO: bug in ext loose selection here, fixed in 4.1.3
 			self.set(p);
 			self.commit();
 		});
 	}
-	
 });
 
 Ext.define('GEN.store.Programs', {
@@ -33,11 +33,13 @@ Ext.define('GEN.store.Programs', {
 		this.callParent();
 		var self = this;
 		Meteor.autorun(function() {
-			var programs = programNames();
+			console.log('autorun...');
+			var programs = Programs.find();
 			var data = programs.map(function(program) {
 				return program;
 			});
 			_.each(data, function(d) {
+				console.log(d);
 				if(self.indexOfId(d._id) == -1) {
 					self.loadData([d], true);
 				}
