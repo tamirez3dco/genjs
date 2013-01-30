@@ -52,7 +52,6 @@ Ext.define('GEN.ui.programs.Panel', {
 				fn : function(model, selected, eOpts) {
 					if(selected.length == 0)
 						return;
-					console.log('set current');
 					Session.set("currentProgram", selected[0].getData()._id);
 				}
 			}

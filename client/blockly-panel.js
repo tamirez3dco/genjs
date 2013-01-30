@@ -37,12 +37,14 @@ Ext.define('GEN.ui.blockly.Panel', {
 					});
 
 					Ext.fly(document.getElementById('blockly-inner')).on('blocklyWorkspaceChange', function() {
+						console.log('change');
 						var xml = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
 						xml = Blockly.Xml.domToText(xml);
+						console.log(xml);
 						if(xml == self.xml)
 							return;
 						self.xml = xml;
-
+						
 						var program = Session.get("currentProgram");
 						if(_.isUndefined(program)) {
 							console.log('create new program');
@@ -75,7 +77,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		});
 
 		Meteor.autorun(function() {
-			console.log('here...');
+			//console.log('here...');
 			var current = Session.get("currentProgram");
 			if(_.isUndefined(current))
 				return;

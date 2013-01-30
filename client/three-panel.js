@@ -257,6 +257,7 @@ Ext.define('GEN.ui.three.Panel', {
 		});
 
 		Meteor.autorun(function() {
+			console.log('three-panel');
 			var current = Session.get("currentProgram");
 			if(_.isUndefined(current))
 				return;
@@ -265,6 +266,7 @@ Ext.define('GEN.ui.three.Panel', {
 				return;
 				
 			var code = Blockly.Generator.workspaceToCode('JavaScript');
+			console.log(code);
 			if(code==self.code) 
 				return;
 			self.code = code;

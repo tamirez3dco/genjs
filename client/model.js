@@ -33,13 +33,13 @@ Ext.define('GEN.store.Programs', {
 		this.callParent();
 		var self = this;
 		Meteor.autorun(function() {
-			console.log('autorun...');
+			//console.log('autorun...');
 			var programs = Programs.find();
 			var data = programs.map(function(program) {
 				return program;
 			});
 			_.each(data, function(d) {
-				console.log(d);
+				//console.log(d);
 				if(self.indexOfId(d._id) == -1) {
 					self.loadData([d], true);
 				}
