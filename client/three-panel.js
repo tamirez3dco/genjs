@@ -258,14 +258,25 @@ Ext.define('GEN.ui.three.Panel', {
 
 		Meteor.autorun(function() {
 			console.log('three-panel');
+			console.log(self);
 			var current = Session.get("currentProgram");
+			console.log(current);
 			if(_.isUndefined(current))
 				return;
 			program = Programs.findOne(current);
+			console.log(program);
 			if(_.isUndefined(program))
 				return;
-				
-			var code = Blockly.Generator.workspaceToCode('JavaScript');
+			
+			console.log('ok');
+			console.log(Blockly.Generator);
+			try {
+				var code = Blockly.Generator.workspaceToCode('JavaScript');
+			} catch(err) {
+				console.log('bad');
+				return;
+			}
+			console.log('good');
 			console.log(code);
 			if(code==self.code) 
 				return;
