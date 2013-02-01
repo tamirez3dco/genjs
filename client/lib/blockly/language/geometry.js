@@ -68,6 +68,7 @@ Blockly.Language.divideCurve = {
 
 Blockly.Language.circle = {
 	category : 'Geometry',
+	title: 'Circle',
 	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);

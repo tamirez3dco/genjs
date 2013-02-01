@@ -19,7 +19,7 @@ function initParticleSystem() {
 
 function addPoint(pX, pY, pZ) {
 	var p = new THREE.Vector3(pX, pY, pZ);
-	console.log(p);
+	//console.log(p);
 	particleSystem.geometry.vertices.push(p);
 	particleSystem.geometry.__dirtyVertices = true;
 	return p;
@@ -83,7 +83,7 @@ function addCircle(radius) {
 }
 
 function addTube(curve, radius, sides) {
-	console.log('addTube');
+	//console.log('addTube');
 	var tube = new THREE.TubeGeometry(curve, 30, radius, sides, false, false);
 	//console.log(tube);
 	addMeshGeometry(tube, 0xff00ff);
@@ -101,7 +101,7 @@ function move(geometry, translation) {
 function moveGeometry(geometry, translation) {
 	var ng = new THREE.Geometry();
 	THREE.GeometryUtils.merge(ng, geometry)
-	console.log(ng);
+	//console.log(ng);
 	move(ng, translation)
 	addMeshGeometry(ng, 0xff00ff);
 	return ng;
@@ -124,9 +124,9 @@ function addCube(width, height, depth, point) {
 }
 
 function divideCurve(curve, segments) {
-	console.log(curve);
+	//console.log(curve);
 	var splinePoints = curve.getSpacedPoints(segments);
-	console.log(splinePoints);
+	//console.log(splinePoints);
 	for(var i = 0; i < splinePoints.length; i++) {
 		addPoint(splinePoints[i].x, splinePoints[i].y, splinePoints[i].z);
 	}
@@ -176,8 +176,8 @@ function addGrid() {
 function init() {
 	container = document.getElementById('viewer3d-container');
 	var width = $(container).width();
-	console.log(width);
-	console.log($(container).height());
+	//console.log(width);
+	//console.log($(container).height());
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize($(container).width(), $(container).height());
 	container.appendChild(renderer.domElement);
@@ -257,19 +257,19 @@ Ext.define('GEN.ui.three.Panel', {
 		});
 
 		Meteor.autorun(function() {
-			console.log('three-panel');
-			console.log(self);
+			//console.log('three-panel');
+			//console.log(self);
 			var current = Session.get("currentProgram");
-			console.log(current);
+			//console.log(current);
 			if(_.isUndefined(current))
 				return;
 			program = Programs.findOne(current);
-			console.log(program);
+			//console.log(program);
 			if(_.isUndefined(program))
 				return;
 			
-			console.log('ok');
-			console.log(Blockly.Generator);
+			//console.log('ok');
+			//console.log(Blockly.Generator);
 			try {
 				var code = Blockly.Generator.workspaceToCode('JavaScript');
 			} catch(err) {

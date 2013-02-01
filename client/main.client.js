@@ -3,9 +3,10 @@ Meteor.startup(function() {
 	Session.set("currentXML",'<xml></xml>')
 	
 	Ext.application({
-		name : 'HelloExt',
+		name : 'GENJS',
 		launch : function() {
 			Ext.create('Ext.container.Viewport', {
+				//title: 'genjs',
 				layout : 'border',
 				bodyBorder : false,
 				defaults : {
@@ -26,24 +27,24 @@ Meteor.startup(function() {
 						bodyPadding : 0,
 						xtype : 'blockly-panel',
 					}, {
-						split : true,
-						title : 'Programs',
-						collapsible : true,
-						region : 'west',
-						margins : '5 0 0 0',
-						width : '20%',
-						bodyPadding : 0,
-						xtype : 'programs-panel',
-						store : Ext.data.StoreManager.lookup('GEN.store.Programs'),
-					}]
-				}, {
 					title : 'Viewer',
 					region : 'east',
 					floatable : false,
 					margins : '5 0 0 0',
 					width : '50%',
 					xtype: 'three-panel'
+				}]
 				}, {
+						split : true,
+						title : 'Programs',
+						collapsible : true,
+						region : 'west',
+						margins : '5 0 0 0',
+						width : '10%',
+						bodyPadding : 0,
+						xtype : 'programs-panel',
+						store : Ext.data.StoreManager.lookup('GEN.store.Programs'),
+					}, {
 					title : 'Footer',
 					region : 'south',
 					height : 150,
