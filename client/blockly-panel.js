@@ -6,36 +6,54 @@ Ext.define('GEN.ui.blockly.Panel', {
 	defaults : {
 	},
 	xml : '<xml></xml>',
+	scale: 1,
 	alias : 'widget.blockly-panel',
 	tbar : {
 		xtype : 'toolbar',
 		itemId : 'tbar',
-		items : [/*{
-		 xtype : 'button',
-		 text : 'New',
-		 //icon: '/static/resources/images/icons/file-empty.png',
-		 //id: 'ez3d-paint-clear-button',
-		 tooltip : 'New Program'
-		 }*/]
+		items : [{
+			xtype : 'button',
+			text : 'New',
+			//icon: '/static/resources/images/icons/file-empty.png',
+			//id: 'ez3d-paint-clear-button',
+			tooltip : 'New Program'
+		}]
 	},
 	initComponent : function() {
 		var self = this;
 		this.callParent();
 		this.on({
+			'mousewheel' : {
+				element : 'el',
+				fn : this.onMouseWheel,
+				scope: this
+			},
 			'afterlayout' : {
 				fn : function() {
-
 					var w = this.body.getWidth();
 					var h = this.body.getHeight();
-					Ext.core.DomHelper.append(this.body, {
+
+					var wrapper = Ext.core.DomHelper.append(this.body, {
 						tag : 'div',
 						id : 'blockly-inner',
 						width : w,
 						height : h,
-						style : ' width: ' + w + 'px; height: ' + h + 'px;'
+						style : 'width: ' + w + 'px; height: ' + h + 'px;'
+						//style : 'overflow: hidden;'
 					});
+					/*
+					var innerSize = 5000;
+					Ext.core.DomHelper.append(wrapper, {
+						tag : 'div',
+						id : 'blockly-inner',
+						width : innerSize,
+						height : innerSize,
+						style : 'border: 1px solid black; margin-left: 0px; margin-top: 0px; width: ' + innerSize + 'px; height: ' + innerSize + 'px;'
+					});*/
+
 					Blockly.inject(document.getElementById('blockly-inner'), {
-						path : '/blockly/'
+						path : '/blockly/',
+						showToolbox : false
 					});
 					//console.log(Blockly.Toolbox.languageTree);
 					this.initLanguageMenus();
@@ -74,6 +92,10 @@ Ext.define('GEN.ui.blockly.Panel', {
 							});
 						}
 					});
+					Ext.fly(document.getElementById('blockly-inner')).setStyle('zoom', this.scale);
+					
+					//console.log(Blockly.getMainWorkspaceMetrics())
+					//Blockly.svgResize();
 				},
 				single : true
 			}
@@ -104,30 +126,32 @@ Ext.define('GEN.ui.blockly.Panel', {
 		//console.log(Blockly.Toolbox.languageTree);
 		var self = this;
 		var tbar = this.getDockedComponent('tbar');
-		_.each(_.keys(Blockly.Toolbox.languageTree), function(cat) {
+		tbar.removeAll();
+		var tree = Blockly.Toolbox.buildTree_();
+		_.each(_.keys(tree), function(cat) {
 			var catName = cat.replace('cat_', '');
 
 			var menuItems = [];
-			_.each(Blockly.Toolbox.languageTree[cat], function(op) {
+			_.each(tree[cat], function(op) {
 				//console.log(Blockly.Language[op]);
 				var menuItem = {
 					text : op,
 					listeners : {
 						'mousedown' : {
-							element: 'el',
+							element : 'el',
 							fn : function(e, item, eOpts) {
 								var eventXY = e.getXY();
 								var browserEvent = e.browserEvent;
 								tbar.getComponent(catName).menu.hide();
-								var block = new Blockly.Block(Blockly.mainWorkspace,op);
+								var block = new Blockly.Block(Blockly.mainWorkspace, op);
 								block.initSvg();
 								block.render();
-								
+
 								var blockXY = self.getBlockWindowXY(block);
 								var dx = eventXY[0] - blockXY[0];
 								var dy = eventXY[1] - blockXY[1];
-							
-								block.moveBy(dx-10,dy-10);
+								console.log(dx);
+								block.moveBy((dx / self.scale) - 10, (dy / self.scale) - 10);
 								block.onMouseDown_(browserEvent);
 							},
 						}
@@ -139,16 +163,33 @@ Ext.define('GEN.ui.blockly.Panel', {
 				xtype : 'button',
 				text : catName,
 				width : 70,
-				itemId: catName,
+				itemId : catName,
 				menu : {
-					items: menuItems,
+					items : menuItems,
 				}
 			});
 		});
 	},
-	getBlockWindowXY: function(block){
+	getBlockWindowXY : function(block) {
 		var thisXY = this.body.getXY();
 		var blockXY = Blockly.getAbsoluteXY_(block.getSvgRoot());
 		return [thisXY[0] + blockXY.x, thisXY[1] + blockXY.y]
-	}
+	},
+	onMouseWheel : function(e) {
+		return;
+		var dw = e.getWheelDelta();
+		if(dw>0){
+			this.scale /= 0.95;
+		} else {
+			this.scale *= 0.95;
+		}	
+		Blockly.scale = this.scale;
+		var t = Blockly.mainWorkspace.getCanvas().getAttribute('transform').split(' ');
+		var scale = 'scale('+ this.scale +','+ this.scale +')';
+		Blockly.mainWorkspace.getCanvas().setAttribute('transform',t[0] + ' ' + scale);
+		Blockly.mainWorkspace.getBubbleCanvas().setAttribute('transform',t[0] + ' ' + scale);
+	},
+	/*scaleToCSS: function() {
+		//(this.scale*100) + ''
+	}*/
 });
