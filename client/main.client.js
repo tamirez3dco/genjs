@@ -54,20 +54,7 @@ Meteor.startup(function() {
 					minHeight : 75,
 					maxHeight : 250,
 					//layout: 'fit
-					items: [{
-						xtype: 'panel',
-						draggable: true,
-						html: 'bpiurbpwbpbpvrpwvpwvvwfhvfpvpvfpvpvpvywivvvvvvvvvffff',
-						listeners: {
-							move: {
-								fn: function(){
-									console.log('click'); 
-									console.log(this.constrainTo);
-									console.log(this);
-								},
-							}
-						}
-					}]
+					html: ''
 				}]
 			});
 		}
