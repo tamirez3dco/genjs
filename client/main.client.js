@@ -14,7 +14,8 @@ Meteor.startup(function() {
 					split : true,
 					bodyPadding : 15
 				},
-				items : [{
+				items : [
+				{
 					bodyPadding : 0,
 					layout : 'border',
 					region : 'center',
@@ -48,12 +49,20 @@ Meteor.startup(function() {
 					xtype : 'programs-panel',
 					store : Ext.data.StoreManager.lookup('GEN.store.Programs'),
 				}, {
-					title : 'Footer',
+					title : 'Nothing yet...',
 					region : 'south',
 					height : 150,
 					minHeight : 75,
 					maxHeight : 250,
 					//layout: 'fit
+					html: ''
+				}, {
+					title : '<span style="font-size: 20px; color: rgb(127,112,205)">genjs</span>',
+					region : 'north',
+					height : 28,
+					//layout: 'fit
+					collapsible: false,
+					split: false,
 					html: ''
 				}]
 			});
