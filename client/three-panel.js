@@ -273,11 +273,11 @@ Ext.define('GEN.ui.three.Panel', {
 			try {
 				var code = Blockly.Generator.workspaceToCode('JavaScript');
 			} catch(err) {
-				console.log('bad');
+				//console.log('bad');
 				return;
 			}
-			console.log('good');
-			console.log(code);
+			//console.log('good');
+			//console.log(code);
 			if(code==self.code) 
 				return;
 			self.code = code;

@@ -22,6 +22,7 @@ Blockly.Language.point = {
 
 Blockly.Language.line = {
 	category : 'Geometry',
+	title: 'Line',
 	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
@@ -37,6 +38,7 @@ Blockly.Language.line = {
 
 Blockly.Language.pipe = {
 	category : 'Geometry',
+	title: 'Pipe',
 	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
@@ -53,6 +55,7 @@ Blockly.Language.pipe = {
 
 Blockly.Language.divideCurve = {
 	category : 'Geometry',
+	title: 'Divide Curve',
 	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
