@@ -196,8 +196,8 @@ Ext.define('GEN.ui.blockly.Panel', {
 	},
 	onWorkspaceChange : function() {
 		var newVarList = _.union(Blockly.Variables.allVariables(),['item']);
-		console.log(newVarList);
-		console.log(this.varList);
+		//console.log(newVarList);
+		//console.log(this.varList);
 		if(!_.isEqual(this.varList, newVarList)) {
 			this.varList = newVarList;
 			Ext.getCmp('Variables-menu').removeAll();

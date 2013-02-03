@@ -77,6 +77,7 @@ Blockly.Language.circle = {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Circle')
 		this.appendValueInput("radius").setCheck(Number).appendTitle("radius");
+		this.appendValueInput("origin").setCheck(String).appendTitle("origin");
 		this.setOutput(true, String);
 		//this.setPreviousStatement(true);
 		//this.setNextStatement(true);
@@ -91,7 +92,7 @@ Blockly.Language.sphere = {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Sphere')
 		this.appendValueInput("radius").setCheck(Number).appendTitle("radius");
-		this.appendValueInput("vector").setCheck(String).appendTitle("vector");
+		this.appendValueInput("origin").setCheck(String).appendTitle("origin");
 		this.setOutput(true, String);
 		//this.setPreviousStatement(true);
 		//this.setNextStatement(true);
@@ -123,7 +124,7 @@ Blockly.Language.cube = {
 		this.appendValueInput("width").setCheck(Number).appendTitle("width");
 		this.appendValueInput("height").setCheck(Number).appendTitle("height");
 		this.appendValueInput("depth").setCheck(Number).appendTitle("depth");
-		this.appendValueInput("vector").setCheck(String).appendTitle("vector");
+		this.appendValueInput("origin").setCheck(String).appendTitle("origin");
 		this.setOutput(true, String);
 		//this.setPreviousStatement(true);
 		//this.setNextStatement(true);
@@ -136,8 +137,8 @@ Blockly.JavaScript.point = function() {
 	var z = Blockly.JavaScript.valueToCode(this, 'Z', Blockly.JavaScript.ORDER_NONE) || 0;
 	if((x == null) || (y == null) || (z == null))
 		return '';
-	var code = "GEN.runner.run(GEN.geometry.point(" + x + ',' + y + ',' + z + "))";
-	//var code = GEN.addGeometry()
+	
+	var code = "GEN.runner.run(new toxi.geom.Vec3D(" + x + ',' + y + ',' + z + "))";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
@@ -170,15 +171,18 @@ Blockly.JavaScript.pipe = function() {
 
 Blockly.JavaScript.circle = function() {
 	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
-	var code = "addCircle(" + radius + ")";
+	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
+	
+	var code = "GEN.runner.run(new toxi.geom.Circle(" + origin + ',' + radius + "))";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
 Blockly.JavaScript.sphere = function() {
 	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
-	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || 'addPoint(0,0,0)';
-	if ((vector==null)||(radius==null)) return "";
-	var code = "addSphere(" + radius + ',' + vector +")";
+	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
+	if ((origin==null)||(radius==null)) return "";
+	
+	var code = "GEN.runner.run(new toxi.geom.Sphere(" + origin + ',' + radius + "))";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
@@ -194,8 +198,9 @@ Blockly.JavaScript.cube = function() {
 	var width = Blockly.JavaScript.valueToCode(this, 'width', Blockly.JavaScript.ORDER_NONE) || 10;
 	var height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_NONE) || 10;
 	var depth = Blockly.JavaScript.valueToCode(this, 'depth', Blockly.JavaScript.ORDER_NONE) || 10;
-	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || 'addPoint(0,0,0)';
-	if (vector==null) return "";
-	var code = "addSphere(" + width + ',' +  height + ',' + depth + ',' + vector +")";
+	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
+	if (origin==null) return "";
+	var code = "GEN.runner.run(new toxi.geom.AABB(" + origin + ", GEN.runner.run(new toxi.geom.Vec3D("+ width + ',' + depth + ',' +  height+"))))";
+	
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };

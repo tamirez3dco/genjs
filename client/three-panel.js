@@ -1,14 +1,12 @@
 //////////
 //MOVE
 ////////////
-
-var geoms = [];
-
-function addPoint(pX, pY, pZ) {
-	var p = new THREE.Vector3(pX, pY, pZ);
-	return p;
-}
-
+/*
+ function addPoint(pX, pY, pZ) {
+ var p = new THREE.Vector3(pX, pY, pZ);
+ return p;
+ }
+ */
 function addLine(p1, p2) {
 	var geometry = new THREE.Geometry();
 	geometry.vertices.push(p1);
@@ -139,6 +137,10 @@ Ext.define('GEN.ui.three.Panel', {
 	extend : 'Ext.panel.Panel',
 	code : '',
 	id : 'threePanel',
+	lineColor : 0xff00ff,
+	meshFaceColor : 0xff00ff,
+	meshEdgeColor : 0x000000,
+	geometries : [],
 	bodyStyle : {
 	},
 	defaults : {
@@ -151,6 +153,19 @@ Ext.define('GEN.ui.three.Panel', {
 	initComponent : function() {
 		var self = this;
 		this.callParent();
+
+		this.lineMaterial = new THREE.LineBasicMaterial({
+			color : this.lineColor,
+		});
+		this.meshMaterial = [new THREE.MeshLambertMaterial({
+			color : this.meshFaceColor,
+			opacity : 0.8,
+			transparent : true
+		}), new THREE.MeshBasicMaterial({
+			color : this.meshEdgeColor,
+			opacity : 0.5,
+			wireframe : true
+		})];
 		this.on({
 			'afterlayout' : {
 				fn : function() {
@@ -170,50 +185,45 @@ Ext.define('GEN.ui.three.Panel', {
 				single : true
 			}
 		});
-
+		this.initProgramChangeHandler();
+	},
+	afterInitialLayout: function() {
+	},
+	initProgramChangeHandler : function() {
+		var self = this;
 		Meteor.autorun(function() {
-			console.log('three-panel');
-			//console.log(self);
 			var current = Session.get("currentProgram");
-			//console.log(current);
 			if(_.isUndefined(current))
 				return;
 			program = Programs.findOne(current);
-			//console.log(program);
 			if(_.isUndefined(program))
 				return;
 
-			console.log('ok');
-			//console.log(Blockly.Generator);
 			try {
 				var code = Blockly.Generator.workspaceToCode('JavaScript');
 			} catch(err) {
-				//console.log('bad');
 				return;
 			}
-			//console.log('good');
-			console.log(code);
+
 			if(code == self.code)
 				return;
 			self.code = code;
-			GEN.runner.removeAll();
-			
-			//resetScene();
-			try {
-				//code="console.log(self); " + code;
-				eval(code);
-			} catch (e) {
-				// A boolean is thrown for normal termination.
-				// Abnormal termination is a user error.
-				if( typeof e != 'boolean') {
-					//alert(e);
-				}
-			}
-			console.log(GEN.runner.points);
-			self.resetParticleSystem();
-			self.addGeometries();
-			self.renderScene();
+
+			self.execCode();
 		});
+	},
+	execCode : function() {
+		console.log(this.code);
+		GEN.runner.removeAll();
+		try {
+			eval(this.code);
+		} catch (e) {
+			return;
+		}
+		this.resetScene();
+		this.resetParticleSystem();
+		this.addGeometries();
+		this.renderScene();
 	},
 	afterRender : function() {
 		this.callParent();
@@ -267,6 +277,14 @@ Ext.define('GEN.ui.three.Panel', {
 		this.camera.position.y = -200;
 		this.camera.position.z = 100;
 	},
+	initLights: function() {
+		var light1 = new THREE.PointLight(0xffffff);
+		light1.position.set(-50, -100, 100);
+		var light2 = new THREE.PointLight(0xffffff);
+		light2.position.set(50, 100, -100);
+		this.scene.add(light1);
+		this.scene.add(light2);
+	},
 	initScene : function() {
 		var w = this.body.getWidth();
 		var h = this.body.getHeight();
@@ -278,18 +296,95 @@ Ext.define('GEN.ui.three.Panel', {
 		this.scene = new THREE.Scene();
 		this.controls = new THREE.OrbitControls(this.camera, this.threeContainer);
 		this.controls.addEventListener('change', this.renderScene);
-		var light = new THREE.PointLight(0xffffff);
-		light.position.set(200, 200, 0);
-		this.scene.add(light);
+		this.initLights();
 		this.createGrid();
 		this.createAxis();
 		this.initParticleSystem();
 		console.log(requestAnimationFrame);
 		//container.addEventListener('resize', onWindowResize, false);
 	},
-	addGeometries: function(){
-		_.each(GEN.runner.points, function(p){
-			this.particleSystem.geometry.vertices.push(p);
+	resetScene : function() {
+		for(var i = 0; i < this.geometries.length; i++) {
+			this.scene.remove(this.geometries[i]);
+		}
+		this.geometries = [];
+	},
+	addToScene : function(renderable) {
+		this.scene.add(renderable);
+		this.geometries.push(renderable);
+	},
+	addLineGeometry : function(poly) {
+		var geometry = new THREE.Geometry();
+		console.log(geometry);
+		for(var i = 0; i < poly.vertices.length; i++) {
+			//console.log(circle.vertices[i])
+			//console.log(i);
+			var p = poly.vertices[i];
+			geometry.vertices.push(new THREE.Vector3(p.x, p.y, p.z));
+		}
+		//should be only for closed...
+		var p = poly.vertices[0];
+		geometry.vertices.push(new THREE.Vector3(p.x, p.y, p.z));
+
+		var line = new THREE.Line(geometry, this.lineMaterial);
+		this.addToScene(line);
+	},
+	addMeshGeometry : function(triangleMesh) {
+		console.log(triangleMesh);
+		var geometry = new THREE.Geometry();
+		var f3 = function(g, i1, i2, i3) {
+			//unlike toxiclibs, a face in three.js are indices related to the vertices array
+			g.faces.push(new THREE.Face3(i1, i2, i3));
+		};
+		var v3 = function(g, a) {
+			var threeV = new THREE.Vector3(a.x, a.y, a.z);
+			g.vertices.push(threeV);
+		};
+		var addFace = function(f) {
+			var vectors = [f.a, f.b, f.c], startIndex = geometry.vertices.length;
+			//make sure this wasnt a vertices from a previous face
+			var i = 0, len = 3;
+			for( i = 0; i < len; i++) {
+				var toxiV = vectors[i];
+				v3(geometry, toxiV);
+			}
+
+			f3(geometry, startIndex, startIndex + 1, startIndex + 2);
+		}
+		for(var j = 0, flen = triangleMesh.faces.length; j < flen; j++) {
+			addFace(triangleMesh.faces[j]);
+		}
+
+		geometry.computeCentroids();
+		geometry.computeFaceNormals();
+		geometry.computeVertexNormals();
+		
+		console.log(geometry);
+		var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial);
+		this.addToScene(mesh);
+	},
+	addGeometries : function() {
+		console.log('points');
+		_.each(GEN.runner.points, function(p) {
+			console.log(p);
+			var threeV = new THREE.Vector3(p.x, p.y, p.z);
+			this.particleSystem.geometry.vertices.push(threeV);
+		}, this);
+		console.log('geometries');
+		_.each(GEN.runner.geometries, function(g) {
+			console.log(g);
+			if( g instanceof toxi.geom.Circle || g instanceof toxi.geom.Ellipse) {
+				var poly = g.toPolygon2D(30);
+				//console.log(poly);
+				this.addLineGeometry(poly);
+			} else if( g instanceof toxi.geom.Sphere) {
+				var mesh = g.toMesh(20);
+				this.addMeshGeometry(mesh);
+			} else if( g instanceof toxi.geom.AABB) {
+				var mesh = g.toMesh();
+				this.addMeshGeometry(mesh);
+			}
+
 		}, this);
 	},
 	renderScene : function() {

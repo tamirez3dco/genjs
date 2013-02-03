@@ -2,7 +2,7 @@ Meteor.startup(function() {
 	Ext.create('GEN.store.Programs', {});
 	Session.set("currentXML", '<xml></xml>')
 	GEN.runner = new GEN.Runner();
-	GEN.geometry = new GEN.Geometry();
+	//GEN.geometry = new GEN.Geometry();
 	Ext.application({
 		name : 'GENJS',
 		launch : function() {
