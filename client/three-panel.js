@@ -135,59 +135,52 @@ function onWindowResize() {
 
 Ext.define('GEN.ui.three.Panel', {
 	extend : 'Ext.panel.Panel',
-	code : '',
+	alias : 'widget.three-panel',
 	id : 'threePanel',
 	lineColor : 0xff00ff,
 	meshFaceColor : 0xff00ff,
 	meshEdgeColor : 0x000000,
 	geometries : [],
-	bodyStyle : {
-	},
-	defaults : {
-	},
-	alias : 'widget.three-panel',
+	code : '',
+
 	tbar : {
 		xtype : 'toolbar',
 		items : []
 	},
 	initComponent : function() {
-		var self = this;
 		this.callParent();
-
-		this.lineMaterial = new THREE.LineBasicMaterial({
-			color : this.lineColor,
-		});
-		this.meshMaterial = [new THREE.MeshLambertMaterial({
-			color : this.meshFaceColor,
-			opacity : 0.8,
-			transparent : true
-		}), new THREE.MeshBasicMaterial({
-			color : this.meshEdgeColor,
-			opacity : 0.5,
-			wireframe : true
-		})];
+		this.createDefaultMaterials();
 		this.on({
 			'afterlayout' : {
-				fn : function() {
-					var w = this.body.getWidth();
-					var h = this.body.getHeight();
-					this.threeContainer = Ext.core.DomHelper.append(this.body, {
-						tag : 'div',
-						id : 'viewer3d-container',
-						width : w,
-						height : h,
-						style : ' width: ' + w + 'px; height: ' + h + 'px;'
-					});
-					this.initScene();
-					this.renderScene();
-					this.startAnimate();
-				},
-				single : true
+				fn : this.afterInitialLayout,
+				single : true,
+				scope : this
 			}
 		});
 		this.initProgramChangeHandler();
 	},
-	afterInitialLayout: function() {
+	afterInitialLayout : function() {
+		this.threeContainer = Ext.core.DomHelper.append(this.body, {
+			tag : 'div',
+			id : 'viewer3d-container',
+		});
+		this.initScene();
+		this.renderScene();
+		this.startAnimate();
+		this.on({
+			'resize' : {
+				fn : this.onResize,
+				scope : this
+			},
+		});
+	},
+	onResize : function() {
+		var w = this.body.getWidth();
+		var h = this.body.getHeight();
+		this.camera.aspect = w / h;
+		this.camera.updateProjectionMatrix();
+		this.renderer.setSize(w, h);
+		this.renderScene();
 	},
 	initProgramChangeHandler : function() {
 		var self = this;
@@ -225,9 +218,7 @@ Ext.define('GEN.ui.three.Panel', {
 		this.addGeometries();
 		this.renderScene();
 	},
-	afterRender : function() {
-		this.callParent();
-	},
+	//Scene initializations
 	createAxis : function() {
 		axis = new THREE.AxisHelper(50);
 		axis.position.set(0, 0, 0);
@@ -257,19 +248,19 @@ Ext.define('GEN.ui.three.Panel', {
 		var grid = new THREE.Line(geometry, material, THREE.LinePieces);
 		this.scene.add(grid);
 	},
-	initParticleSystem : function() {
-		var pMaterial = new THREE.ParticleBasicMaterial({
-			color : 0x00FF00,
-			size : 2
+	createDefaultMaterials : function() {
+		this.lineMaterial = new THREE.LineBasicMaterial({
+			color : this.lineColor,
 		});
-		var points = new THREE.Geometry();
-		this.particleSystem = new THREE.ParticleSystem(points, pMaterial);
-		this.scene.add(this.particleSystem);
-	},
-	resetParticleSystem : function() {
-		this.scene.remove(this.particleSystem);
-		this.initParticleSystem();
-
+		this.meshMaterial = [new THREE.MeshLambertMaterial({
+			color : this.meshFaceColor,
+			opacity : 0.8,
+			transparent : true
+		}), new THREE.MeshBasicMaterial({
+			color : this.meshEdgeColor,
+			opacity : 0.5,
+			wireframe : true
+		})];
 	},
 	initCamera : function(w, h) {
 		this.camera = new THREE.PerspectiveCamera(70, w / h, 1, 1000);
@@ -277,7 +268,7 @@ Ext.define('GEN.ui.three.Panel', {
 		this.camera.position.y = -200;
 		this.camera.position.z = 100;
 	},
-	initLights: function() {
+	initLights : function() {
 		var light1 = new THREE.PointLight(0xffffff);
 		light1.position.set(-50, -100, 100);
 		var light2 = new THREE.PointLight(0xffffff);
@@ -300,8 +291,20 @@ Ext.define('GEN.ui.three.Panel', {
 		this.createGrid();
 		this.createAxis();
 		this.initParticleSystem();
-		console.log(requestAnimationFrame);
-		//container.addEventListener('resize', onWindowResize, false);
+	},
+	initParticleSystem : function() {
+		var pMaterial = new THREE.ParticleBasicMaterial({
+			color : 0x00FF00,
+			size : 2
+		});
+		var points = new THREE.Geometry();
+		this.particleSystem = new THREE.ParticleSystem(points, pMaterial);
+		this.scene.add(this.particleSystem);
+	},
+	resetParticleSystem : function() {
+		this.scene.remove(this.particleSystem);
+		this.initParticleSystem();
+
 	},
 	resetScene : function() {
 		for(var i = 0; i < this.geometries.length; i++) {
@@ -358,7 +361,7 @@ Ext.define('GEN.ui.three.Panel', {
 		geometry.computeCentroids();
 		geometry.computeFaceNormals();
 		geometry.computeVertexNormals();
-		
+
 		console.log(geometry);
 		var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial);
 		this.addToScene(mesh);
