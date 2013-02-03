@@ -160,6 +160,23 @@ Ext.define('GEN.ui.three.Panel', {
 		this.initProgramChangeHandler();
 	},
 	afterInitialLayout : function() {
+		//GEN.runner.chain((GEN.runner.run((GEN.runner.run(new toxi.geom.Sphere(GEN.runner.run(new toxi.geom.Vec3D(0,0,0)),10))).toMesh(20))).toWEMesh() , 'subdivide', [new toxi.geom.mesh.subdiv.MidpointSubdivision(), 0.2]);
+		//console.log(toxi.geom);
+		//var strategy = new toxi.geom.mesh.subdiv.MidpointSubdivision();
+		//console.log(strategy);
+		//GEN.runner.chain(GEN.runner.run(new toxi.geom.Sphere(new toxi.geom.Vec3D(0,0,0), 10)).toMesh(20))).toWEMesh())), 'subdivide',[new toxi.geom.mesh.subdiv.MidpointSubdivision()]
+		//var sph = new toxi.geom.Sphere(new toxi.geom.Vec3D(0,0,0), 10);
+		//console.log(sph);
+		//var wemesh = sph.toMesh(20).toWEMesh();
+		//console.log(wemesh);
+		//var strat = new toxi.geom.mesh.subdiv.MidpointSubdivision();
+		//console.log(strat);
+		//console.log(_.chain(wemesh));
+		//var res = wemesh.subdivide(strat,0.2);
+		//var res = wemesh.subdivide.apply(wemesh, [strat,0.2]);
+		//console.log(res);
+		//console.log(wemesh);
+		
 		this.threeContainer = Ext.core.DomHelper.append(this.body, {
 			tag : 'div',
 			id : 'viewer3d-container',
@@ -333,7 +350,7 @@ Ext.define('GEN.ui.three.Panel', {
 		this.addToScene(line);
 	},
 	addMeshGeometry : function(triangleMesh) {
-		console.log(triangleMesh);
+		//console.log(triangleMesh);
 		var geometry = new THREE.Geometry();
 		var f3 = function(g, i1, i2, i3) {
 			//unlike toxiclibs, a face in three.js are indices related to the vertices array
@@ -362,7 +379,7 @@ Ext.define('GEN.ui.three.Panel', {
 		geometry.computeFaceNormals();
 		geometry.computeVertexNormals();
 
-		console.log(geometry);
+		//console.log(geometry);
 		var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial);
 		this.addToScene(mesh);
 	},
@@ -386,6 +403,8 @@ Ext.define('GEN.ui.three.Panel', {
 			} else if( g instanceof toxi.geom.AABB) {
 				var mesh = g.toMesh();
 				this.addMeshGeometry(mesh);
+			} else if( g instanceof toxi.geom.mesh.TriangleMesh || g instanceof toxi.geom.mesh.WETriangleMesh ) {
+				this.addMeshGeometry(g);
 			}
 
 		}, this);

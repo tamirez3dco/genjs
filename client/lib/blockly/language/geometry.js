@@ -22,7 +22,7 @@ Blockly.Language.point = {
 
 Blockly.Language.line = {
 	category : 'Geometry',
-	title: 'Line',
+	title : 'Line',
 	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
@@ -38,7 +38,7 @@ Blockly.Language.line = {
 
 Blockly.Language.pipe = {
 	category : 'Geometry',
-	title: 'Pipe',
+	title : 'Pipe',
 	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
@@ -55,7 +55,7 @@ Blockly.Language.pipe = {
 
 Blockly.Language.divideCurve = {
 	category : 'Geometry',
-	title: 'Divide Curve',
+	title : 'Divide Curve',
 	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
@@ -71,7 +71,7 @@ Blockly.Language.divideCurve = {
 
 Blockly.Language.circle = {
 	category : 'Geometry',
-	title: 'Circle',
+	title : 'Circle',
 	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
@@ -131,13 +131,50 @@ Blockly.Language.cube = {
 		this.setTooltip('Returns a sphere');
 	}
 };
+Blockly.Language.geometry_mesh_fromsurface = {
+	category : 'Geometry',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('Mesh Surface');
+		this.setOutput(true, String);
+		this.appendValueInput('surface').setCheck(String).appendTitle("surface");
+	}
+};
+Blockly.Language.geometry_mesh_subdivide = {
+	category : 'Geometry',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('Subdivide');
+		this.appendDummyInput().appendTitle(new Blockly.FieldDropdown(this.STRATEGIES), 'STRATEGY');
+		this.setOutput(true, String);
+		this.appendValueInput('mesh').setCheck(String).appendTitle("mesh");
+	}
+};
+Blockly.Language.geometry_mesh_subdivide.STRATEGIES = [['Midpoint', 'Midpoint'], ['Dual', 'Dual']];
+/*
+Blockly.Language.math_arithmetic.OPERATORS =
+[['+', 'ADD'],
+['-', 'MINUS'],
+['\u00D7', 'MULTIPLY'],
+['\u00F7', 'DIVIDE'],
+['^', 'POWER']];
+
+Blockly.Language.math_arithmetic.TOOLTIPS = {
+ADD: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_ADD,
+MINUS: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_MINUS,
+MULTIPLY: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_MULTIPLY,
+DIVIDE: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_DIVIDE,
+POWER: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_POWER
+};
+*/
+///Generators
 Blockly.JavaScript.point = function() {
 	var x = Blockly.JavaScript.valueToCode(this, 'X', Blockly.JavaScript.ORDER_NONE) || 0;
 	var y = Blockly.JavaScript.valueToCode(this, 'Y', Blockly.JavaScript.ORDER_NONE) || 0;
 	var z = Blockly.JavaScript.valueToCode(this, 'Z', Blockly.JavaScript.ORDER_NONE) || 0;
 	if((x == null) || (y == null) || (z == null))
 		return '';
-	
+
 	var code = "GEN.runner.run(new toxi.geom.Vec3D(" + x + ',' + y + ',' + z + "))";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
@@ -172,7 +209,7 @@ Blockly.JavaScript.pipe = function() {
 Blockly.JavaScript.circle = function() {
 	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
 	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
-	
+
 	var code = "GEN.runner.run(new toxi.geom.Circle(" + origin + ',' + radius + "))";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
@@ -180,8 +217,9 @@ Blockly.JavaScript.circle = function() {
 Blockly.JavaScript.sphere = function() {
 	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
 	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
-	if ((origin==null)||(radius==null)) return "";
-	
+	if((origin == null) || (radius == null))
+		return "";
+
 	var code = "GEN.runner.run(new toxi.geom.Sphere(" + origin + ',' + radius + "))";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
@@ -189,8 +227,9 @@ Blockly.JavaScript.sphere = function() {
 Blockly.JavaScript.move = function() {
 	var geometry = Blockly.JavaScript.valueToCode(this, 'geometry', Blockly.JavaScript.ORDER_NONE) || null;
 	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || 'addPoint(0,0,0)';
-	if ((geometry==null)) return "";
-	var code = "moveGeometry(" + geometry + ',' + vector +")";
+	if((geometry == null))
+		return "";
+	var code = "moveGeometry(" + geometry + ',' + vector + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
@@ -199,8 +238,32 @@ Blockly.JavaScript.cube = function() {
 	var height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_NONE) || 10;
 	var depth = Blockly.JavaScript.valueToCode(this, 'depth', Blockly.JavaScript.ORDER_NONE) || 10;
 	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
-	if (origin==null) return "";
-	var code = "GEN.runner.run(new toxi.geom.AABB(" + origin + ", GEN.runner.run(new toxi.geom.Vec3D("+ width + ',' + depth + ',' +  height+"))))";
-	
+	if(origin == null)
+		return "";
+	var code = "GEN.runner.run(new toxi.geom.AABB(" + origin + ", GEN.runner.run(new toxi.geom.Vec3D(" + width + ',' + depth + ',' + height + "))))";
+
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
+Blockly.JavaScript.geometry_mesh_fromsurface = function() {
+	var surface = Blockly.JavaScript.valueToCode(this, 'surface', Blockly.JavaScript.ORDER_NONE) || null;
+	if(surface == null)
+		return "";
+	var code = "GEN.runner.run("+ surface + ".toMesh(20))";
+	console.log(code);
+	return [code, Blockly.JavaScript.ORDER_NONE];
+}
+
+Blockly.JavaScript.geometry_mesh_subdivide = function() {
+	var mesh = Blockly.JavaScript.valueToCode(this, 'mesh', Blockly.JavaScript.ORDER_NONE) || null;
+	var strategy = this.getTitleValue('STRATEGY');
+	console.log('kkk');
+	console.log(mesh);
+	if(mesh == null)
+		return "";
+	var code = "GEN.runner.chain("+ mesh + ".toWEMesh() , 'subdivide', [new toxi.geom.mesh.subdiv.MidpointSubdivision(), 0.2])";
+	console.log('code');
+	console.log(code);
+	return [code, Blockly.JavaScript.ORDER_NONE];
+}
+
+
