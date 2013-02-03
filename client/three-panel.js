@@ -1,27 +1,11 @@
 //////////
 //MOVE
 ////////////
-var camera, scene, renderer;
-var WIDTH = 400, HEIGHT = 600;
-var container;
-var particleSystem;
-var geoms = [];
 
-function initParticleSystem() {
-	var pMaterial = new THREE.ParticleBasicMaterial({
-		color : 0x00FF00,
-		size : 2
-	});
-	var points = new THREE.Geometry();
-	particleSystem = new THREE.ParticleSystem(points, pMaterial);
-	scene.add(particleSystem);
-}
+var geoms = [];
 
 function addPoint(pX, pY, pZ) {
 	var p = new THREE.Vector3(pX, pY, pZ);
-	//console.log(p);
-	particleSystem.geometry.vertices.push(p);
-	particleSystem.geometry.__dirtyVertices = true;
 	return p;
 }
 
@@ -100,8 +84,7 @@ function move(geometry, translation) {
 
 function moveGeometry(geometry, translation) {
 	var ng = new THREE.Geometry();
-	THREE.GeometryUtils.merge(ng, geometry)
-	//console.log(ng);
+	THREE.GeometryUtils.merge(ng, geometry);
 	move(ng, translation)
 	addMeshGeometry(ng, 0xff00ff);
 	return ng;
@@ -140,66 +123,6 @@ function resetScene() {
 	geoms = [];
 }
 
-function resetParticleSystem() {
-	scene.remove(particleSystem);
-	initParticleSystem();
-	//particleSystem.geometry.vertices = [];
-	//particleSystem.geometry.__dirtyVertices = true;
-	//render();
-}
-
-function addGrid() {
-	var size = 200, step = 10;
-	var geometry = new THREE.Geometry();
-	var material = new THREE.LineBasicMaterial({
-		vertexColors : THREE.VertexColors
-	});
-	var color1 = new THREE.Color(0x444444), color2 = new THREE.Color(0x888888);
-
-	for(var i = -size; i <= size; i += step) {
-		geometry.vertices.push(new THREE.Vector3(-size, i, 0));
-		geometry.vertices.push(new THREE.Vector3(size, i, 0));
-
-		geometry.vertices.push(new THREE.Vector3(i, -size, 0));
-		geometry.vertices.push(new THREE.Vector3(i, size, 0));
-
-		var color = i === 0 ? color1 : color2;
-
-		geometry.colors.push(color, color, color, color);
-
-	}
-
-	var grid = new THREE.Line(geometry, material, THREE.LinePieces);
-	scene.add(grid);
-}
-
-function init() {
-	container = document.getElementById('viewer3d-container');
-	var width = $(container).width();
-	//console.log(width);
-	//console.log($(container).height());
-	renderer = new THREE.WebGLRenderer();
-	renderer.setSize($(container).width(), $(container).height());
-	container.appendChild(renderer.domElement);
-	camera = new THREE.PerspectiveCamera(70, $(container).width() / $(container).height(), 1, 1000);
-	camera.position.z = 100;
-	camera.position.y = -200;
-	camera.position.x = 10;
-	scene = new THREE.Scene();
-	controls = new THREE.OrbitControls(camera, container);
-	controls.addEventListener('change', render);
-	var light = new THREE.PointLight(0xffffff);
-	light.position.set(200, 200, 0);
-	scene.add(light);
-	addGrid();
-	object = new THREE.AxisHelper(50);
-	object.position.set(0, 0, 0);
-	scene.add(object);
-
-	initParticleSystem();
-	container.addEventListener('resize', onWindowResize, false);
-}
-
 function onWindowResize() {
 	camera.aspect = $(container).width() / $(container).height();
 	camera.updateProjectionMatrix();
@@ -208,22 +131,14 @@ function onWindowResize() {
 
 }
 
-function animate() {
-	requestAnimationFrame(animate);
-	controls.update();
-}
-
-function render() {
-	renderer.render(scene, camera);
-}
-
 //////////////////
 //Till here
 //////////////////
 
 Ext.define('GEN.ui.three.Panel', {
 	extend : 'Ext.panel.Panel',
-	code: '',
+	code : '',
+	id : 'threePanel',
 	bodyStyle : {
 	},
 	defaults : {
@@ -241,23 +156,23 @@ Ext.define('GEN.ui.three.Panel', {
 				fn : function() {
 					var w = this.body.getWidth();
 					var h = this.body.getHeight();
-					Ext.core.DomHelper.append(this.body, {
+					this.threeContainer = Ext.core.DomHelper.append(this.body, {
 						tag : 'div',
 						id : 'viewer3d-container',
 						width : w,
 						height : h,
 						style : ' width: ' + w + 'px; height: ' + h + 'px;'
 					});
-					init();
-					render();
-					animate();
+					this.initScene();
+					this.renderScene();
+					this.startAnimate();
 				},
 				single : true
 			}
 		});
 
 		Meteor.autorun(function() {
-			//console.log('three-panel');
+			console.log('three-panel');
 			//console.log(self);
 			var current = Session.get("currentProgram");
 			//console.log(current);
@@ -267,8 +182,8 @@ Ext.define('GEN.ui.three.Panel', {
 			//console.log(program);
 			if(_.isUndefined(program))
 				return;
-			
-			//console.log('ok');
+
+			console.log('ok');
 			//console.log(Blockly.Generator);
 			try {
 				var code = Blockly.Generator.workspaceToCode('JavaScript');
@@ -277,14 +192,15 @@ Ext.define('GEN.ui.three.Panel', {
 				return;
 			}
 			//console.log('good');
-			//console.log(code);
-			if(code==self.code) 
+			console.log(code);
+			if(code == self.code)
 				return;
 			self.code = code;
+			GEN.runner.removeAll();
 			
-			resetParticleSystem();
-			resetScene();
+			//resetScene();
 			try {
+				//code="console.log(self); " + code;
 				eval(code);
 			} catch (e) {
 				// A boolean is thrown for normal termination.
@@ -293,10 +209,100 @@ Ext.define('GEN.ui.three.Panel', {
 					//alert(e);
 				}
 			}
-			render();
+			console.log(GEN.runner.points);
+			self.resetParticleSystem();
+			self.addGeometries();
+			self.renderScene();
 		});
 	},
 	afterRender : function() {
 		this.callParent();
+	},
+	createAxis : function() {
+		axis = new THREE.AxisHelper(50);
+		axis.position.set(0, 0, 0);
+		this.scene.add(axis);
+	},
+	createGrid : function() {
+		var size = 200, step = 10;
+		var geometry = new THREE.Geometry();
+		var material = new THREE.LineBasicMaterial({
+			vertexColors : THREE.VertexColors
+		});
+		var color1 = new THREE.Color(0x444444), color2 = new THREE.Color(0x888888);
+
+		for(var i = -size; i <= size; i += step) {
+			geometry.vertices.push(new THREE.Vector3(-size, i, 0));
+			geometry.vertices.push(new THREE.Vector3(size, i, 0));
+
+			geometry.vertices.push(new THREE.Vector3(i, -size, 0));
+			geometry.vertices.push(new THREE.Vector3(i, size, 0));
+
+			var color = i === 0 ? color1 : color2;
+
+			geometry.colors.push(color, color, color, color);
+
+		}
+
+		var grid = new THREE.Line(geometry, material, THREE.LinePieces);
+		this.scene.add(grid);
+	},
+	initParticleSystem : function() {
+		var pMaterial = new THREE.ParticleBasicMaterial({
+			color : 0x00FF00,
+			size : 2
+		});
+		var points = new THREE.Geometry();
+		this.particleSystem = new THREE.ParticleSystem(points, pMaterial);
+		this.scene.add(this.particleSystem);
+	},
+	resetParticleSystem : function() {
+		this.scene.remove(this.particleSystem);
+		this.initParticleSystem();
+
+	},
+	initCamera : function(w, h) {
+		this.camera = new THREE.PerspectiveCamera(70, w / h, 1, 1000);
+		this.camera.position.x = 10;
+		this.camera.position.y = -200;
+		this.camera.position.z = 100;
+	},
+	initScene : function() {
+		var w = this.body.getWidth();
+		var h = this.body.getHeight();
+		this.renderer = new THREE.WebGLRenderer();
+		this.renderer.setSize(w, h);
+		this.threeContainer.appendChild(this.renderer.domElement);
+		this.initCamera(w, h)
+
+		this.scene = new THREE.Scene();
+		this.controls = new THREE.OrbitControls(this.camera, this.threeContainer);
+		this.controls.addEventListener('change', this.renderScene);
+		var light = new THREE.PointLight(0xffffff);
+		light.position.set(200, 200, 0);
+		this.scene.add(light);
+		this.createGrid();
+		this.createAxis();
+		this.initParticleSystem();
+		console.log(requestAnimationFrame);
+		//container.addEventListener('resize', onWindowResize, false);
+	},
+	addGeometries: function(){
+		_.each(GEN.runner.points, function(p){
+			this.particleSystem.geometry.vertices.push(p);
+		}, this);
+	},
+	renderScene : function() {
+		//console.log('lll');
+		var self = Ext.getCmp('threePanel');
+		self.renderer.render(self.scene, self.camera);
+	},
+	startAnimate : function() {
+		var self = this;
+		var animate = function() {
+			requestAnimationFrame(animate);
+			self.controls.update();
+		};
+		animate();
 	}
 });

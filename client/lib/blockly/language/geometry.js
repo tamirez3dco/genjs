@@ -136,7 +136,8 @@ Blockly.JavaScript.point = function() {
 	var z = Blockly.JavaScript.valueToCode(this, 'Z', Blockly.JavaScript.ORDER_NONE) || 0;
 	if((x == null) || (y == null) || (z == null))
 		return '';
-	var code = "addPoint(" + x + ',' + y + ',' + z + ")";
+	var code = "GEN.runner.run(GEN.geometry.point(" + x + ',' + y + ',' + z + "))";
+	//var code = GEN.addGeometry()
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 

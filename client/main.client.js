@@ -1,10 +1,12 @@
 Meteor.startup(function() {
 	Ext.create('GEN.store.Programs', {});
 	Session.set("currentXML", '<xml></xml>')
-
+	GEN.runner = new GEN.Runner();
+	GEN.geometry = new GEN.Geometry();
 	Ext.application({
 		name : 'GENJS',
 		launch : function() {
+			//var GEN.
 			Ext.create('Ext.container.Viewport', {
 				//title: 'genjs',
 				layout : 'border',
@@ -20,6 +22,8 @@ Meteor.startup(function() {
 					layout : 'border',
 					region : 'center',
 					collapsible : false,
+					frame:false,
+					border:false,
 					items : [{
 						title : 'Editor',
 						//collapsible : true,
@@ -57,13 +61,21 @@ Meteor.startup(function() {
 					//layout: 'fit
 					html: ''
 				}, {
-					title : '<span style="font-size: 20px; color: rgb(127,112,205)">genjs</span>',
+					title : '<div style="float: left;"><span style="font-size: 20px; color: rgb(127,112,205)">genjs</span></div>',
 					region : 'north',
 					height : 28,
 					//layout: 'fit
 					collapsible: false,
 					split: false,
-					html: ''
+					html: '',
+					listeners: {
+						/*'afterrender': {
+							fn: function(){
+								var el = document.getElementById('sign-in-div');
+								el.appendChild()
+							}
+						}*/
+					}
 				}]
 			});
 		}
