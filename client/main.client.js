@@ -31,6 +31,7 @@ Meteor.startup(function() {
 						region : 'center',
 						margins : '5 0 0 0',
 						bodyPadding : 0,
+						width : '50%',
 						xtype : 'blockly-panel',
 					}, {
 						title : 'Viewer',

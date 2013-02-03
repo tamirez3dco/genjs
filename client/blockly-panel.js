@@ -55,22 +55,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		this.callParent();
 	},
 	onInitialLayout : function() {
-		var w = this.body.getWidth();
-		var h = this.body.getHeight();
-
-		var wrapper = Ext.core.DomHelper.append(this.body, {
-			tag : 'div',
-			id : 'blockly-inner',
-			width : w,
-			height : h,
-			style : 'width: ' + w + 'px; height: ' + h + 'px;'
-		});
-
-		Blockly.inject(wrapper, {
-			path : '/blockly/',
-			showToolbox : false
-		});
-
+		this.injectBlockly();
 		this.initLanguageMenus();
 		Ext.fly(document.getElementById('blockly-inner')).on('blocklyWorkspaceChange', function() {
 			this.onWorkspaceChange();
@@ -79,16 +64,38 @@ Ext.define('GEN.ui.blockly.Panel', {
 
 		this.on({
 			'resize' : {
-				fn : function() {
-					Blockly.svgResize();
-				}
+				fn : this.onResize
 			}
 		});
+	},
+	injectBlockly : function() {
+		var w = this.body.getWidth();
+		var h = this.body.getHeight();
+
+		this.blocklyWrapper = Ext.core.DomHelper.append(this.body, {
+			tag : 'div',
+			id : 'blockly-inner',
+			width : w,
+			height : h,
+			style : 'width: ' + w + 'px; height: ' + h + 'px;'
+		});
+
+		Blockly.inject(this.blocklyWrapper, {
+			path : '/blockly/',
+			showToolbox : false
+		});
+		
+
+	},
+	onResize:function(){
+		this.body.dom.removeChild(this.blocklyWrapper);
+		this.injectBlockly();
+		Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, Blockly.Xml.textToDom(this.xml));
 	},
 	initLanguageMenus : function() {
 		this.languageToolbar.removeAll();
 		var menuList = [];
-		
+
 		menuList.push(this.buildCategoryMenu('Variables', this.variablesMenu()));
 
 		var tree = Blockly.Toolbox.buildTree_();
@@ -115,7 +122,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 	variablesMenu : function() {
 		var tbar = this.languageToolbar;
 		var variablesCatName = "Variables";
-		var menuItems = [];	
+		var menuItems = [];
 
 		_.each(this.varList, function(name) {
 			var setHandler = this.blockFactory(variablesCatName, 'variables_set', tbar, function(block) {
@@ -195,7 +202,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		Blockly.mainWorkspace.getBubbleCanvas().setAttribute('transform', t[0] + ' ' + scale);
 	},
 	onWorkspaceChange : function() {
-		var newVarList = _.union(Blockly.Variables.allVariables(),['item']);
+		var newVarList = _.union(Blockly.Variables.allVariables(), ['item']);
 		//console.log(newVarList);
 		//console.log(this.varList);
 		if(!_.isEqual(this.varList, newVarList)) {
