@@ -6,7 +6,7 @@ Blockly.JavaScript = Blockly.Generator.get('JavaScript');
 
 Blockly.Language.point = {
 	category : 'Geometry',
-	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
+	title : 'Point',
 	init : function() {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Point')
@@ -14,8 +14,6 @@ Blockly.Language.point = {
 		this.appendValueInput("Y").setCheck(Number).appendTitle("Y");
 		this.appendValueInput("Z").setCheck(Number).appendTitle("Z");
 		this.setOutput(true, String);
-		//this.setPreviousStatement(true);
-		//this.setNextStatement(true);
 		this.setTooltip('Returns a point');
 	}
 };
@@ -23,15 +21,12 @@ Blockly.Language.point = {
 Blockly.Language.line = {
 	category : 'Geometry',
 	title : 'Line',
-	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Line')
 		this.appendValueInput("P1").setCheck(String).appendTitle("P1");
 		this.appendValueInput("P2").setCheck(String).appendTitle("P2");
 		this.setOutput(true, String);
-		//this.setPreviousStatement(true);
-		//this.setNextStatement(true);
 		this.setTooltip('Returns a line');
 	}
 };
@@ -39,7 +34,6 @@ Blockly.Language.line = {
 Blockly.Language.pipe = {
 	category : 'Geometry',
 	title : 'Pipe',
-	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Pipe')
@@ -47,8 +41,6 @@ Blockly.Language.pipe = {
 		this.appendValueInput("radius").setCheck(Number).appendTitle("radius");
 		this.appendValueInput("sides").setCheck(Number).appendTitle("sides");
 		this.setOutput(true, String);
-		//this.setPreviousStatement(true);
-		//this.setNextStatement(true);
 		this.setTooltip('Returns a pipe');
 	}
 };
@@ -56,15 +48,12 @@ Blockly.Language.pipe = {
 Blockly.Language.divideCurve = {
 	category : 'Geometry',
 	title : 'Divide Curve',
-	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Divide curve')
 		this.appendValueInput("curve").setCheck(String).appendTitle("curve");
 		this.appendValueInput("segments").setCheck(Number).appendTitle("segments");
 		this.setOutput(true, Array);
-		//this.setPreviousStatement(true);
-		//this.setNextStatement(true);
 		this.setTooltip('Divides a curve to n segments');
 	}
 };
@@ -72,52 +61,45 @@ Blockly.Language.divideCurve = {
 Blockly.Language.circle = {
 	category : 'Geometry',
 	title : 'Circle',
-	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
 	init : function() {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Circle')
 		this.appendValueInput("radius").setCheck(Number).appendTitle("radius");
 		this.appendValueInput("origin").setCheck(String).appendTitle("origin");
 		this.setOutput(true, String);
-		//this.setPreviousStatement(true);
-		//this.setNextStatement(true);
 		this.setTooltip('Returns a circle');
 	}
 };
 
 Blockly.Language.sphere = {
 	category : 'Geometry',
-	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
+	title : 'Sphere',
 	init : function() {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Sphere')
 		this.appendValueInput("radius").setCheck(Number).appendTitle("radius");
 		this.appendValueInput("origin").setCheck(String).appendTitle("origin");
 		this.setOutput(true, String);
-		//this.setPreviousStatement(true);
-		//this.setNextStatement(true);
 		this.setTooltip('Returns a sphere');
 	}
 };
 
 Blockly.Language.move = {
 	category : 'Geometry',
-	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
+	title : 'Move',
 	init : function() {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Move')
 		this.appendValueInput("geometry").setCheck(String).appendTitle("geometry");
 		this.appendValueInput("vector").setCheck(String).appendTitle("vector");
 		this.setOutput(true, String);
-		//this.setPreviousStatement(true);
-		//this.setNextStatement(true);
 		this.setTooltip('Moves a geometry');
 	}
 };
 
 Blockly.Language.cube = {
 	category : 'Geometry',
-	//helpUrl: 'http://www.w3schools.com/jsref/jsref_length_string.asp',
+	title : 'Cube',
 	init : function() {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Cube')
@@ -126,13 +108,12 @@ Blockly.Language.cube = {
 		this.appendValueInput("depth").setCheck(Number).appendTitle("depth");
 		this.appendValueInput("origin").setCheck(String).appendTitle("origin");
 		this.setOutput(true, String);
-		//this.setPreviousStatement(true);
-		//this.setNextStatement(true);
-		this.setTooltip('Returns a sphere');
+		this.setTooltip('Returns a cube');
 	}
 };
 Blockly.Language.geometry_mesh_fromsurface = {
 	category : 'Geometry',
+	title : 'Mesh Surface',
 	init : function() {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Mesh Surface');
@@ -142,6 +123,7 @@ Blockly.Language.geometry_mesh_fromsurface = {
 };
 Blockly.Language.geometry_mesh_subdivide = {
 	category : 'Geometry',
+	title : 'Subdivide Mesh',
 	init : function() {
 		this.setColour(160);
 		this.appendDummyInput().appendTitle('Subdivide');
@@ -150,7 +132,7 @@ Blockly.Language.geometry_mesh_subdivide = {
 		this.appendValueInput('mesh').setCheck(String).appendTitle("mesh");
 	}
 };
-Blockly.Language.geometry_mesh_subdivide.STRATEGIES = [['Midpoint', 'Midpoint'], ['Dual', 'Dual']];
+Blockly.Language.geometry_mesh_subdivide.STRATEGIES = [['Midpoint', 'Midpoint'], ['Dual', 'Dual'],['Tri','Tri']];
 /*
 Blockly.Language.math_arithmetic.OPERATORS =
 [['+', 'ADD'],
@@ -226,10 +208,13 @@ Blockly.JavaScript.sphere = function() {
 
 Blockly.JavaScript.move = function() {
 	var geometry = Blockly.JavaScript.valueToCode(this, 'geometry', Blockly.JavaScript.ORDER_NONE) || null;
-	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || 'addPoint(0,0,0)';
+	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
 	if((geometry == null))
 		return "";
-	var code = "moveGeometry(" + geometry + ',' + vector + ")";
+	//console.log(geometry);
+	//var code = "moveGeometry(" + geometry + ',' + vector + ")";
+	//var code = "GEN.runner.run(" + geometry + ".getTranslated(" + vector + "))";
+	var code = "GEN.runner.chain(" + geometry + ", 'translate',[" + vector + "])";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
@@ -249,20 +234,20 @@ Blockly.JavaScript.geometry_mesh_fromsurface = function() {
 	if(surface == null)
 		return "";
 	var code = "GEN.runner.run("+ surface + ".toMesh(20))";
-	console.log(code);
+	//console.log(code);
 	return [code, Blockly.JavaScript.ORDER_NONE];
 }
 
 Blockly.JavaScript.geometry_mesh_subdivide = function() {
 	var mesh = Blockly.JavaScript.valueToCode(this, 'mesh', Blockly.JavaScript.ORDER_NONE) || null;
 	var strategy = this.getTitleValue('STRATEGY');
-	console.log('kkk');
-	console.log(mesh);
+	//console.log('kkk');
+	//console.log(mesh);
 	if(mesh == null)
 		return "";
-	var code = "GEN.runner.chain("+ mesh + ".toWEMesh() , 'subdivide', [new toxi.geom.mesh.subdiv.MidpointSubdivision(), 0.2])";
-	console.log('code');
-	console.log(code);
+	var code = "GEN.runner.chain("+ mesh + ".toWEMesh() , 'subdivide', [new toxi.geom.mesh.subdiv."+strategy+"Subdivision(), 0.5])";
+	//console.log('code');
+	//console.log(code);
 	return [code, Blockly.JavaScript.ORDER_NONE];
 }
 

@@ -1,4 +1,7 @@
 GEN = {};
+
+
+//TODO: All this is no good..
 GEN.Runner = function() {
 	this.points = [];
 	this.geometries = [];
