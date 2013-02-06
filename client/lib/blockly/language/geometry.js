@@ -18,6 +18,7 @@ Blockly.Language.point = {
 	}
 };
 
+/* Re implement this
 Blockly.Language.line = {
 	category : 'Geometry',
 	title : 'Line',
@@ -57,7 +58,7 @@ Blockly.Language.divideCurve = {
 		this.setTooltip('Divides a curve to n segments');
 	}
 };
-
+*/
 Blockly.Language.circle = {
 	category : 'Geometry',
 	title : 'Circle',
