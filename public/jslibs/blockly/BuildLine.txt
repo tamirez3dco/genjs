@@ -1,0 +1,1 @@
+./closure-library/closure/bin/build/closurebuilder.py --root=closure-library --root=blockly-lib --namespace="Blockly.core" --output_mode=compiled --compiler_jar=compiler.jar --output_file=../../code/genjs/client/lib/blockly/first/blockly-compressed.js
