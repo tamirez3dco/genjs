@@ -18,6 +18,29 @@ GEN.Geometry.prototype.createSphere = function(origin, radius) {
 	return c;
 };
 
+GEN.Geometry.prototype.createTextGeo = function(text, size , height) {
+	
+	var c = new THREE.TextGeometry( text, {
+
+					size: size,
+					height: height,
+					curveSegments: 4,
+
+					font: "optimer",
+
+					bevelThickness: 2,
+					bevelSize: 1.5,
+					bevelEnabled: true,
+
+					material: 0,
+					extrudeMaterial: 1
+
+				});
+	
+	return c;
+};
+
+
 GEN.Geometry.prototype.createCube = function(origin, width, depth, height) {
 	var c = new toxi.geom.AABB(origin, this.createPoint(width, depth, height));
 	return c;
