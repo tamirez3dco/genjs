@@ -85,6 +85,21 @@ Blockly.Language.sphere = {
 	}
 };
 
+Blockly.Language.TextGeo = {
+	category : 'Geometry',
+	title : 'TextGeo',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('TextGeo')
+		this.appendValueInput("size").setCheck(Number).appendTitle("size");
+		this.appendValueInput("text").setCheck(String).appendTitle("text");
+		this.appendValueInput("height").setCheck(Number).appendTitle("height");
+		this.setOutput(true, String);
+		this.setTooltip('Returns a Text Geometry');
+	}
+};
+
+
 Blockly.Language.move = {
 	category : 'Geometry',
 	title : 'Move',
@@ -226,6 +241,19 @@ Blockly.JavaScript.sphere = function() {
 	var code = "_g.createSphere(" + origin + ',' + radius + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
+
+
+Blockly.JavaScript.TextGeo = function() {
+	var size = Blockly.JavaScript.valueToCode(this, 'size', Blockly.JavaScript.ORDER_NONE) || 10;
+	var text = Blockly.JavaScript.valueToCode(this, 'text', Blockly.JavaScript.ORDER_NONE) || 'Blockly.debug.trace(\"mussa\")';
+	var height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_NONE) || 5;
+	if((size == null) || (text == null))
+		return "";
+
+	var code = "_g.createTextGeo(" + text + ',' + size + "," + height +")";
+	return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
 
 Blockly.JavaScript.move = function() {
 	var geometry = Blockly.JavaScript.valueToCode(this, 'geometry', Blockly.JavaScript.ORDER_NONE) || null;
