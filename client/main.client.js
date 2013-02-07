@@ -1,8 +1,9 @@
 Meteor.startup(function() {
 	Ext.create('GEN.store.Programs', {});
 	Session.set("currentXML", '<xml></xml>')
-	GEN.runner = new GEN.Runner();
-	//GEN.geometry = new GEN.Geometry();
+	//GEN.runner = new GEN.Runner();
+	Blockly.debug = new Blockly.Debugger();
+	_g = new GEN.Geometry();
 	Ext.application({
 		name : 'GENJS',
 		launch : function() {

@@ -29,6 +29,26 @@ goog.provide('Blockly.Generator');
 
 goog.require('Blockly.Block');
 
+Blockly.Debugger = function(){
+	this.tracedValues = [];
+};
+Blockly.Debugger.prototype.trace = function(value, blockId) {
+	console.log('trc');
+	this.tracedValues.push(value);
+	console.log(blockId);
+	if(_.isUndefined(this.tracedBlocks[blockId])) {
+		this.tracedBlocks[blockId] = [value];
+	} else {
+		this.tracedBlocks[blockId].push(value);
+	}
+	return value;
+}
+Blockly.Debugger.prototype.start = function(value) {
+	this.tracedValues = [];
+	this.tracedBlocks = {};
+}
+
+
 
 /**
  * Name space for the generator singleton.
@@ -74,6 +94,7 @@ Blockly.Generator.workspaceToCode = function(name) {
       // Value blocks return tuples of code and operator order.
       // Top-level blocks don't care about operator order.
       line = line[0];
+      line = "Blockly.debug.trace(" + line + ","+ block.id + ")";
     }
     if (line) {
       if (block.outputConnection && generator.scrubNakedValue) {
@@ -200,6 +221,9 @@ Blockly.CodeGenerator.prototype.valueToCode = function(block, name, order) {
   if (isNaN(innerOrder)) {
     throw 'Expecting valid order from value block "' + targetBlock.type + '".';
   }
+  
+  code = "Blockly.debug.trace(" + code +","+ targetBlock.id + ")";
+  
   if (code && order <= innerOrder) {
     // The operators outside this code are stonger than the operators
     // inside this code.  To prevent the code from being pulled apart,

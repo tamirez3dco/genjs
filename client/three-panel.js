@@ -72,12 +72,15 @@ Ext.define('GEN.ui.three.Panel', {
 	},
 	execCode : function() {
 		console.log(this.code);
-		GEN.runner.removeAll();
+		Blockly.debug.start();
+		//GEN.runner.removeAll();
 		try {
 			eval(this.code);
 		} catch (e) {
+			console.log(e);
 			return;
 		}
+		console.log(Blockly.debug.tracedValues);
 		this.resetScene();
 		this.resetParticleSystem();
 		this.addGeometries();
@@ -231,7 +234,7 @@ Ext.define('GEN.ui.three.Panel', {
 		var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial);
 		this.addToScene(mesh);
 	},
-	addGeometries : function() {
+	/*addGeometries : function() {
 		console.log('points');
 		_.each(GEN.runner.points, function(p) {
 			console.log(p);
@@ -256,7 +259,29 @@ Ext.define('GEN.ui.three.Panel', {
 			}
 
 		}, this);
+	},*/
+	addGeometries : function() {
+		console.log(Blockly.debug.tracedBlocks);			
+		_.each(Blockly.debug.tracedValues, function(val){
+			if( val instanceof toxi.geom.Circle || val instanceof toxi.geom.Ellipse) {
+				var poly = val.toPolygon2D(30);
+				//console.log(poly);
+				this.addLineGeometry(poly);
+			} else if( val instanceof toxi.geom.Sphere) {
+				var mesh = val.toMesh(20);
+				this.addMeshGeometry(mesh);
+			} else if( val instanceof toxi.geom.AABB) {
+				var mesh = val.toMesh();
+				this.addMeshGeometry(mesh);
+			} else if(val instanceof toxi.geom.Vec3D) {
+				var threeV = new THREE.Vector3(val.x, val.y, val.z);
+				this.particleSystem.geometry.vertices.push(threeV);
+			}		
+		},this); 
+			
+		
 	},
+	
 	renderScene : function() {
 		//console.log('lll');
 		var self = Ext.getCmp('threePanel');

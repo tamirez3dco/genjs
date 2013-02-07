@@ -151,6 +151,7 @@ POWER: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_POWER
 };
 */
 ///Generators
+/*
 Blockly.JavaScript.point = function() {
 	var x = Blockly.JavaScript.valueToCode(this, 'X', Blockly.JavaScript.ORDER_NONE) || 0;
 	var y = Blockly.JavaScript.valueToCode(this, 'Y', Blockly.JavaScript.ORDER_NONE) || 0;
@@ -161,10 +162,22 @@ Blockly.JavaScript.point = function() {
 	var code = "GEN.runner.run(new toxi.geom.Vec3D(" + x + ',' + y + ',' + z + "))";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
+*/
+
+Blockly.JavaScript.point = function() {
+	var x = Blockly.JavaScript.valueToCode(this, 'X', Blockly.JavaScript.ORDER_NONE) || 0;
+	var y = Blockly.JavaScript.valueToCode(this, 'Y', Blockly.JavaScript.ORDER_NONE) || 0;
+	var z = Blockly.JavaScript.valueToCode(this, 'Z', Blockly.JavaScript.ORDER_NONE) || 0;
+	if((x == null) || (y == null) || (z == null))
+		return '';
+
+	var code = "_g.createPoint(" + x + ',' + y + ',' + z + ")";
+	return [code, Blockly.JavaScript.ORDER_NONE];
+};
 
 Blockly.JavaScript.line = function() {
-	var p1 = Blockly.JavaScript.valueToCode(this, 'P1', Blockly.JavaScript.ORDER_NONE) || 'addPoint(0,0,0)';
-	var p2 = Blockly.JavaScript.valueToCode(this, 'P2', Blockly.JavaScript.ORDER_NONE) || 'addPoint(10,10,0)';
+	var p1 = Blockly.JavaScript.valueToCode(this, 'P1', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	var p2 = Blockly.JavaScript.valueToCode(this, 'P2', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(10,10,10)';
 	if((p1 == null) || (p2 == null))
 		return '';
 	var code = "addLine(" + p1 + ',' + p2 + ")";
@@ -191,31 +204,31 @@ Blockly.JavaScript.pipe = function() {
 
 Blockly.JavaScript.circle = function() {
 	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
+	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
 
-	var code = "GEN.runner.run(new toxi.geom.Circle(" + origin + ',' + radius + "))";
+	var code = "_g.createCircle(" + origin + ',' + radius + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
 Blockly.JavaScript.sphere = function() {
 	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
+	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
 	if((origin == null) || (radius == null))
 		return "";
 
-	var code = "GEN.runner.run(new toxi.geom.Sphere(" + origin + ',' + radius + "))";
+	var code = "_g.createSphere(" + origin + ',' + radius + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
 Blockly.JavaScript.move = function() {
 	var geometry = Blockly.JavaScript.valueToCode(this, 'geometry', Blockly.JavaScript.ORDER_NONE) || null;
-	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
+	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
 	if((geometry == null))
 		return "";
 	//console.log(geometry);
 	//var code = "moveGeometry(" + geometry + ',' + vector + ")";
 	//var code = "GEN.runner.run(" + geometry + ".getTranslated(" + vector + "))";
-	var code = "GEN.runner.chain(" + geometry + ", 'translate',[" + vector + "])";
+	var code = "_g.moveGeometry(" + geometry + "," + vector + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
@@ -223,10 +236,10 @@ Blockly.JavaScript.cube = function() {
 	var width = Blockly.JavaScript.valueToCode(this, 'width', Blockly.JavaScript.ORDER_NONE) || 10;
 	var height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_NONE) || 10;
 	var depth = Blockly.JavaScript.valueToCode(this, 'depth', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || 'GEN.runner.run(new toxi.geom.Vec3D(0,0,0))';
+	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
 	if(origin == null)
 		return "";
-	var code = "GEN.runner.run(new toxi.geom.AABB(" + origin + ", GEN.runner.run(new toxi.geom.Vec3D(" + width + ',' + depth + ',' + height + "))))";
+	var code = "_g.createCube(" + origin + ',' + width + ',' + depth + ',' + height + ")";
 
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
