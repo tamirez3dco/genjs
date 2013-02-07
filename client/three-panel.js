@@ -213,6 +213,8 @@ Ext.define('GEN.ui.three.Panel', {
 		var line = new THREE.Line(geometry, this.lineMaterial);
 		this.addToScene(line);
 	},
+	
+	
 	addMeshGeometry : function(triangleMesh) {
 		//console.log(triangleMesh);
 		var geometry = new THREE.Geometry();
@@ -290,6 +292,10 @@ Ext.define('GEN.ui.three.Panel', {
 				var threeV = new THREE.Vector3(val.x, val.y, val.z);
 				this.particleSystem.geometry.vertices.push(threeV);
 			}		
+			else if(val instanceof THREE.CubeGeometry || val instanceof THREE.TextGeometry) {
+				var mesh = THREE.SceneUtils.createMultiMaterialObject(val, this.meshMaterial);
+				this.addToScene(mesh);
+			}	
 		},this); 
 			
 		
