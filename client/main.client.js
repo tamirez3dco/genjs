@@ -1,6 +1,7 @@
 Meteor.startup(function() {
 	Ext.create('GEN.store.Programs', {});
-	Session.set("currentXML", '<xml></xml>')
+	Session.set("currentXML", '<xml></xml>');
+	Session.set("selectedBlock", -1);
 	//GEN.runner = new GEN.Runner();
 	Blockly.debug = new Blockly.Debugger();
 	_g = new GEN.Geometry();

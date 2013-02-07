@@ -112,6 +112,7 @@ Blockly.Language.cube = {
 		this.setTooltip('Returns a cube');
 	}
 };
+/*
 Blockly.Language.geometry_mesh_fromsurface = {
 	category : 'Geometry',
 	title : 'Mesh Surface',
@@ -133,7 +134,12 @@ Blockly.Language.geometry_mesh_subdivide = {
 		this.appendValueInput('mesh').setCheck(String).appendTitle("mesh");
 	}
 };
+
 Blockly.Language.geometry_mesh_subdivide.STRATEGIES = [['Midpoint', 'Midpoint'], ['Dual', 'Dual'],['Tri','Tri']];
+*/
+
+
+
 /*
 Blockly.Language.math_arithmetic.OPERATORS =
 [['+', 'ADD'],
@@ -174,7 +180,7 @@ Blockly.JavaScript.point = function() {
 	var code = "_g.createPoint(" + x + ',' + y + ',' + z + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
-
+/*
 Blockly.JavaScript.line = function() {
 	var p1 = Blockly.JavaScript.valueToCode(this, 'P1', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
 	var p2 = Blockly.JavaScript.valueToCode(this, 'P2', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(10,10,10)';
@@ -183,6 +189,7 @@ Blockly.JavaScript.line = function() {
 	var code = "addLine(" + p1 + ',' + p2 + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
+
 Blockly.JavaScript.divideCurve = function() {
 	var curve = Blockly.JavaScript.valueToCode(this, 'curve', Blockly.JavaScript.ORDER_NONE) || null;
 	var segments = Blockly.JavaScript.valueToCode(this, 'segments', Blockly.JavaScript.ORDER_NONE) || 10;
@@ -201,7 +208,7 @@ Blockly.JavaScript.pipe = function() {
 	var code = "addTube(" + curve + ',' + radius + ',' + sides + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
-
+*/
 Blockly.JavaScript.circle = function() {
 	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
 	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
@@ -243,6 +250,7 @@ Blockly.JavaScript.cube = function() {
 
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
+/*
 Blockly.JavaScript.geometry_mesh_fromsurface = function() {
 	var surface = Blockly.JavaScript.valueToCode(this, 'surface', Blockly.JavaScript.ORDER_NONE) || null;
 	if(surface == null)
@@ -264,5 +272,5 @@ Blockly.JavaScript.geometry_mesh_subdivide = function() {
 	//console.log(code);
 	return [code, Blockly.JavaScript.ORDER_NONE];
 }
-
+*/
 

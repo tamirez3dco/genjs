@@ -33,9 +33,9 @@ Blockly.Debugger = function(){
 	this.tracedValues = [];
 };
 Blockly.Debugger.prototype.trace = function(value, blockId) {
-	console.log('trc');
+	//console.log('trc');
 	this.tracedValues.push(value);
-	console.log(blockId);
+	//console.log(blockId);
 	if(_.isUndefined(this.tracedBlocks[blockId])) {
 		this.tracedBlocks[blockId] = [value];
 	} else {

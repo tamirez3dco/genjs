@@ -23,6 +23,7 @@ Ext.define('GEN.ui.three.Panel', {
 			}
 		});
 		this.initProgramChangeHandler();
+		this.initSelectionChangeHandler();
 	},
 	afterInitialLayout : function() {
 		this.threeContainer = Ext.core.DomHelper.append(this.body, {
@@ -68,6 +69,18 @@ Ext.define('GEN.ui.three.Panel', {
 			self.code = code;
 
 			self.execCode();
+		});
+	},
+	initSelectionChangeHandler : function() {
+		var self = this;
+		Meteor.autorun(function() {
+			console.log('three-panel');
+			var blockId = Session.get("selectedBlock");
+			if(blockId==-1){
+				console.log(blockId);
+			}else{
+				console.log(blockId);
+			}
 		});
 	},
 	execCode : function() {

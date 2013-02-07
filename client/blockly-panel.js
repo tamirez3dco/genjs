@@ -60,6 +60,15 @@ Ext.define('GEN.ui.blockly.Panel', {
 		Ext.fly(document.getElementById('blockly-inner')).on('blocklyWorkspaceChange', function() {
 			this.onWorkspaceChange();
 		}, this);
+		Ext.fly(document.getElementById('blockly-inner')).on('blocklySelectChange', function(a,b,c) {
+			console.log('selectionChange');
+			console.log(Blockly.selected);
+			if(_.isUndefined(Blockly.selected) || Blockly.selected==null) {
+				Session.set("selectedBlock", -1);
+			} else {
+				Session.set("selectedBlock", Blockly.selected.id);
+			}
+		}, this);
 		Ext.fly(document.getElementById('blockly-inner')).setStyle('zoom', this.scale);
 
 		this.on({
