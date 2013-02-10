@@ -226,38 +226,11 @@ Ext.define('GEN.ui.three.Panel', {
 		}, this);
 
 		this.geometries = {};
-		//this.selectedGeometries = [];
 	},
 	addToScene : function(renderable) {
 		this.scene.add(renderable);
 		this.geometries.push(renderable);
 	},
-	/*
-	 addGeometries : function() {
-	 //console.log(Blockly.debug.tracedBlocks);
-	 var values = [];
-	 if(this.renderOnlySelected == true) {
-	 if(this.selectedBlock != -1) {
-	 values = Blockly.debug.tracedBlocks[this.selectedBlock];
-	 }
-	 } else {
-	 values = Blockly.debug.tracedValues;
-	 }
-	 _.each(values, function(val) {
-	 if(val.toRenderable) {
-	 var geometry = val.toRenderable();
-	 if(val.RENDER_TYPE == "Point") {
-	 this.particleSystem.geometry.vertices.push(geometry);
-	 } else if(val.RENDER_TYPE == "Line") {
-	 var line = new THREE.Line(geometry, this.lineMaterial);
-	 this.addToScene(line);
-	 } else if(val.RENDER_TYPE == "Mesh") {
-	 var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial);
-	 this.addToScene(mesh);
-	 }
-	 }
-	 }, this);
-	 },*/
 	addGeometries : function() {
 		var blocksIds = _.keys(Blockly.debug.tracedBlocks);
 		_.each(blocksIds, function(id) {

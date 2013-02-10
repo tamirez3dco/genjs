@@ -8,6 +8,7 @@ toxi.geom.AABB.prototype.RENDER_TYPE = "Mesh";
 
 //THREE render types
 THREE.TextGeometry.prototype.RENDER_TYPE = "Mesh";
+THREE.ParametricGeometry.prototype.RENDER_TYPE = "Mesh";
 
 //Points
 toxi.geom.Vec3D.prototype.toRenderable = function() {
@@ -28,7 +29,6 @@ toxi.geom.Polygon2D.prototype.toRenderable = function() {
 toxi.geom.Circle.prototype.toRenderable = function() {
 	return this.toPolygon2D(30).toRenderable();
 }
-
 //Surfaces & Meshes
 toxi.geom.mesh.TriangleMesh.prototype.toRenderable = function() {
 	var geometry = new THREE.Geometry();
@@ -76,7 +76,9 @@ THREE.TextGeometry.prototype.toRenderable = function() {
 THREE.CubeGeometry.prototype.toRenderable = function() {
 	return this;
 }
-
+THREE.ParametricGeometry.prototype.toRenderable = function() {
+	return this;
+}
 //GEN Geometry API
 
 GEN = {};
@@ -100,9 +102,7 @@ GEN.Geometry.prototype.createSphere = function(origin, radius) {
 };
 
 GEN.Geometry.prototype.createTextGeo = function(text, size, height) {
-
 	var c = new THREE.TextGeometry(text, {
-
 		size : size,
 		height : height,
 		curveSegments : 4,
@@ -115,15 +115,18 @@ GEN.Geometry.prototype.createTextGeo = function(text, size, height) {
 
 		material : 0,
 		extrudeMaterial : 1
-
 	});
-
 	return c;
 };
 
 GEN.Geometry.prototype.createCube = function(origin, width, depth, height) {
 	var c = new toxi.geom.AABB(origin, this.createPoint(width, depth, height));
 	return c;
+};
+
+GEN.Geometry.prototype.createKlein = function(){
+	var geo = new THREE.ParametricGeometry(GEN.Geometry.Surfaces.klein, 20, 40 );
+	return geo;
 };
 
 GEN.Geometry.prototype.moveGeometry = function(geometry, translation) {
@@ -143,6 +146,25 @@ GEN.Geometry.prototype.moveGeometry = function(geometry, translation) {
 	}
 	return ng;
 };
+
+GEN.Geometry.Surfaces = {}
+
+GEN.Geometry.Surfaces.klein = function(v, u) {
+	u *= Math.PI;
+	v *= 2 * Math.PI;
+	u = u * 2;
+	var x, y, z;
+	if(u < Math.PI) {
+		x = 3 * Math.cos(u) * (1 + Math.sin(u)) + (2 * (1 - Math.cos(u) / 2)) * Math.cos(u) * Math.cos(v);
+		z = -8 * Math.sin(u) - 2 * (1 - Math.cos(u) / 2) * Math.sin(u) * Math.cos(v);
+	} else {
+		x = 3 * Math.cos(u) * (1 + Math.sin(u)) + (2 * (1 - Math.cos(u) / 2)) * Math.cos(v + Math.PI);
+		z = -8 * Math.sin(u);
+	}
+	y = -2 * (1 - Math.cos(u) / 2) * Math.sin(v);
+
+	return new THREE.Vector3(x, y, z);
+}
 /*
 GEN.Geometry.prototype.line = function(p1, p2) {
 var geometry = new THREE.Geometry();
