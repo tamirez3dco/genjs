@@ -23,7 +23,7 @@ Ext.define('GEN.ui.programs.Panel', {
 		xtype : 'actioncolumn',
 		width : 40,
 		items : [{
-			icon : 'path_to_img',
+			icon : '/img/delete.gif',
 			handler : function(grid, rowIndex, colindex) {
 				Programs.remove(grid.getStore().getAt(rowIndex).getData()._id);
 				grid.getStore().removeAt(rowIndex);

@@ -76,9 +76,9 @@ Ext.define('GEN.ui.three.Panel', {
 		Meteor.autorun(function() {
 			console.log('three-panel');
 			var blockId = Session.get("selectedBlock");
-			if(blockId==-1){
+			if(blockId == -1) {
 				console.log(blockId);
-			}else{
+			} else {
 				console.log(blockId);
 			}
 		});
@@ -197,112 +197,25 @@ Ext.define('GEN.ui.three.Panel', {
 		this.scene.add(renderable);
 		this.geometries.push(renderable);
 	},
-	addLineGeometry : function(poly) {
-		var geometry = new THREE.Geometry();
-		console.log(geometry);
-		for(var i = 0; i < poly.vertices.length; i++) {
-			//console.log(circle.vertices[i])
-			//console.log(i);
-			var p = poly.vertices[i];
-			geometry.vertices.push(new THREE.Vector3(p.x, p.y, p.z));
-		}
-		//should be only for closed...
-		var p = poly.vertices[0];
-		geometry.vertices.push(new THREE.Vector3(p.x, p.y, p.z));
 
-		var line = new THREE.Line(geometry, this.lineMaterial);
-		this.addToScene(line);
-	},
-	
-	
-	addMeshGeometry : function(triangleMesh) {
-		//console.log(triangleMesh);
-		var geometry = new THREE.Geometry();
-		var f3 = function(g, i1, i2, i3) {
-			//unlike toxiclibs, a face in three.js are indices related to the vertices array
-			g.faces.push(new THREE.Face3(i1, i2, i3));
-		};
-		var v3 = function(g, a) {
-			var threeV = new THREE.Vector3(a.x, a.y, a.z);
-			g.vertices.push(threeV);
-		};
-		var addFace = function(f) {
-			var vectors = [f.a, f.b, f.c], startIndex = geometry.vertices.length;
-			//make sure this wasnt a vertices from a previous face
-			var i = 0, len = 3;
-			for( i = 0; i < len; i++) {
-				var toxiV = vectors[i];
-				v3(geometry, toxiV);
-			}
-
-			f3(geometry, startIndex, startIndex + 1, startIndex + 2);
-		}
-		for(var j = 0, flen = triangleMesh.faces.length; j < flen; j++) {
-			addFace(triangleMesh.faces[j]);
-		}
-
-		geometry.computeCentroids();
-		geometry.computeFaceNormals();
-		geometry.computeVertexNormals();
-
-		//console.log(geometry);
-		var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial);
-		this.addToScene(mesh);
-	},
-	/*addGeometries : function() {
-		console.log('points');
-		_.each(GEN.runner.points, function(p) {
-			console.log(p);
-			var threeV = new THREE.Vector3(p.x, p.y, p.z);
-			this.particleSystem.geometry.vertices.push(threeV);
-		}, this);
-		console.log('geometries');
-		_.each(GEN.runner.geometries, function(g) {
-			console.log(g);
-			if( g instanceof toxi.geom.Circle || g instanceof toxi.geom.Ellipse) {
-				var poly = g.toPolygon2D(30);
-				//console.log(poly);
-				this.addLineGeometry(poly);
-			} else if( g instanceof toxi.geom.Sphere) {
-				var mesh = g.toMesh(20);
-				this.addMeshGeometry(mesh);
-			} else if( g instanceof toxi.geom.AABB) {
-				var mesh = g.toMesh();
-				this.addMeshGeometry(mesh);
-			} else if( g instanceof toxi.geom.mesh.TriangleMesh || g instanceof toxi.geom.mesh.WETriangleMesh ) {
-				this.addMeshGeometry(g);
-			}
-
-		}, this);
-	},*/
 	addGeometries : function() {
-		console.log(Blockly.debug.tracedBlocks);			
-		_.each(Blockly.debug.tracedValues, function(val){
-			if( val instanceof toxi.geom.Circle || val instanceof toxi.geom.Ellipse) {
-				var poly = val.toPolygon2D(30);
-				//console.log(poly);
-				this.addLineGeometry(poly);
-			} else if( val instanceof toxi.geom.Sphere) {
-				var mesh = val.toMesh(20);
-				this.addMeshGeometry(mesh);
-			} else if( val instanceof toxi.geom.AABB) {
-				var mesh = val.toMesh();
-				this.addMeshGeometry(mesh);
-			} else if(val instanceof toxi.geom.Vec3D) {
-				var threeV = new THREE.Vector3(val.x, val.y, val.z);
-				this.particleSystem.geometry.vertices.push(threeV);
-			}		
-			else if(val instanceof THREE.CubeGeometry || val instanceof THREE.TextGeometry) {
-				var mesh = THREE.SceneUtils.createMultiMaterialObject(val, this.meshMaterial);
-				this.addToScene(mesh);
-			}	
-		},this); 
-			
-		
+		console.log(Blockly.debug.tracedBlocks);
+		_.each(Blockly.debug.tracedValues, function(val) {
+			if(val.toRenderable) {
+				var geometry = val.toRenderable();
+				if(val.RENDER_TYPE == "Point") { 
+					this.particleSystem.geometry.vertices.push(geometry);
+				} else if(val.RENDER_TYPE == "Line") {
+					var line = new THREE.Line(geometry, this.lineMaterial);
+					this.addToScene(line);
+				} else if(val.RENDER_TYPE == "Mesh") {
+					var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial);
+					this.addToScene(mesh);
+				}
+			}
+		}, this);
 	},
-	
 	renderScene : function() {
-		//console.log('lll');
 		var self = Ext.getCmp('threePanel');
 		self.renderer.render(self.scene, self.camera);
 	},
@@ -316,7 +229,6 @@ Ext.define('GEN.ui.three.Panel', {
 	}
 });
 
-
 //////////
 //MOVE
 ////////////
@@ -325,126 +237,126 @@ Ext.define('GEN.ui.three.Panel', {
  var p = new THREE.Vector3(pX, pY, pZ);
  return p;
  }
- 
-function addLine(p1, p2) {
-	var geometry = new THREE.Geometry();
-	geometry.vertices.push(p1);
-	geometry.vertices.push(p2);
-	var l = new THREE.Line(geometry)
-	scene.add(l);
-	geoms.push(l);
-	var spline = new THREE.SplineCurve3([p1, p2]);
-	return spline;
-}
 
-function addLineGeometry(geometry, color) {
-	var material = new THREE.LineBasicMaterial({
-		color : color,
-	});
-	var line = new THREE.Line(geometry, material);
-	scene.add(line);
-	geoms.push(line);
-}
+ function addLine(p1, p2) {
+ var geometry = new THREE.Geometry();
+ geometry.vertices.push(p1);
+ geometry.vertices.push(p2);
+ var l = new THREE.Line(geometry)
+ scene.add(l);
+ geoms.push(l);
+ var spline = new THREE.SplineCurve3([p1, p2]);
+ return spline;
+ }
 
-function addMeshGeometry(geometry, color) {
-	tubeMesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [new THREE.MeshLambertMaterial({
-		color : color,
-		opacity : 0.8,
-		transparent : true
-	}), new THREE.MeshBasicMaterial({
-		color : 0x000000,
-		opacity : 0.5,
-		wireframe : true
-	})]);
-	scene.add(tubeMesh);
-	geoms.push(tubeMesh);
-};
+ function addLineGeometry(geometry, color) {
+ var material = new THREE.LineBasicMaterial({
+ color : color,
+ });
+ var line = new THREE.Line(geometry, material);
+ scene.add(line);
+ geoms.push(line);
+ }
 
-function addSplineGeometry(spline) {
-	var splinePoints = spline.getPoints(30);
-	var geometry = new THREE.Geometry();
-	for(var i = 0; i < splinePoints.length; i++) {
-		geometry.vertices.push(splinePoints[i]);
-	}
-	addLineGeometry(geometry, 0xff00ff);
-}
+ function addMeshGeometry(geometry, color) {
+ tubeMesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [new THREE.MeshLambertMaterial({
+ color : color,
+ opacity : 0.8,
+ transparent : true
+ }), new THREE.MeshBasicMaterial({
+ color : 0x000000,
+ opacity : 0.5,
+ wireframe : true
+ })]);
+ scene.add(tubeMesh);
+ geoms.push(tubeMesh);
+ };
 
-function addCircle(radius) {
-	var circle = new THREE.CircleGeometry(radius, 20);
-	var geometry = new THREE.Geometry();
-	for(var i = 1; i < circle.vertices.length; i++) {
-		//console.log(circle.vertices[i])
-		geometry.vertices.push(circle.vertices[i]);
-	}
-	//addLineGeometry(geometry, 0xff00ff);
-	spline = new THREE.ClosedSplineCurve3(geometry.vertices);
-	addSplineGeometry(spline);
-	return geometry;
-	return spline;
-}
+ function addSplineGeometry(spline) {
+ var splinePoints = spline.getPoints(30);
+ var geometry = new THREE.Geometry();
+ for(var i = 0; i < splinePoints.length; i++) {
+ geometry.vertices.push(splinePoints[i]);
+ }
+ addLineGeometry(geometry, 0xff00ff);
+ }
 
-function addTube(curve, radius, sides) {
-	//console.log('addTube');
-	var tube = new THREE.TubeGeometry(curve, 30, radius, sides, false, false);
-	//console.log(tube);
-	addMeshGeometry(tube, 0xff00ff);
-	return tube
-}
+ function addCircle(radius) {
+ var circle = new THREE.CircleGeometry(radius, 20);
+ var geometry = new THREE.Geometry();
+ for(var i = 1; i < circle.vertices.length; i++) {
+ //console.log(circle.vertices[i])
+ geometry.vertices.push(circle.vertices[i]);
+ }
+ //addLineGeometry(geometry, 0xff00ff);
+ spline = new THREE.ClosedSplineCurve3(geometry.vertices);
+ addSplineGeometry(spline);
+ return geometry;
+ return spline;
+ }
 
-function move(geometry, translation) {
-	var mat = new THREE.Matrix4();
-	mat.identity();
-	//console.log(mat);
-	mat.setPosition(translation);
-	geometry.applyMatrix(mat);
-}
+ function addTube(curve, radius, sides) {
+ //console.log('addTube');
+ var tube = new THREE.TubeGeometry(curve, 30, radius, sides, false, false);
+ //console.log(tube);
+ addMeshGeometry(tube, 0xff00ff);
+ return tube
+ }
 
-function moveGeometry(geometry, translation) {
-	var ng = new THREE.Geometry();
-	THREE.GeometryUtils.merge(ng, geometry);
-	move(ng, translation)
-	addMeshGeometry(ng, 0xff00ff);
-	return ng;
-}
+ function move(geometry, translation) {
+ var mat = new THREE.Matrix4();
+ mat.identity();
+ //console.log(mat);
+ mat.setPosition(translation);
+ geometry.applyMatrix(mat);
+ }
 
-function addSphere(radius, point) {
-	var sphere = new THREE.SphereGeometry(radius, 20, 10)
-	//console.log(point);
-	move(sphere, point);
-	addMeshGeometry(sphere, 0xff00ff);
-	return sphere;
-}
+ function moveGeometry(geometry, translation) {
+ var ng = new THREE.Geometry();
+ THREE.GeometryUtils.merge(ng, geometry);
+ move(ng, translation)
+ addMeshGeometry(ng, 0xff00ff);
+ return ng;
+ }
 
-function addCube(width, height, depth, point) {
-	var cube = new THREE.CubeGeometry(width, height, depth, 10, 10, 10)
-	//console.log(point);
-	move(cube, point);
-	addMeshGeometry(cube, 0xff00ff);
-	return cube;
-}
+ function addSphere(radius, point) {
+ var sphere = new THREE.SphereGeometry(radius, 20, 10)
+ //console.log(point);
+ move(sphere, point);
+ addMeshGeometry(sphere, 0xff00ff);
+ return sphere;
+ }
 
-function divideCurve(curve, segments) {
-	//console.log(curve);
-	var splinePoints = curve.getSpacedPoints(segments);
-	//console.log(splinePoints);
-	for(var i = 0; i < splinePoints.length; i++) {
-		addPoint(splinePoints[i].x, splinePoints[i].y, splinePoints[i].z);
-	}
-	return splinePoints;
-}
+ function addCube(width, height, depth, point) {
+ var cube = new THREE.CubeGeometry(width, height, depth, 10, 10, 10)
+ //console.log(point);
+ move(cube, point);
+ addMeshGeometry(cube, 0xff00ff);
+ return cube;
+ }
 
-function resetScene() {
-	for(var i = 0; i < geoms.length; i++) {
-		scene.remove(geoms[i]);
-	}
-	geoms = [];
-}
+ function divideCurve(curve, segments) {
+ //console.log(curve);
+ var splinePoints = curve.getSpacedPoints(segments);
+ //console.log(splinePoints);
+ for(var i = 0; i < splinePoints.length; i++) {
+ addPoint(splinePoints[i].x, splinePoints[i].y, splinePoints[i].z);
+ }
+ return splinePoints;
+ }
 
-function onWindowResize() {
-	camera.aspect = $(container).width() / $(container).height();
-	camera.updateProjectionMatrix();
+ function resetScene() {
+ for(var i = 0; i < geoms.length; i++) {
+ scene.remove(geoms[i]);
+ }
+ geoms = [];
+ }
 
-	renderer.setSize($(container).width(), $(container).height());
+ function onWindowResize() {
+ camera.aspect = $(container).width() / $(container).height();
+ camera.updateProjectionMatrix();
 
-}
-*/
+ renderer.setSize($(container).width(), $(container).height());
+
+ }
+ */
