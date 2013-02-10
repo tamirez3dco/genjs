@@ -2,15 +2,32 @@ Ext.define('GEN.ui.three.Panel', {
 	extend : 'Ext.panel.Panel',
 	alias : 'widget.three-panel',
 	id : 'threePanel',
-	lineColor : 0xff00ff,
-	meshFaceColor : 0xff00ff,
-	meshEdgeColor : 0x000000,
-	geometries : [],
+	lineColorNormal : 0xff00ff,
+	lineColorSelected : 0x00ff00,
+	meshFaceColorNormal : 0xff00ff,
+	meshEdgeColorNormal : 0x220022,
+	meshFaceColorSelected : 0x00ff00,
+	meshEdgeColorSelected : 0x002200,
+	geometries : {},
+	selectedBlock : -1,
+	renderOnlySelected : false,
+	initializedScene : false,
 	code : '',
 
 	tbar : {
 		xtype : 'toolbar',
-		items : []
+		items : [{
+			text : 'Only Selected',
+			enableToggle : true,
+			cls : 'x-btn-default-small',
+			toggleHandler : function() {
+				console.log('toog')
+				console.log(this.pressed);
+				console.log(Ext.getCmp('threePanel'));
+				Ext.getCmp('threePanel').renderOnlySelected = this.pressed;
+				Ext.getCmp('threePanel').reRenderScene();
+			}
+		}]
 	},
 	initComponent : function() {
 		this.callParent();
@@ -69,35 +86,35 @@ Ext.define('GEN.ui.three.Panel', {
 			self.code = code;
 
 			self.execCode();
+			self.reRenderScene();
 		});
 	},
 	initSelectionChangeHandler : function() {
 		var self = this;
 		Meteor.autorun(function() {
-			console.log('three-panel');
 			var blockId = Session.get("selectedBlock");
-			if(blockId == -1) {
-				console.log(blockId);
+			if(self.initializedScene !== true)
+				return;
+
+			if(self.renderOnlySelected) {
+				self.selectedBlock = blockId;
+				self.reRenderScene();
 			} else {
-				console.log(blockId);
+				self.clearSelectionColor();
+				self.selectedBlock = blockId;
+				self.colorSelection();
+				self.renderScene();
 			}
 		});
 	},
 	execCode : function() {
-		console.log(this.code);
 		Blockly.debug.start();
-		//GEN.runner.removeAll();
 		try {
 			eval(this.code);
 		} catch (e) {
 			console.log(e);
 			return;
 		}
-		console.log(Blockly.debug.tracedValues);
-		this.resetScene();
-		this.resetParticleSystem();
-		this.addGeometries();
-		this.renderScene();
 	},
 	//Scene initializations
 	createAxis : function() {
@@ -116,29 +133,41 @@ Ext.define('GEN.ui.three.Panel', {
 		for(var i = -size; i <= size; i += step) {
 			geometry.vertices.push(new THREE.Vector3(-size, i, 0));
 			geometry.vertices.push(new THREE.Vector3(size, i, 0));
-
 			geometry.vertices.push(new THREE.Vector3(i, -size, 0));
 			geometry.vertices.push(new THREE.Vector3(i, size, 0));
-
 			var color = i === 0 ? color1 : color2;
-
 			geometry.colors.push(color, color, color, color);
-
 		}
 
 		var grid = new THREE.Line(geometry, material, THREE.LinePieces);
 		this.scene.add(grid);
 	},
 	createDefaultMaterials : function() {
-		this.lineMaterial = new THREE.LineBasicMaterial({
-			color : this.lineColor,
+		this.lineMaterial = {};
+		this.lineMaterial['normal'] = new THREE.LineBasicMaterial({
+			color : this.lineColorNormal,
 		});
-		this.meshMaterial = [new THREE.MeshLambertMaterial({
-			color : this.meshFaceColor,
+		this.lineMaterial['selected'] = new THREE.LineBasicMaterial({
+			color : this.lineColorSelected,
+		});
+
+		this.meshMaterial = {};
+		this.meshMaterial['normal'] = [new THREE.MeshLambertMaterial({
+			color : this.meshFaceColorNormal,
 			opacity : 0.8,
 			transparent : true
 		}), new THREE.MeshBasicMaterial({
-			color : this.meshEdgeColor,
+			color : this.meshEdgeColorNormal,
+			opacity : 0.5,
+			wireframe : true
+		})];
+
+		this.meshMaterial['selected'] = [new THREE.MeshLambertMaterial({
+			color : this.meshFaceColorSelected,
+			opacity : 0.8,
+			transparent : true
+		}), new THREE.MeshBasicMaterial({
+			color : this.meshEdgeColorSelected,
 			opacity : 0.5,
 			wireframe : true
 		})];
@@ -172,6 +201,7 @@ Ext.define('GEN.ui.three.Panel', {
 		this.createGrid();
 		this.createAxis();
 		this.initParticleSystem();
+		this.initializedScene = true;
 	},
 	initParticleSystem : function() {
 		var pMaterial = new THREE.ParticleBasicMaterial({
@@ -185,35 +215,115 @@ Ext.define('GEN.ui.three.Panel', {
 	resetParticleSystem : function() {
 		this.scene.remove(this.particleSystem);
 		this.initParticleSystem();
-
 	},
 	resetScene : function() {
-		for(var i = 0; i < this.geometries.length; i++) {
-			this.scene.remove(this.geometries[i]);
-		}
-		this.geometries = [];
+		this.resetParticleSystem();
+
+		_.each(_.keys(this.geometries), function(blockId) {
+			_.each(this.geometries[blockId], function(geometry) {
+				this.scene.remove(geometry);
+			}, this);
+		}, this);
+
+		this.geometries = {};
+		//this.selectedGeometries = [];
 	},
 	addToScene : function(renderable) {
 		this.scene.add(renderable);
 		this.geometries.push(renderable);
 	},
-
+	/*
+	 addGeometries : function() {
+	 //console.log(Blockly.debug.tracedBlocks);
+	 var values = [];
+	 if(this.renderOnlySelected == true) {
+	 if(this.selectedBlock != -1) {
+	 values = Blockly.debug.tracedBlocks[this.selectedBlock];
+	 }
+	 } else {
+	 values = Blockly.debug.tracedValues;
+	 }
+	 _.each(values, function(val) {
+	 if(val.toRenderable) {
+	 var geometry = val.toRenderable();
+	 if(val.RENDER_TYPE == "Point") {
+	 this.particleSystem.geometry.vertices.push(geometry);
+	 } else if(val.RENDER_TYPE == "Line") {
+	 var line = new THREE.Line(geometry, this.lineMaterial);
+	 this.addToScene(line);
+	 } else if(val.RENDER_TYPE == "Mesh") {
+	 var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial);
+	 this.addToScene(mesh);
+	 }
+	 }
+	 }, this);
+	 },*/
 	addGeometries : function() {
-		console.log(Blockly.debug.tracedBlocks);
-		_.each(Blockly.debug.tracedValues, function(val) {
-			if(val.toRenderable) {
-				var geometry = val.toRenderable();
-				if(val.RENDER_TYPE == "Point") { 
-					this.particleSystem.geometry.vertices.push(geometry);
-				} else if(val.RENDER_TYPE == "Line") {
-					var line = new THREE.Line(geometry, this.lineMaterial);
-					this.addToScene(line);
-				} else if(val.RENDER_TYPE == "Mesh") {
-					var mesh = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial);
-					this.addToScene(mesh);
+		var blocksIds = _.keys(Blockly.debug.tracedBlocks);
+		_.each(blocksIds, function(id) {
+			if((this.renderOnlySelected == true) && (id != this.selectedBlock))
+				return;
+			var values = Blockly.debug.tracedBlocks[id];
+			_.each(values, function(val) {
+				if(val.toRenderable) {
+					var rendered = null;
+					var geometry = val.toRenderable();
+					if(val.RENDER_TYPE == "Point") {
+						this.particleSystem.geometry.vertices.push(geometry);
+						return;
+					} else if(val.RENDER_TYPE == "Line") {
+						rendered = new THREE.Line(geometry, this.lineMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
+						console.log(rendered);
+					} else if(val.RENDER_TYPE == "Mesh") {
+						rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
+					}
+
+					if(this.geometries[id]) {
+						this.geometries[id].push(rendered);
+					} else {
+						this.geometries[id] = [rendered];
+					}
+					this.scene.add(rendered);
 				}
+			}, this);
+		}, this);
+	},
+	clearSelectionColor : function() {
+		if(this.selectedBlock == -1)
+			return;
+		if(_.isUndefined(this.geometries[this.selectedBlock]))
+			return;
+		_.each(this.geometries[this.selectedBlock], function(rendered) {
+			console.log(rendered)
+			if(rendered.material instanceof THREE.LineBasicMaterial) {
+				rendered.material = this.lineMaterial['normal'];
+			} else {
+				rendered.children[0].material = this.meshMaterial['normal'][0];
+				rendered.children[1].material = this.meshMaterial['normal'][1];
 			}
 		}, this);
+	},
+	colorSelection : function() {
+		if(this.selectedBlock == -1)
+			return;
+		if(_.isUndefined(this.geometries[this.selectedBlock]))
+			return;
+		_.each(this.geometries[this.selectedBlock], function(rendered) {
+			console.log(rendered)
+			if(rendered.material instanceof THREE.LineBasicMaterial) {
+				rendered.material = this.lineMaterial['selected'];
+			} else {
+				rendered.children[0].material = this.meshMaterial['selected'][0];
+				rendered.children[1].material = this.meshMaterial['selected'][1];
+			}
+		}, this);
+	},
+	reRenderScene : function() {
+		if(this.initializedScene !== true)
+			return;
+		this.resetScene();
+		this.addGeometries();
+		this.renderScene();
 	},
 	renderScene : function() {
 		var self = Ext.getCmp('threePanel');
