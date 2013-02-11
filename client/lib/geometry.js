@@ -146,8 +146,8 @@ GEN.Geometry.prototype.createCube = function(origin, width, depth, height) {
 	return c;
 };
 
-GEN.Geometry.prototype.createKlein = function(){
-	var geo = new THREE.ParametricGeometry(GEN.Geometry.Surfaces.klein, 20, 40 );
+GEN.Geometry.prototype.createParametricSurface = function(name, udiv, vdiv){
+	var geo = new THREE.ParametricGeometry(GEN.Geometry.Surfaces[name], udiv, vdiv );
 	return geo;
 };
 
@@ -189,9 +189,24 @@ GEN.Geometry.Surfaces.klein = function(v, u) {
 		z = -8 * Math.sin(u);
 	}
 	y = -2 * (1 - Math.cos(u) / 2) * Math.sin(v);
+	scale = 5;
+	return new THREE.Vector3(x*scale, y*scale, z*scale);
+}
+GEN.Geometry.Surfaces.enneper = function(v, u) {
+	u = (u*4)-2;
+	v= (v*4)-2;
+	
+	var x = u - (Math.pow(u,3)/3) + (u*Math.pow(v,2));
+	var y = -v + (Math.pow(v,3)/3) - (v*Math.pow(u,2));
+	var z = Math.pow(u,2) - Math.pow(v,2);
 
+	var scale = 5;
+	x*=scale;
+	y*=scale;
+	z*=scale;
 	return new THREE.Vector3(x, y, z);
 }
+
 /*
 GEN.Geometry.prototype.line = function(p1, p2) {
 var geometry = new THREE.Geometry();

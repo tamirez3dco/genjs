@@ -58,18 +58,21 @@ Blockly.Language.geometry_textGeo = {
 	}
 };
 
-Blockly.Language.geometry_klein = {
+Blockly.Language.geometry_parametricSurface = {
 	category : 'Geometry',
-	title : 'Klein',
+	title : 'Parametric Surface',
 	init : function() {
+		console.log('init language: geometry_parametricSurface');
 		this.setColour(160);
-		this.appendDummyInput().appendTitle('Klein')
-		this.appendValueInput("radius").setCheck(Number).appendTitle("radius");
-		this.appendValueInput("origin").setCheck(String).appendTitle("origin");
+		//this.appendDummyInput().appendTitle('Parametric Surface')
+		this.appendDummyInput().appendTitle(new Blockly.FieldDropdown(this.surfaceNames), 'NAME');
+		this.appendValueInput("udiv").setCheck(Number).appendTitle("U Divisions");
+		this.appendValueInput("vdiv").setCheck(Number).appendTitle("V Divisions");
 		this.setOutput(true, String);
-		this.setTooltip('Klein');
+		this.setTooltip('Create a parametric surface');
 	}
 };
+Blockly.Language.geometry_parametricSurface.surfaceNames = [['Klein Surface', 'klein'], ['Enneper Surface', 'enneper']];
 
 Blockly.Language.geometry_cube = {
 	category : 'Geometry',
@@ -214,13 +217,12 @@ Blockly.JavaScript.geometry_sphere = function() {
 };
 
 //Primitives - meshes
-Blockly.JavaScript.geometry_klein = function() {
-	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
-	if((origin == null) || (radius == null))
-		return "";
-
-	var code = "_g.createKlein(" + ")";
+Blockly.JavaScript.geometry_parametricSurface = function() {
+	var name = this.getTitleValue('NAME');
+	var udiv = Blockly.JavaScript.valueToCode(this, 'udiv', Blockly.JavaScript.ORDER_NONE) || 20;
+	var vdiv = Blockly.JavaScript.valueToCode(this, 'vdiv', Blockly.JavaScript.ORDER_NONE) || 20;
+	
+	var code = "_g.createParametricSurface('" + name + "'," + udiv + "," + vdiv + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
