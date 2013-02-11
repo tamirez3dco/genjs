@@ -29,6 +29,7 @@ goog.require('Blockly.Language');
 
 Blockly.Language.controls_if = {
   // If/elseif/else condition.
+  title: 'If Else',
   category: Blockly.LANG_CATEGORY_CONTROLS,
   helpUrl: Blockly.LANG_CONTROLS_IF_HELPURL,
   
@@ -220,6 +221,7 @@ Blockly.Language.controls_if_else = {
 
 Blockly.Language.controls_repeat = {
   // Repeat n times.
+  title: 'Repeat',
   category: Blockly.LANG_CATEGORY_CONTROLS,
   helpUrl: Blockly.LANG_CONTROLS_REPEAT_HELPURL,
   init: function() {
@@ -239,6 +241,7 @@ Blockly.Language.controls_repeat = {
 
 Blockly.Language.controls_whileUntil = {
   // Do while/until loop.
+  title: 'While Loop',
   category: Blockly.LANG_CATEGORY_CONTROLS,
   helpUrl: Blockly.LANG_CONTROLS_WHILEUNTIL_HELPURL,
   init: function() {
@@ -271,6 +274,7 @@ Blockly.Language.controls_whileUntil.TOOLTIPS = {
 
 Blockly.Language.controls_for = {
   // For loop.
+  title: 'For Loop',
   category: Blockly.LANG_CATEGORY_CONTROLS,
   helpUrl: Blockly.LANG_CONTROLS_FOR_HELPURL,
   init: function() {
@@ -310,6 +314,7 @@ Blockly.Language.controls_for = {
 
 Blockly.Language.controls_forEach = {
   // For each loop.
+  title: 'For Each Loop',
   category: Blockly.LANG_CATEGORY_CONTROLS,
   helpUrl: Blockly.LANG_CONTROLS_FOREACH_HELPURL,
   init: function() {
@@ -342,6 +347,7 @@ Blockly.Language.controls_forEach = {
 
 Blockly.Language.controls_flow_statements = {
   // Flow statements: continue, break.
+  title: 'Flow Control',
   category: Blockly.LANG_CATEGORY_CONTROLS,
   helpUrl: Blockly.LANG_CONTROLS_FLOW_STATEMENTS_HELPURL,
   init: function() {

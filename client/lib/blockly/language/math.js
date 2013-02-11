@@ -29,6 +29,7 @@ goog.require('Blockly.Language');
 
 Blockly.Language.math_number = {
   // Numeric value.
+  title: 'Number',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_NUMBER_HELPURL,
   init: function() {
@@ -43,6 +44,7 @@ Blockly.Language.math_number = {
 
 Blockly.Language.math_arithmetic = {
   // Basic arithmetic operator.
+  title: 'Arithmetic',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_ARITHMETIC_HELPURL,
   init: function() {
@@ -80,6 +82,7 @@ Blockly.Language.math_arithmetic.TOOLTIPS = {
 
 Blockly.Language.math_single = {
   // Advanced math operators with single operand.
+  title: 'Single Operand',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_SINGLE_HELPURL,
   init: function() {
@@ -118,6 +121,7 @@ Blockly.Language.math_single.TOOLTIPS = {
 
 Blockly.Language.math_trig = {
   // Trigonometry operators.
+  title: 'Trigonometry',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_TRIG_HELPURL,
   init: function() {
@@ -156,6 +160,7 @@ Blockly.Language.math_constant = {
   // Constants: PI, E, the Golden Ratio, sqrt(2), 1/sqrt(2), INFINITY.
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_CONSTANT_HELPURL,
+  title: 'Constants',
   init: function() {
     this.setColour(230);
     this.setOutput(true, Number);
@@ -176,6 +181,7 @@ Blockly.Language.math_constant.CONSTANTS =
 Blockly.Language.math_number_property = {
   // Check if a number is even, odd, prime, whole, positive, or negative
   // or if it is divisible by certain number. Returns true or false.
+  title: 'Number Property',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: '',
   init: function() {
@@ -229,6 +235,7 @@ Blockly.Language.math_number_property.PROPERTIES =
 
 Blockly.Language.math_change = {
   // Add to a variable in place.
+  title: 'Change Variable',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_CHANGE_HELPURL,
   init: function() {
@@ -260,6 +267,7 @@ Blockly.Language.math_change = {
 
 Blockly.Language.math_round = {
   // Rounding functions.
+  title: 'Round',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_ROUND_HELPURL,
   init: function() {
@@ -280,6 +288,7 @@ Blockly.Language.math_round.OPERATORS =
 Blockly.Language.math_on_list = {
   // Evaluate a list of numbers to return sum, average, min, max, etc.
   // Some functions also work on text (min, max, mode, median).
+  title: 'Evaluate List',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_ONLIST_HELPURL,
   init: function() {
@@ -328,6 +337,7 @@ Blockly.Language.math_on_list.TOOLTIPS = {
 
 Blockly.Language.math_modulo = {
   // Remainder of a division.
+  title: 'Modulo',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_MODULO_HELPURL,
   init: function() {
@@ -347,6 +357,7 @@ Blockly.Language.math_modulo = {
 
 Blockly.Language.math_constrain = {
   // Constrain a number between two limits.
+  title: 'Constrain',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_CONSTRAIN_HELPURL,
   init: function() {
@@ -368,6 +379,7 @@ Blockly.Language.math_constrain = {
 
 Blockly.Language.math_random_int = {
   // Random integer between [X] and [Y].
+  title: 'Random Integer',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_RANDOM_INT_HELPURL,
   init: function() {
@@ -387,6 +399,7 @@ Blockly.Language.math_random_int = {
 
 Blockly.Language.math_random_float = {
   // Random fraction between 0 and 1.
+  title: 'Random Number',
   category: Blockly.LANG_CATEGORY_MATH,
   helpUrl: Blockly.LANG_MATH_RANDOM_FLOAT_HELPURL,
   init: function() {
