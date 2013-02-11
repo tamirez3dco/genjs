@@ -253,7 +253,23 @@ GEN.Geometry.Surfaces.helicoidal = function(scale) {
 		return new THREE.Vector3(x, y, z);
 	}
 }
+GEN.Geometry.Surfaces.torus = function(scale) {
+	return function(v, u) {
+		var t = 5;
+		
+		u = (u * 2 * Math.PI);
+		v = (v * 2 * Math.PI);
+		
+		var x = (1+0.5*cos(u))*cos(v);
+		var z = 0.5*sin(u);
+		var y = (1+0.5*cos(u))*sin(v);
 
+		x *= scale;
+		y *= scale;
+		z *= scale;
+		return new THREE.Vector3(x, y, z);
+	}
+}
 /*
 GEN.Geometry.prototype.line = function(p1, p2) {
 var geometry = new THREE.Geometry();

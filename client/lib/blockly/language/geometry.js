@@ -73,6 +73,7 @@ Blockly.Language.geometry_parametricSurface = {
 	}
 };
 Blockly.Language.geometry_parametricSurface.surfaceNames = [
+	['Torus', 'torus'],
 	['Klein Surface', 'klein'], 
 	['Enneper Surface', 'enneper'],
 	['Catenoid Surface', 'catenoid'],

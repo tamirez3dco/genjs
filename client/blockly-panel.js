@@ -21,6 +21,10 @@ Ext.define('GEN.ui.blockly.Panel', {
 		'Vector': {position: 10, title: 'Vector', tbarId: 'tbar2'},
 		'Transform': {position: 40, title: 'Transform', tbarId: 'tbar2'},
 	},
+	emptyMenuItem: {
+		xtype : 'displayfield',
+		height: 20
+	},
 	dockedItems: [{
         xtype: 'toolbar',
         dock: 'top',
@@ -135,7 +139,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 			var catName = cat.replace('cat_', '');
 			console.log(catName);
 			var tbar = this.getComponent(this.langCategories[catName].tbarId);
-			var menuItems = [];
+			var menuItems = this.langCategories[catName].tbarId=='tbar1'?[this.emptyMenuItem]:[];
 			_.each(tree[cat], function(op) {
 				var title = op;
 				if(!_.isUndefined(Blockly.Language[op].title)) {
@@ -157,7 +161,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		var variablesCatName = "Variables";
 		//var tbar = this.getComponent('tbar1');
 		var tbar = this.getComponent(this.langCategories[variablesCatName].tbarId);
-		var menuItems = [];
+		var menuItems = [this.emptyMenuItem];
 
 		_.each(this.varList, function(name) {
 			var setHandler = this.blockFactory(variablesCatName, 'variables_set', tbar, function(block) {
