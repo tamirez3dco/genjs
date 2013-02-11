@@ -102,6 +102,19 @@ Blockly.Language.geometry_move = {
 	}
 };
 
+Blockly.Language.geometry_scale = {
+	category : 'Geometry',
+	title : 'Scale',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('Scale')
+		this.appendValueInput("geometry").setCheck(String).appendTitle("geometry");
+		this.appendValueInput("vector").setCheck(String).appendTitle("vector");
+		this.setOutput(true, String);
+		this.setTooltip('Scales a geometry');
+	}
+};
+
 //TODO: reimplement
 /*
 Blockly.Language.line = {
@@ -251,7 +264,7 @@ Blockly.JavaScript.geometry_move = function() {
 
 Blockly.JavaScript.geometry_scale = function() {
 	var geometry = Blockly.JavaScript.valueToCode(this, 'geometry', Blockly.JavaScript.ORDER_NONE) || null;
-	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(2,2,2)';
 	if((geometry == null))
 		return "";
 	

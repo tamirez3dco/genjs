@@ -77,16 +77,16 @@ THREE.Geometry.prototype.toRenderable = function() {
 	return this;
 }
 /*
-THREE.TextGeometry.prototype.toRenderable = function() {
-	return this;
-}
-THREE.CubeGeometry.prototype.toRenderable = function() {
-	return this;
-}
-THREE.ParametricGeometry.prototype.toRenderable = function() {
-	return this;
-}
-*/
+ THREE.TextGeometry.prototype.toRenderable = function() {
+ return this;
+ }
+ THREE.CubeGeometry.prototype.toRenderable = function() {
+ return this;
+ }
+ THREE.ParametricGeometry.prototype.toRenderable = function() {
+ return this;
+ }
+ */
 THREE.Geometry.prototype.translate = function(vec) {
 	var mat = new THREE.Matrix4();
 	mat.makeTranslation(vec.x, vec.y, vec.z);
@@ -95,11 +95,10 @@ THREE.Geometry.prototype.translate = function(vec) {
 }
 THREE.Geometry.prototype.scale = function(vec) {
 	var mat = new THREE.Matrix4();
-	mat.makeTranslation(vec.x, vec.y, vec.z);
+	mat.makeScale(vec.x, vec.y, vec.z);
 	this.applyMatrix(mat);
 	return this;
 }
-
 //GEN Geometry API
 
 GEN = {};
@@ -121,7 +120,6 @@ GEN.Geometry.prototype.createSphere = function(origin, radius) {
 	var c = new toxi.geom.Sphere(origin, radius);
 	return c;
 };
-
 //TODO: add font selection, bevel?
 GEN.Geometry.prototype.createTextGeo = function(text, size, height) {
 	var c = new THREE.TextGeometry(text, {
@@ -146,11 +144,10 @@ GEN.Geometry.prototype.createCube = function(origin, width, depth, height) {
 	return c;
 };
 
-GEN.Geometry.prototype.createParametricSurface = function(name, udiv, vdiv){
-	var geo = new THREE.ParametricGeometry(GEN.Geometry.Surfaces[name], udiv, vdiv );
+GEN.Geometry.prototype.createParametricSurface = function(name, udiv, vdiv) {
+	var geo = new THREE.ParametricGeometry(GEN.Geometry.Surfaces[name](5), udiv, vdiv);
 	return geo;
 };
-
 //TODO: Not nice + take care of all types
 GEN.Geometry.prototype.move = function(geometry, translation) {
 	if( geometry instanceof toxi.geom.Circle) {
@@ -169,44 +166,56 @@ GEN.Geometry.prototype.move = function(geometry, translation) {
 };
 
 GEN.Geometry.prototype.scale = function(geometry, vecOrFactor) {
+	var vec = vecOrFactor;
+	if (_.isNumber(vec)) {
+		vec = this.createPoint(vec); 
+	}
+	console.log(vec);
 	
+	if( geometry instanceof THREE.Geometry) {
+		var ng = geometry.clone();
+		ng.scale(vec);
+	} else {
+		ng = geometry;
+	}
+	
+	return ng;
 }
-
-
 //Parametric surface functions
 GEN.Geometry.Surfaces = {}
 
-GEN.Geometry.Surfaces.klein = function(v, u) {
-	u *= Math.PI;
-	v *= 2 * Math.PI;
-	u = u * 2;
-	var x, y, z;
-	if(u < Math.PI) {
-		x = 3 * Math.cos(u) * (1 + Math.sin(u)) + (2 * (1 - Math.cos(u) / 2)) * Math.cos(u) * Math.cos(v);
-		z = -8 * Math.sin(u) - 2 * (1 - Math.cos(u) / 2) * Math.sin(u) * Math.cos(v);
-	} else {
-		x = 3 * Math.cos(u) * (1 + Math.sin(u)) + (2 * (1 - Math.cos(u) / 2)) * Math.cos(v + Math.PI);
-		z = -8 * Math.sin(u);
+GEN.Geometry.Surfaces.klein = function(scale) {
+	return function(v, u) {
+		u *= Math.PI;
+		v *= 2 * Math.PI;
+		u = u * 2;
+		var x, y, z;
+		if(u < Math.PI) {
+			x = 3 * Math.cos(u) * (1 + Math.sin(u)) + (2 * (1 - Math.cos(u) / 2)) * Math.cos(u) * Math.cos(v);
+			z = -8 * Math.sin(u) - 2 * (1 - Math.cos(u) / 2) * Math.sin(u) * Math.cos(v);
+		} else {
+			x = 3 * Math.cos(u) * (1 + Math.sin(u)) + (2 * (1 - Math.cos(u) / 2)) * Math.cos(v + Math.PI);
+			z = -8 * Math.sin(u);
+		}
+		y = -2 * (1 - Math.cos(u) / 2) * Math.sin(v);
+		return new THREE.Vector3(x * scale, y * scale, z * scale);
 	}
-	y = -2 * (1 - Math.cos(u) / 2) * Math.sin(v);
-	scale = 5;
-	return new THREE.Vector3(x*scale, y*scale, z*scale);
 }
-GEN.Geometry.Surfaces.enneper = function(v, u) {
-	u = (u*4)-2;
-	v= (v*4)-2;
-	
-	var x = u - (Math.pow(u,3)/3) + (u*Math.pow(v,2));
-	var y = -v + (Math.pow(v,3)/3) - (v*Math.pow(u,2));
-	var z = Math.pow(u,2) - Math.pow(v,2);
+GEN.Geometry.Surfaces.enneper = function(scale) {
+	return function(v, u) {
+		u = (u * 4) - 2;
+		v = (v * 4) - 2;
 
-	var scale = 5;
-	x*=scale;
-	y*=scale;
-	z*=scale;
-	return new THREE.Vector3(x, y, z);
+		var x = u - (Math.pow(u, 3) / 3) + (u * Math.pow(v, 2));
+		var y = -v + (Math.pow(v, 3) / 3) - (v * Math.pow(u, 2));
+		var z = Math.pow(u, 2) - Math.pow(v, 2);
+
+		x *= scale;
+		y *= scale;
+		z *= scale;
+		return new THREE.Vector3(x, y, z);
+	}
 }
-
 /*
 GEN.Geometry.prototype.line = function(p1, p2) {
 var geometry = new THREE.Geometry();
