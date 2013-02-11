@@ -7,8 +7,11 @@ toxi.geom.Sphere.prototype.RENDER_TYPE = "Mesh";
 toxi.geom.AABB.prototype.RENDER_TYPE = "Mesh";
 
 //THREE render types
+THREE.Geometry.prototype.RENDER_TYPE = "Mesh";
+/*
 THREE.TextGeometry.prototype.RENDER_TYPE = "Mesh";
 THREE.ParametricGeometry.prototype.RENDER_TYPE = "Mesh";
+*/
 
 //Points
 toxi.geom.Vec3D.prototype.toRenderable = function() {
@@ -70,6 +73,10 @@ toxi.geom.AABB.prototype.toRenderable = function() {
 	return this.toMesh().toRenderable();
 }
 
+THREE.Geometry.prototype.toRenderable = function() {
+	return this;
+}
+/*
 THREE.TextGeometry.prototype.toRenderable = function() {
 	return this;
 }
@@ -79,6 +86,20 @@ THREE.CubeGeometry.prototype.toRenderable = function() {
 THREE.ParametricGeometry.prototype.toRenderable = function() {
 	return this;
 }
+*/
+THREE.Geometry.prototype.translate = function(vec) {
+	var mat = new THREE.Matrix4();
+	mat.makeTranslation(vec.x, vec.y, vec.z);
+	this.applyMatrix(mat);
+	return this;
+}
+THREE.Geometry.prototype.scale = function(vec) {
+	var mat = new THREE.Matrix4();
+	mat.makeTranslation(vec.x, vec.y, vec.z);
+	this.applyMatrix(mat);
+	return this;
+}
+
 //GEN Geometry API
 
 GEN = {};
@@ -101,6 +122,7 @@ GEN.Geometry.prototype.createSphere = function(origin, radius) {
 	return c;
 };
 
+//TODO: add font selection, bevel?
 GEN.Geometry.prototype.createTextGeo = function(text, size, height) {
 	var c = new THREE.TextGeometry(text, {
 		size : size,
@@ -129,24 +151,29 @@ GEN.Geometry.prototype.createKlein = function(){
 	return geo;
 };
 
-GEN.Geometry.prototype.moveGeometry = function(geometry, translation) {
+//TODO: Not nice + take care of all types
+GEN.Geometry.prototype.move = function(geometry, translation) {
 	if( geometry instanceof toxi.geom.Circle) {
-		var vec = geometry.add(translation);
-		var ng = new toxi.geom.Circle(vec, geometry.radius);
-	} else if( geometry instanceof toxi.geom.Circle) {
 		var vec = geometry.add(translation);
 		var ng = new toxi.geom.Circle(vec, geometry.radius);
 	} else if( geometry instanceof toxi.geom.Sphere) {
 		var vec = geometry.add(translation);
 		var ng = new toxi.geom.Sphere(vec, geometry.radius);
-	} else if( geometry instanceof toxi.geom.Vec3D) {
-		var ng = geometry.add(translation);
+	} else if( geometry instanceof THREE.Geometry) {
+		var ng = geometry.clone();
+		ng.translate(translation);
 	} else {
 		ng = geometry;
 	}
 	return ng;
 };
 
+GEN.Geometry.prototype.scale = function(geometry, vecOrFactor) {
+	
+}
+
+
+//Parametric surface functions
 GEN.Geometry.Surfaces = {}
 
 GEN.Geometry.Surfaces.klein = function(v, u) {

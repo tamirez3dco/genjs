@@ -21,9 +21,6 @@ Ext.define('GEN.ui.three.Panel', {
 			enableToggle : true,
 			cls : 'x-btn-default-small',
 			toggleHandler : function() {
-				console.log('toog')
-				console.log(this.pressed);
-				console.log(Ext.getCmp('threePanel'));
 				Ext.getCmp('threePanel').renderOnlySelected = this.pressed;
 				Ext.getCmp('threePanel').reRenderScene();
 			}
@@ -108,10 +105,13 @@ Ext.define('GEN.ui.three.Panel', {
 		});
 	},
 	execCode : function() {
+		console.log('Execute Code:');
+		console.log(this.code);
 		Blockly.debug.start();
 		try {
 			eval(this.code);
 		} catch (e) {
+			console.log('Error executing:');
 			console.log(e);
 			return;
 		}
@@ -246,7 +246,7 @@ Ext.define('GEN.ui.three.Panel', {
 						return;
 					} else if(val.RENDER_TYPE == "Line") {
 						rendered = new THREE.Line(geometry, this.lineMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
-						console.log(rendered);
+						//console.log(rendered);
 					} else if(val.RENDER_TYPE == "Mesh") {
 						rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
 					}
@@ -267,7 +267,7 @@ Ext.define('GEN.ui.three.Panel', {
 		if(_.isUndefined(this.geometries[this.selectedBlock]))
 			return;
 		_.each(this.geometries[this.selectedBlock], function(rendered) {
-			console.log(rendered)
+			//console.log(rendered)
 			if(rendered.material instanceof THREE.LineBasicMaterial) {
 				rendered.material = this.lineMaterial['normal'];
 			} else {
@@ -282,7 +282,7 @@ Ext.define('GEN.ui.three.Panel', {
 		if(_.isUndefined(this.geometries[this.selectedBlock]))
 			return;
 		_.each(this.geometries[this.selectedBlock], function(rendered) {
-			console.log(rendered)
+			//console.log(rendered)
 			if(rendered.material instanceof THREE.LineBasicMaterial) {
 				rendered.material = this.lineMaterial['selected'];
 			} else {

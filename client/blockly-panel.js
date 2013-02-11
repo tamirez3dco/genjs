@@ -61,8 +61,6 @@ Ext.define('GEN.ui.blockly.Panel', {
 			this.onWorkspaceChange();
 		}, this);
 		Ext.fly(document.getElementById('blockly-inner')).on('blocklySelectChange', function(a,b,c) {
-			console.log('selectionChange');
-			console.log(Blockly.selected);
 			if(_.isUndefined(Blockly.selected) || Blockly.selected==null) {
 				Session.set("selectedBlock", -1);
 			} else {

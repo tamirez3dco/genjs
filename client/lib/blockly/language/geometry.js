@@ -18,47 +18,6 @@ Blockly.Language.geometry_point = {
 	}
 };
 
-/* Re implement this
-Blockly.Language.line = {
-	category : 'Geometry',
-	title : 'Line',
-	init : function() {
-		this.setColour(160);
-		this.appendDummyInput().appendTitle('Line')
-		this.appendValueInput("P1").setCheck(String).appendTitle("P1");
-		this.appendValueInput("P2").setCheck(String).appendTitle("P2");
-		this.setOutput(true, String);
-		this.setTooltip('Returns a line');
-	}
-};
-
-Blockly.Language.pipe = {
-	category : 'Geometry',
-	title : 'Pipe',
-	init : function() {
-		this.setColour(160);
-		this.appendDummyInput().appendTitle('Pipe')
-		this.appendValueInput("curve").setCheck(String).appendTitle("curve");
-		this.appendValueInput("radius").setCheck(Number).appendTitle("radius");
-		this.appendValueInput("sides").setCheck(Number).appendTitle("sides");
-		this.setOutput(true, String);
-		this.setTooltip('Returns a pipe');
-	}
-};
-
-Blockly.Language.divideCurve = {
-	category : 'Geometry',
-	title : 'Divide Curve',
-	init : function() {
-		this.setColour(160);
-		this.appendDummyInput().appendTitle('Divide curve')
-		this.appendValueInput("curve").setCheck(String).appendTitle("curve");
-		this.appendValueInput("segments").setCheck(Number).appendTitle("segments");
-		this.setOutput(true, Array);
-		this.setTooltip('Divides a curve to n segments');
-	}
-};
-*/
 Blockly.Language.geometry_circle = {
 	category : 'Geometry',
 	title : 'Circle',
@@ -112,19 +71,6 @@ Blockly.Language.geometry_klein = {
 	}
 };
 
-Blockly.Language.geometry_move = {
-	category : 'Geometry',
-	title : 'Move',
-	init : function() {
-		this.setColour(160);
-		this.appendDummyInput().appendTitle('Move')
-		this.appendValueInput("geometry").setCheck(String).appendTitle("geometry");
-		this.appendValueInput("vector").setCheck(String).appendTitle("vector");
-		this.setOutput(true, String);
-		this.setTooltip('Moves a geometry');
-	}
-};
-
 Blockly.Language.geometry_cube = {
 	category : 'Geometry',
 	title : 'Cube',
@@ -139,7 +85,62 @@ Blockly.Language.geometry_cube = {
 		this.setTooltip('Returns a cube');
 	}
 };
+
+Blockly.Language.geometry_move = {
+	category : 'Geometry',
+	title : 'Move',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('Move')
+		this.appendValueInput("geometry").setCheck(String).appendTitle("geometry");
+		this.appendValueInput("vector").setCheck(String).appendTitle("vector");
+		this.setOutput(true, String);
+		this.setTooltip('Moves a geometry');
+	}
+};
+
+//TODO: reimplement
 /*
+Blockly.Language.line = {
+	category : 'Geometry',
+	title : 'Line',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('Line')
+		this.appendValueInput("P1").setCheck(String).appendTitle("P1");
+		this.appendValueInput("P2").setCheck(String).appendTitle("P2");
+		this.setOutput(true, String);
+		this.setTooltip('Returns a line');
+	}
+};
+
+Blockly.Language.pipe = {
+	category : 'Geometry',
+	title : 'Pipe',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('Pipe')
+		this.appendValueInput("curve").setCheck(String).appendTitle("curve");
+		this.appendValueInput("radius").setCheck(Number).appendTitle("radius");
+		this.appendValueInput("sides").setCheck(Number).appendTitle("sides");
+		this.setOutput(true, String);
+		this.setTooltip('Returns a pipe');
+	}
+};
+
+Blockly.Language.divideCurve = {
+	category : 'Geometry',
+	title : 'Divide Curve',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('Divide curve')
+		this.appendValueInput("curve").setCheck(String).appendTitle("curve");
+		this.appendValueInput("segments").setCheck(Number).appendTitle("segments");
+		this.setOutput(true, Array);
+		this.setTooltip('Divides a curve to n segments');
+	}
+};
+
 Blockly.Language.geometry_mesh_fromsurface = {
 	category : 'Geometry',
 	title : 'Mesh Surface',
@@ -166,37 +167,9 @@ Blockly.Language.geometry_mesh_subdivide.STRATEGIES = [['Midpoint', 'Midpoint'],
 */
 
 
-
-/*
-Blockly.Language.math_arithmetic.OPERATORS =
-[['+', 'ADD'],
-['-', 'MINUS'],
-['\u00D7', 'MULTIPLY'],
-['\u00F7', 'DIVIDE'],
-['^', 'POWER']];
-
-Blockly.Language.math_arithmetic.TOOLTIPS = {
-ADD: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_ADD,
-MINUS: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_MINUS,
-MULTIPLY: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_MULTIPLY,
-DIVIDE: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_DIVIDE,
-POWER: Blockly.LANG_MATH_ARITHMETIC_TOOLTIP_POWER
-};
-*/
 ///Generators
-/*
-Blockly.JavaScript.point = function() {
-	var x = Blockly.JavaScript.valueToCode(this, 'X', Blockly.JavaScript.ORDER_NONE) || 0;
-	var y = Blockly.JavaScript.valueToCode(this, 'Y', Blockly.JavaScript.ORDER_NONE) || 0;
-	var z = Blockly.JavaScript.valueToCode(this, 'Z', Blockly.JavaScript.ORDER_NONE) || 0;
-	if((x == null) || (y == null) || (z == null))
-		return '';
 
-	var code = "GEN.runner.run(new toxi.geom.Vec3D(" + x + ',' + y + ',' + z + "))";
-	return [code, Blockly.JavaScript.ORDER_NONE];
-};
-*/
-
+//Primitives - points, vectors, etc
 Blockly.JavaScript.geometry_point = function() {
 	var x = Blockly.JavaScript.valueToCode(this, 'X', Blockly.JavaScript.ORDER_NONE) || 0;
 	var y = Blockly.JavaScript.valueToCode(this, 'Y', Blockly.JavaScript.ORDER_NONE) || 0;
@@ -207,6 +180,85 @@ Blockly.JavaScript.geometry_point = function() {
 	var code = "_g.createPoint(" + x + ',' + y + ',' + z + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
+
+//Primitives - 2D
+Blockly.JavaScript.geometry_circle = function() {
+	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
+	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+
+	var code = "_g.createCircle(" + origin + ',' + radius + ")";
+	return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+//Primitives - surfaces
+Blockly.JavaScript.geometry_cube = function() {
+	var width = Blockly.JavaScript.valueToCode(this, 'width', Blockly.JavaScript.ORDER_NONE) || 10;
+	var height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_NONE) || 10;
+	var depth = Blockly.JavaScript.valueToCode(this, 'depth', Blockly.JavaScript.ORDER_NONE) || 10;
+	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	if(origin == null)
+		return "";
+	var code = "_g.createCube(" + origin + ',' + width + ',' + depth + ',' + height + ")";
+
+	return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.JavaScript.geometry_sphere = function() {
+	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
+	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	if((origin == null) || (radius == null))
+		return "";
+
+	var code = "_g.createSphere(" + origin + ',' + radius + ")";
+	return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+//Primitives - meshes
+Blockly.JavaScript.geometry_klein = function() {
+	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
+	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	if((origin == null) || (radius == null))
+		return "";
+
+	var code = "_g.createKlein(" + ")";
+	return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.JavaScript.geometry_textGeo = function() {
+	var size = Blockly.JavaScript.valueToCode(this, 'size', Blockly.JavaScript.ORDER_NONE) || 10;
+	var text = Blockly.JavaScript.valueToCode(this, 'text', Blockly.JavaScript.ORDER_NONE) || 'Blockly.debug.trace(\"mussa\")';
+	var height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_NONE) || 5;
+	if((size == null) || (text == null))
+		return "";
+
+	var code = "_g.createTextGeo(" + text + ',' + size + "," + height +")";
+	return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+//Transform - basic
+Blockly.JavaScript.geometry_move = function() {
+	var geometry = Blockly.JavaScript.valueToCode(this, 'geometry', Blockly.JavaScript.ORDER_NONE) || null;
+	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	if((geometry == null))
+		return "";
+	
+	var code = "_g.move(" + geometry + "," + vector + ")";
+	return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+
+Blockly.JavaScript.geometry_scale = function() {
+	var geometry = Blockly.JavaScript.valueToCode(this, 'geometry', Blockly.JavaScript.ORDER_NONE) || null;
+	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	if((geometry == null))
+		return "";
+	
+	var code = "_g.scale(" + geometry + "," + vector + ")";
+	return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+
+//TODO: reimplement
 /*
 Blockly.JavaScript.line = function() {
 	var p1 = Blockly.JavaScript.valueToCode(this, 'P1', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
@@ -235,69 +287,7 @@ Blockly.JavaScript.pipe = function() {
 	var code = "addTube(" + curve + ',' + radius + ',' + sides + ")";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
-*/
-Blockly.JavaScript.geometry_circle = function() {
-	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
 
-	var code = "_g.createCircle(" + origin + ',' + radius + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
-Blockly.JavaScript.geometry_sphere = function() {
-	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
-	if((origin == null) || (radius == null))
-		return "";
-
-	var code = "_g.createSphere(" + origin + ',' + radius + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
-Blockly.JavaScript.geometry_klein = function() {
-	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
-	if((origin == null) || (radius == null))
-		return "";
-
-	var code = "_g.createKlein(" + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
-Blockly.JavaScript.geometry_textGeo = function() {
-	var size = Blockly.JavaScript.valueToCode(this, 'size', Blockly.JavaScript.ORDER_NONE) || 10;
-	var text = Blockly.JavaScript.valueToCode(this, 'text', Blockly.JavaScript.ORDER_NONE) || 'Blockly.debug.trace(\"mussa\")';
-	var height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_NONE) || 5;
-	if((size == null) || (text == null))
-		return "";
-
-	var code = "_g.createTextGeo(" + text + ',' + size + "," + height +")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
-
-Blockly.JavaScript.geometry_move = function() {
-	var geometry = Blockly.JavaScript.valueToCode(this, 'geometry', Blockly.JavaScript.ORDER_NONE) || null;
-	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
-	if((geometry == null))
-		return "";
-	
-	var code = "_g.moveGeometry(" + geometry + "," + vector + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
-Blockly.JavaScript.geometry_cube = function() {
-	var width = Blockly.JavaScript.valueToCode(this, 'width', Blockly.JavaScript.ORDER_NONE) || 10;
-	var height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_NONE) || 10;
-	var depth = Blockly.JavaScript.valueToCode(this, 'depth', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
-	if(origin == null)
-		return "";
-	var code = "_g.createCube(" + origin + ',' + width + ',' + depth + ',' + height + ")";
-
-	return [code, Blockly.JavaScript.ORDER_NONE];
-};
-/*
 Blockly.JavaScript.geometry_mesh_fromsurface = function() {
 	var surface = Blockly.JavaScript.valueToCode(this, 'surface', Blockly.JavaScript.ORDER_NONE) || null;
 	if(surface == null)
