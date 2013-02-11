@@ -72,7 +72,11 @@ Blockly.Language.geometry_parametricSurface = {
 		this.setTooltip('Create a parametric surface');
 	}
 };
-Blockly.Language.geometry_parametricSurface.surfaceNames = [['Klein Surface', 'klein'], ['Enneper Surface', 'enneper']];
+Blockly.Language.geometry_parametricSurface.surfaceNames = [
+	['Klein Surface', 'klein'], 
+	['Enneper Surface', 'enneper'],
+	['Catenoid Surface', 'catenoid'],
+	['Helicoidal Surface', 'helicoidal']];
 
 Blockly.Language.geometry_cube = {
 	category : 'Mesh',

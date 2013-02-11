@@ -217,6 +217,43 @@ GEN.Geometry.Surfaces.enneper = function(scale) {
 		return new THREE.Vector3(x, y, z);
 	}
 }
+
+GEN.Geometry.Surfaces.catenoid = function(scale) {
+	return function(v, u) {
+		var t = 5;
+		
+		u = (u * 2 * Math.PI) - Math.PI;
+		v = (v * 2 * Math.PI) - Math.PI;
+		
+		var x = 2*cosh(v/2)*cos(u);
+		var z = v;
+		var y = 2*cosh(v/2)*sin(u)
+
+		x *= scale;
+		y *= scale;
+		z *= scale;
+		return new THREE.Vector3(x, y, z);
+	}
+}
+
+GEN.Geometry.Surfaces.helicoidal = function(scale) {
+	return function(v, u) {
+		var t = 5;
+		
+		u = (u * 2 * Math.PI) - Math.PI;
+		v = (v * 2 * Math.PI) - Math.PI;
+		
+		var x = sinh(v)*sin(u);
+		var z = 3*u;
+		var y = -sinh(v)*cos(u);
+
+		x *= scale;
+		y *= scale;
+		z *= scale;
+		return new THREE.Vector3(x, y, z);
+	}
+}
+
 /*
 GEN.Geometry.prototype.line = function(p1, p2) {
 var geometry = new THREE.Geometry();
