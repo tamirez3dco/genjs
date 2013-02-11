@@ -102,6 +102,7 @@ Blockly.Language.geometry_move = {
 	}
 };
 
+//TODO: add options to uniform / nonuniform change inputs dynamically
 Blockly.Language.geometry_scale = {
 	category : 'Geometry',
 	title : 'Scale',
@@ -114,6 +115,7 @@ Blockly.Language.geometry_scale = {
 		this.setTooltip('Scales a geometry');
 	}
 };
+
 
 //TODO: reimplement
 /*
