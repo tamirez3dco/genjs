@@ -165,6 +165,7 @@ GEN.Geometry.prototype.move = function(geometry, translation) {
 	return ng;
 };
 
+//TODO: only works for mesh
 GEN.Geometry.prototype.scale = function(geometry, vecOrFactor) {
 	var vec = vecOrFactor;
 	if (_.isNumber(vec)) {

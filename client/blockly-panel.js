@@ -9,19 +9,41 @@ Ext.define('GEN.ui.blockly.Panel', {
 	scale : 1,
 	varList : ['item'],
 	alias : 'widget.blockly-panel',
-	tbar : {
-		xtype : 'toolbar',
-		itemId : 'tbar',
-		items : [{
+	langCategories: {
+		'Variables': {position: 10, title: 'Variables', tbarId: 'tbar1'},
+		'Control': {position: 30, title: 'Control', tbarId: 'tbar1'},
+		'Lists': {position: 40, title: 'Lists', tbarId: 'tbar1'},
+		'Logic': {position: 50, title: 'Logic', tbarId: 'tbar1'},
+		'Math': {position: 20, title: 'Math', tbarId: 'tbar1'},
+		'Text': {position: 60, title: 'Text', tbarId: 'tbar1'},
+		'Mesh': {position: 30, title: 'Mesh', tbarId: 'tbar2'},
+		'Curve': {position: 20, title: 'Curve', tbarId: 'tbar2'},
+		'Vector': {position: 10, title: 'Vector', tbarId: 'tbar2'},
+		'Transform': {position: 40, title: 'Transform', tbarId: 'tbar2'},
+	},
+	dockedItems: [{
+        xtype: 'toolbar',
+        dock: 'top',
+        itemId : 'tbar1',
+        items : [{
 			xtype : 'button',
 			text : 'Dummy',
 			tooltip : 'Layout place holder'
 		}]
-	},
+    },{
+        xtype: 'toolbar',
+        dock: 'top',
+        itemId : 'tbar2',
+        items : [{
+			xtype : 'button',
+			text : 'Dummy',
+			tooltip : 'Layout place holder'
+		}]
+    }],
 	initComponent : function() {
 		var self = this;
 		this.callParent();
-		this.languageToolbar = this.getDockedComponent('tbar');
+		//this.languageToolbar = this.getDockedComponent('tbar1');
 		this.on({
 			'mousewheel' : {
 				element : 'el',
@@ -100,35 +122,41 @@ Ext.define('GEN.ui.blockly.Panel', {
 		Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, Blockly.Xml.textToDom(this.xml));
 	},
 	initLanguageMenus : function() {
-		this.languageToolbar.removeAll();
-		var menuList = [];
-
-		menuList.push(this.buildCategoryMenu('Variables', this.variablesMenu()));
+		this.getComponent('tbar1').removeAll();
+		this.getComponent('tbar2').removeAll();
+		//var menuList = [];
+		
+		var tbar = this.getComponent(this.langCategories['Variables'].tbarId);
+		tbar.add(this.buildCategoryMenu('Variables', this.variablesMenu()));
 
 		var tree = Blockly.Toolbox.buildTree_();
 		_.each(_.keys(tree), function(cat) {
+			//var tbar = this.getComponent(this.langCategories[variablesCatName].tbarId);
 			var catName = cat.replace('cat_', '');
-
+			console.log(catName);
+			var tbar = this.getComponent(this.langCategories[catName].tbarId);
 			var menuItems = [];
 			_.each(tree[cat], function(op) {
 				var title = op;
 				if(!_.isUndefined(Blockly.Language[op].title)) {
 					title = Blockly.Language[op].title;
 				}
-				var handler = this.blockFactory(catName, op, this.languageToolbar);
+				var handler = this.blockFactory(catName, op, tbar);
 				var menuItem = this.buildMenuItem(title, handler);
 				menuItems.push(menuItem);
 			}, this);
 			var menu = this.buildCategoryMenu(catName, menuItems);
-
-			menuList.push(menu)
+			tbar.add([menu]);
+			//menuList.push(menu)
 		}, this);
 
-		this.languageToolbar.add(menuList);
+		//this.languageToolbar.add(menuList);
 	},
 	variablesMenu : function() {
-		var tbar = this.languageToolbar;
+		//var tbar = this.languageToolbar;
 		var variablesCatName = "Variables";
+		//var tbar = this.getComponent('tbar1');
+		var tbar = this.getComponent(this.langCategories[variablesCatName].tbarId);
 		var menuItems = [];
 
 		_.each(this.varList, function(name) {
@@ -162,7 +190,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		return {
 			xtype : 'button',
 			text : category,
-			width : 70,
+			width : 75,
 			itemId : category,
 			menu : {
 				id : category + '-menu',

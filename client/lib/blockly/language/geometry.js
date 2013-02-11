@@ -5,7 +5,7 @@
 Blockly.JavaScript = Blockly.Generator.get('JavaScript');
 
 Blockly.Language.geometry_point = {
-	category : 'Geometry',
+	category : 'Vector',
 	title : 'Point',
 	init : function() {
 		this.setColour(160);
@@ -19,7 +19,7 @@ Blockly.Language.geometry_point = {
 };
 
 Blockly.Language.geometry_circle = {
-	category : 'Geometry',
+	category : 'Curve',
 	title : 'Circle',
 	init : function() {
 		this.setColour(160);
@@ -32,7 +32,7 @@ Blockly.Language.geometry_circle = {
 };
 
 Blockly.Language.geometry_sphere = {
-	category : 'Geometry',
+	category : 'Mesh',
 	title : 'Sphere',
 	init : function() {
 		this.setColour(160);
@@ -45,7 +45,7 @@ Blockly.Language.geometry_sphere = {
 };
 
 Blockly.Language.geometry_textGeo = {
-	category : 'Geometry',
+	category : 'Mesh',
 	title : 'TextGeo',
 	init : function() {
 		this.setColour(160);
@@ -59,7 +59,7 @@ Blockly.Language.geometry_textGeo = {
 };
 
 Blockly.Language.geometry_parametricSurface = {
-	category : 'Geometry',
+	category : 'Mesh',
 	title : 'Parametric Surface',
 	init : function() {
 		console.log('init language: geometry_parametricSurface');
@@ -75,7 +75,7 @@ Blockly.Language.geometry_parametricSurface = {
 Blockly.Language.geometry_parametricSurface.surfaceNames = [['Klein Surface', 'klein'], ['Enneper Surface', 'enneper']];
 
 Blockly.Language.geometry_cube = {
-	category : 'Geometry',
+	category : 'Mesh',
 	title : 'Cube',
 	init : function() {
 		this.setColour(160);
@@ -90,7 +90,7 @@ Blockly.Language.geometry_cube = {
 };
 
 Blockly.Language.geometry_move = {
-	category : 'Geometry',
+	category : 'Transform',
 	title : 'Move',
 	init : function() {
 		this.setColour(160);
@@ -104,7 +104,7 @@ Blockly.Language.geometry_move = {
 
 //TODO: add options to uniform / nonuniform change inputs dynamically
 Blockly.Language.geometry_scale = {
-	category : 'Geometry',
+	category : 'Transform',
 	title : 'Scale',
 	init : function() {
 		this.setColour(160);
