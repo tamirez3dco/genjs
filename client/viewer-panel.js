@@ -191,7 +191,8 @@ Ext.define('GEN.ui.three.Panel', {
 	initParticleSystem : function() {
 		var pMaterial = new THREE.ParticleBasicMaterial({
 			color : 0x00FF00,
-			size : 2
+			size : 0.8,
+			sizeAttenuation: true,
 		});
 		var points = new THREE.Geometry();
 		this.particleSystem = new THREE.ParticleSystem(points, pMaterial);
