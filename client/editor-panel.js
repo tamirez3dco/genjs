@@ -75,11 +75,11 @@ Ext.define('GEN.ui.blockly.Panel', {
 			Blockly.mainWorkspace.clear();
 			//TODO: prevent 'blocklyWorkspaceChange' event here.
 			Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+			self.xmlChanged();	
 		});
 	},
-	afterRender : function() {
-		this.callParent();
-	},
+	/*initWorkspaceChangeHandler : function() {
+	},*/
 	onInitialLayout : function() {
 		this.injectBlockly();
 		this.initLanguageMenus();
@@ -137,7 +137,6 @@ Ext.define('GEN.ui.blockly.Panel', {
 		_.each(_.keys(tree), function(cat) {
 			//var tbar = this.getComponent(this.langCategories[variablesCatName].tbarId);
 			var catName = cat.replace('cat_', '');
-			console.log(catName);
 			var tbar = this.getComponent(this.langCategories[catName].tbarId);
 			var menuItems = this.langCategories[catName].tbarId=='tbar1'?[this.emptyMenuItem]:[];
 			_.each(tree[cat], function(op) {
@@ -256,7 +255,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		if(xml == this.xml)
 			return;
 		this.xml = xml;
-
+		
 		var program = Session.get("currentProgram");
 		if(_.isUndefined(program)) {
 			console.log('create new program');
@@ -273,5 +272,44 @@ Ext.define('GEN.ui.blockly.Panel', {
 				}
 			});
 		}
-	}
+		this.xmlChanged();	
+	},
+	xmlChanged: function() {
+		try {
+			Blockly.debug.traceOn=true;
+			var code = Blockly.Generator.workspaceToCode('JavaScript');
+		} catch(err) {
+			return;
+		}
+
+		if(code == this.tracedCode)
+			return;
+		this.tracedCode = code;
+
+		try {
+			Blockly.debug.traceOn=false;
+			var cleanCode = Blockly.Generator.workspaceToCode('JavaScript');
+		} catch(err) {
+			return;
+		}
+		this.cleanCode = cleanCode;
+
+		this.execCode();
+		
+		Session.set('tracedCode',  this.tracedCode);
+		Session.set('cleanCode',  this.cleanCode);
+	},
+	execCode : function() {
+		console.log('Execute Code:');
+		console.log(this.tracedCode);
+		Blockly.debug.start();
+		try {
+			eval(this.tracedCode);
+		} catch (e) {
+			console.log('Error executing:');
+			console.log(e);
+			return;
+		}
+		Blockly.debug.stop();
+	},
 });

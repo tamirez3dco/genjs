@@ -31,6 +31,8 @@ goog.require('Blockly.Block');
 
 Blockly.Debugger = function(){
 	this.tracedValues = [];
+	this.tracedBlocks = {};
+	this.traceOn=false;
 };
 Blockly.Debugger.prototype.trace = function(value, blockId) {
 	//console.log('trc');
@@ -43,11 +45,14 @@ Blockly.Debugger.prototype.trace = function(value, blockId) {
 	}
 	return value;
 }
-Blockly.Debugger.prototype.start = function(value) {
+Blockly.Debugger.prototype.start = function() {
+	//this.traceOn=true;
 	this.tracedValues = [];
 	this.tracedBlocks = {};
 }
-
+Blockly.Debugger.prototype.stop = function() {
+	//this.traceOn=false;
+}
 
 
 /**
@@ -83,11 +88,11 @@ Blockly.Generator.get = function(name) {
  * @param {string} name Language name (e.g. 'JavaScript').
  * @return {string} Generated code.
  */
-Blockly.Generator.workspaceToCode = function(name, trace) {
+Blockly.Generator.workspaceToCode = function(name) {
   var code = [];
   var generator = Blockly.Generator.get(name);
   generator.init();
-  generator.traceOn = trace;
+  
   var blocks = Blockly.mainWorkspace.getTopBlocks(true);
   for (var x = 0, block; block = blocks[x]; x++) {
     var line = generator.blockToCode(block);
@@ -96,7 +101,7 @@ Blockly.Generator.workspaceToCode = function(name, trace) {
       // Top-level blocks don't care about operator order.
       line = line[0];
       //var cleanLine
-      if (trace) {
+      if (Blockly.debug.traceOn) {
       	line = "Blockly.debug.trace(" + line + ","+ block.id + ")";
       }
     }
@@ -226,7 +231,7 @@ Blockly.CodeGenerator.prototype.valueToCode = function(block, name, order) {
     throw 'Expecting valid order from value block "' + targetBlock.type + '".';
   }
   
-  if (this.trace) {
+  if (Blockly.debug.traceOn) {
   	code = "Blockly.debug.trace(" + code +","+ targetBlock.id + ")";
   }
   if (code && order <= innerOrder) {

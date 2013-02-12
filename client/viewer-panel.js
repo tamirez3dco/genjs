@@ -65,24 +65,8 @@ Ext.define('GEN.ui.three.Panel', {
 	initProgramChangeHandler : function() {
 		var self = this;
 		Meteor.autorun(function() {
-			var current = Session.get("currentProgram");
-			if(_.isUndefined(current))
-				return;
-			program = Programs.findOne(current);
-			if(_.isUndefined(program))
-				return;
-
-			try {
-				var code = Blockly.Generator.workspaceToCode('JavaScript', true);
-			} catch(err) {
-				return;
-			}
-
-			if(code == self.code)
-				return;
-			self.code = code;
-
-			self.execCode();
+			var code = Session.get("tracedCode");
+			if(_.isUndefined(code)) return;
 			self.reRenderScene();
 		});
 	},
@@ -90,6 +74,7 @@ Ext.define('GEN.ui.three.Panel', {
 		var self = this;
 		Meteor.autorun(function() {
 			var blockId = Session.get("selectedBlock");
+			if(_.isUndefined(blockId)) return;
 			if(self.initializedScene !== true)
 				return;
 

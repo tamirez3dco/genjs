@@ -15,18 +15,7 @@ Ext.define('GEN.ui.jscode.Panel', {
 	initProgramChangeHandler : function() {
 		var self = this;
 		Meteor.autorun(function() {
-			var current = Session.get("currentProgram");
-			if(_.isUndefined(current))
-				return;
-			program = Programs.findOne(current);
-			if(_.isUndefined(program))
-				return;
-
-			try {
-				var code = Blockly.Generator.workspaceToCode('JavaScript', false);
-			} catch(err) {
-				return;
-			}
+			var code = Session.get("cleanCode");
 
 			if(code == self.code)
 				return;

@@ -83,7 +83,8 @@ Meteor.startup(function() {
 					}, {
 						region : 'center',
 						width : '30%',
-						title : 'Selected Values - stub'
+						title : 'Selected Values',
+						xtype : 'values-panel'
 					}, {
 						region : 'east',
 						width : '30%',

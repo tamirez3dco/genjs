@@ -232,7 +232,7 @@ Blockly.JavaScript.geometry_sphere = function() {
 	if((origin == null) || (radius == null))
 		return "";
 
-	var code = "_g.createSphere(" + origin + ',' + radius + ")";
+	var code = "_g.createSphere(\n    " + origin + ',\n    ' + radius + "\n)";
 	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 

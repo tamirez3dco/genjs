@@ -69,7 +69,9 @@ toxi.geom.mesh.TriangleMesh.prototype.toRenderable = function() {
 toxi.geom.Sphere.prototype.toRenderable = function() {
 	return this.toMesh(20).toRenderable();
 }
-
+toxi.geom.Sphere.prototype.toString = function() {
+	return 'Sphere: [origin: [x: ' +this.x+ ', y: ' +this.y + ', z: ' +this.z + '], radius: '+ this.radius +']';
+}
 toxi.geom.AABB.prototype.toRenderable = function() {
 	return this.toMesh().toRenderable();
 }
