@@ -73,7 +73,7 @@ Ext.define('GEN.ui.three.Panel', {
 				return;
 
 			try {
-				var code = Blockly.Generator.workspaceToCode('JavaScript');
+				var code = Blockly.Generator.workspaceToCode('JavaScript', true);
 			} catch(err) {
 				return;
 			}
