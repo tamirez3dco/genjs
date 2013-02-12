@@ -109,7 +109,7 @@ Blockly.Language.geometry_meshComponents = {
 
 Blockly.Language.geometry_meshComponents.componentNames = [
 	['Mesh Faces', 'faces'],
-	/*['Mesh Edges', 'edges'], */ //TODO: Implement get edges 
+	['Mesh Edges', 'edges'], 
 	['Mesh Vertices', 'vertices'],
 	
 ];
@@ -141,7 +141,34 @@ Blockly.Language.geometry_scale = {
 	}
 };
 
+Blockly.Language.geometry_pipe = {
+	category : 'Mesh',
+	title : 'Pipe',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('Pipe')
+		this.appendValueInput("curve").setCheck(String).appendTitle("curve");
+		this.appendValueInput("radius").setCheck(Number).appendTitle("radius");
+		this.appendValueInput("sides").setCheck(Number).appendTitle("sides");
+		this.setOutput(true, String);
+		this.setTooltip('Creates a pipe');
+	}
+};
 
+/*
+Blockly.Language.geometry_circle = {
+	category : 'Curve',
+	title : 'Circle',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('Circle')
+		this.appendValueInput("radius").setCheck(Number).appendTitle("radius");
+		this.appendValueInput("origin").setCheck(String).appendTitle("origin");
+		this.setOutput(true, String);
+		this.setTooltip('Returns a circle');
+	}
+};
+*/
 //TODO: reimplement
 /*
 Blockly.Language.line = {
@@ -307,6 +334,16 @@ Blockly.JavaScript.geometry_scale = function() {
 	
 	var code = "_g.scale(" + geometry + "," + vector + ")";
 	return [code, orderNone];
+};
+
+Blockly.JavaScript.geometry_pipe = function() {
+	var curve = valueToCode(this, 'curve', orderNone) || null;
+	var radius = valueToCode(this, 'radius', orderNone) || 3;
+	var sides = valueToCode(this, 'sides', orderNone) || 12;
+	if(curve == null)
+		return '';
+	var code = "_g.createPipe(" + curve + ',' + radius + ',' + sides + ")";
+	return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
 

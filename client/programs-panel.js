@@ -49,7 +49,7 @@ Ext.define('GEN.ui.programs.Panel', {
 		this.getSelectionModel().on({
 			'selectionchange' : {
 				fn : function(model, selected, eOpts) {
-					console.log('programs panel -- selectionchange');
+					//console.log('programs panel -- selectionchange');
 					if(selected.length == 0)
 						return;
 					Session.set("currentProgram", selected[0].getData()._id);

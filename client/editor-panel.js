@@ -9,42 +9,86 @@ Ext.define('GEN.ui.blockly.Panel', {
 	scale : 1,
 	varList : ['item'],
 	alias : 'widget.blockly-panel',
-	langCategories: {
-		'Variables': {position: 10, title: 'Variables', tbarId: 'tbar1'},
-		'Control': {position: 30, title: 'Control', tbarId: 'tbar1'},
-		'Lists': {position: 40, title: 'Lists', tbarId: 'tbar1'},
-		'Logic': {position: 50, title: 'Logic', tbarId: 'tbar1'},
-		'Math': {position: 20, title: 'Math', tbarId: 'tbar1'},
-		'Text': {position: 60, title: 'Text', tbarId: 'tbar1'},
-		'Mesh': {position: 30, title: 'Mesh', tbarId: 'tbar2'},
-		'Surface': {position: 25, title: 'Surface', tbarId: 'tbar2'},
-		'Curve': {position: 20, title: 'Curve', tbarId: 'tbar2'},
-		'Vector': {position: 10, title: 'Vector', tbarId: 'tbar2'},
-		'Transform': {position: 40, title: 'Transform', tbarId: 'tbar2'},
+	langCategories : {
+		'Variables' : {
+			position : 10,
+			title : 'Variables',
+			tbarId : 'tbar1'
+		},
+		'Control' : {
+			position : 30,
+			title : 'Control',
+			tbarId : 'tbar1'
+		},
+		'Lists' : {
+			position : 40,
+			title : 'Lists',
+			tbarId : 'tbar1'
+		},
+		'Logic' : {
+			position : 50,
+			title : 'Logic',
+			tbarId : 'tbar1'
+		},
+		'Math' : {
+			position : 20,
+			title : 'Math',
+			tbarId : 'tbar1'
+		},
+		'Text' : {
+			position : 60,
+			title : 'Text',
+			tbarId : 'tbar1'
+		},
+		'Mesh' : {
+			position : 30,
+			title : 'Mesh',
+			tbarId : 'tbar2'
+		},
+		'Surface' : {
+			position : 25,
+			title : 'Surface',
+			tbarId : 'tbar2'
+		},
+		'Curve' : {
+			position : 20,
+			title : 'Curve',
+			tbarId : 'tbar2'
+		},
+		'Vector' : {
+			position : 10,
+			title : 'Vector',
+			tbarId : 'tbar2'
+		},
+		'Transform' : {
+			position : 40,
+			title : 'Transform',
+			tbarId : 'tbar2'
+		},
 	},
-	emptyMenuItem: {
+	emptyMenuItem : {
 		xtype : 'displayfield',
-		height: 20
+		height : 20
 	},
-	dockedItems: [{
-        xtype: 'toolbar',
-        dock: 'top',
-        itemId : 'tbar1',
-        items : [{
+	dockedItems : [{
+		xtype : 'toolbar',
+		dock : 'top',
+		itemId : 'tbar1',
+		items : [{
 			xtype : 'button',
 			text : 'Dummy',
 			tooltip : 'Layout place holder'
 		}]
-    },{
-        xtype: 'toolbar',
-        dock: 'top',
-        itemId : 'tbar2',
-        items : [{
+	}, {
+		xtype : 'toolbar',
+		dock : 'top',
+		itemId : 'tbar2',
+		items : [{
 			xtype : 'button',
 			text : 'Dummy',
 			tooltip : 'Layout place holder'
 		}]
-    }],
+	}],
 	initComponent : function() {
 		var self = this;
 		this.callParent();
@@ -62,33 +106,36 @@ Ext.define('GEN.ui.blockly.Panel', {
 		});
 
 		Meteor.autorun(function() {
-			//console.log('here...');
-			var current = Session.get("currentProgram");
-			if(_.isUndefined(current))
-				return;
-			program = Programs.findOne(current);
-			if(_.isUndefined(program))
-				return;
-			if(program.xml == self.xml)
-				return;
-			self.xml = program.xml;
-			xml = Blockly.Xml.textToDom(program.xml);
-			Blockly.mainWorkspace.clear();
-			//TODO: prevent 'blocklyWorkspaceChange' event here.
-			Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
-			self.xmlChanged();	
+			try {
+				var current = Session.get("currentProgram");
+				if(_.isUndefined(current))
+					return;
+				program = Programs.findOne(current);
+				if(_.isUndefined(program))
+					return;
+				if(program.xml == self.xml)
+					return;
+				self.xml = program.xml;
+				xml = Blockly.Xml.textToDom(program.xml);
+				Blockly.mainWorkspace.clear();
+				//TODO: prevent 'blocklyWorkspaceChange' event here.
+				Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
+				self.xmlChanged();
+			} catch(err) {
+				console.log('Editor panel: Error while program changed');
+			}
 		});
 	},
 	/*initWorkspaceChangeHandler : function() {
-	},*/
+	 },*/
 	onInitialLayout : function() {
 		this.injectBlockly();
 		this.initLanguageMenus();
 		Ext.fly(document.getElementById('blockly-inner')).on('blocklyWorkspaceChange', function() {
 			this.onWorkspaceChange();
 		}, this);
-		Ext.fly(document.getElementById('blockly-inner')).on('blocklySelectChange', function(a,b,c) {
-			if(_.isUndefined(Blockly.selected) || Blockly.selected==null) {
+		Ext.fly(document.getElementById('blockly-inner')).on('blocklySelectChange', function(a, b, c) {
+			if(_.isUndefined(Blockly.selected) || Blockly.selected == null) {
 				Session.set("selectedBlock", -1);
 			} else {
 				Session.set("selectedBlock", Blockly.selected.id);
@@ -118,10 +165,9 @@ Ext.define('GEN.ui.blockly.Panel', {
 			path : '/blockly/',
 			showToolbox : false
 		});
-		
 
 	},
-	onResize:function(){
+	onResize : function() {
 		this.body.dom.removeChild(this.blocklyWrapper);
 		this.injectBlockly();
 		Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, Blockly.Xml.textToDom(this.xml));
@@ -130,7 +176,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		this.getComponent('tbar1').removeAll();
 		this.getComponent('tbar2').removeAll();
 		//var menuList = [];
-		
+
 		var tbar = this.getComponent(this.langCategories['Variables'].tbarId);
 		tbar.add(this.buildCategoryMenu('Variables', this.variablesMenu()));
 
@@ -139,7 +185,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 			//var tbar = this.getComponent(this.langCategories[variablesCatName].tbarId);
 			var catName = cat.replace('cat_', '');
 			var tbar = this.getComponent(this.langCategories[catName].tbarId);
-			var menuItems = this.langCategories[catName].tbarId=='tbar1'?[this.emptyMenuItem]:[];
+			var menuItems = this.langCategories[catName].tbarId == 'tbar1' ? [this.emptyMenuItem] : [];
 			_.each(tree[cat], function(op) {
 				var title = op;
 				if(!_.isUndefined(Blockly.Language[op].title)) {
@@ -153,7 +199,6 @@ Ext.define('GEN.ui.blockly.Panel', {
 			tbar.add([menu]);
 			//menuList.push(menu)
 		}, this);
-
 		//this.languageToolbar.add(menuList);
 	},
 	variablesMenu : function() {
@@ -257,7 +302,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		if(xml == this.xml)
 			return;
 		this.xml = xml;
-		
+
 		var program = Session.get("currentProgram");
 		if(_.isUndefined(program)) {
 			console.log('create new program');
@@ -274,11 +319,11 @@ Ext.define('GEN.ui.blockly.Panel', {
 				}
 			});
 		}
-		this.xmlChanged();	
+		this.xmlChanged();
 	},
-	xmlChanged: function() {
+	xmlChanged : function() {
 		try {
-			Blockly.debug.traceOn=true;
+			Blockly.debug.traceOn = true;
 			var code = Blockly.Generator.workspaceToCode('JavaScript');
 		} catch(err) {
 			return;
@@ -289,7 +334,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		this.tracedCode = code;
 
 		try {
-			Blockly.debug.traceOn=false;
+			Blockly.debug.traceOn = false;
 			var cleanCode = Blockly.Generator.workspaceToCode('JavaScript');
 		} catch(err) {
 			return;
@@ -297,9 +342,9 @@ Ext.define('GEN.ui.blockly.Panel', {
 		this.cleanCode = cleanCode;
 
 		this.execCode();
-		
-		Session.set('tracedCode',  this.tracedCode);
-		Session.set('cleanCode',  this.cleanCode);
+
+		Session.set('tracedCode', this.tracedCode);
+		Session.set('cleanCode', this.cleanCode);
 	},
 	execCode : function() {
 		console.log('Execute Code:');

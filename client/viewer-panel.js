@@ -65,27 +65,37 @@ Ext.define('GEN.ui.three.Panel', {
 	initProgramChangeHandler : function() {
 		var self = this;
 		Meteor.autorun(function() {
-			var code = Session.get("tracedCode");
-			if(_.isUndefined(code)) return;
-			self.reRenderScene();
+			try {
+				var code = Session.get("tracedCode");
+				if(_.isUndefined(code))
+					return;
+				self.reRenderScene();
+			} catch(err) {
+				console.log(err);
+			}
 		});
 	},
 	initSelectionChangeHandler : function() {
 		var self = this;
 		Meteor.autorun(function() {
-			var blockId = Session.get("selectedBlock");
-			if(_.isUndefined(blockId)) return;
-			if(self.initializedScene !== true)
-				return;
+			try {
+				var blockId = Session.get("selectedBlock");
+				if(_.isUndefined(blockId))
+					return;
+				if(self.initializedScene !== true)
+					return;
 
-			if(self.renderOnlySelected) {
-				self.selectedBlock = blockId;
-				self.reRenderScene();
-			} else {
-				self.clearSelectionColor();
-				self.selectedBlock = blockId;
-				self.colorSelection();
-				self.renderScene();
+				if(self.renderOnlySelected) {
+					self.selectedBlock = blockId;
+					self.reRenderScene();
+				} else {
+					self.clearSelectionColor();
+					self.selectedBlock = blockId;
+					self.colorSelection();
+					self.renderScene();
+				}
+			} catch(err) {
+				console.log(err);
 			}
 		});
 	},
@@ -191,8 +201,8 @@ Ext.define('GEN.ui.three.Panel', {
 	initParticleSystem : function() {
 		var pMaterial = new THREE.ParticleBasicMaterial({
 			color : 0x00FF00,
-			size : 0.8,
-			sizeAttenuation: true,
+			size : 2,
+			sizeAttenuation : true,
 		});
 		var points = new THREE.Geometry();
 		this.particleSystem = new THREE.ParticleSystem(points, pMaterial);
@@ -223,7 +233,7 @@ Ext.define('GEN.ui.three.Panel', {
 			if((this.renderOnlySelected == true) && (id != this.selectedBlock))
 				return;
 			var values = Blockly.debug.tracedBlocks[id];
-			if(_.isArray(values) && values.length==1 && _.isArray(values[0])) {
+			if(_.isArray(values) && values.length == 1 && _.isArray(values[0])) {
 				values = values[0];
 			}
 			_.each(values, function(val) {
