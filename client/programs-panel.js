@@ -5,11 +5,7 @@ var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
 
 Ext.define('GEN.ui.programs.Panel', {
 	extend : 'Ext.grid.Panel',
-	//border: true,
-	bodyStyle : {
-	},
-	defaults : {
-	},
+	id : 'programsPanel',
 	alias : 'widget.programs-panel',
 	plugins : [cellEditing],
 	columns : [{
@@ -23,6 +19,7 @@ Ext.define('GEN.ui.programs.Panel', {
 		xtype : 'actioncolumn',
 		width : 40,
 		items : [{
+			title: 'Delete',
 			icon : '/img/delete.gif',
 			handler : function(grid, rowIndex, colindex) {
 				Programs.remove(grid.getStore().getAt(rowIndex).getData()._id);
@@ -50,6 +47,7 @@ Ext.define('GEN.ui.programs.Panel', {
 		this.getSelectionModel().on({
 			'selectionchange' : {
 				fn : function(model, selected, eOpts) {
+					console.log('programs panel -- selectionchange');
 					if(selected.length == 0)
 						return;
 					Session.set("currentProgram", selected[0].getData()._id);
