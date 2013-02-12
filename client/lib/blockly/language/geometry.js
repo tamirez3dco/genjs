@@ -102,7 +102,7 @@ Blockly.Language.geometry_meshComponents = {
 		//this.appendDummyInput().appendTitle('Cube')
 		this.appendDummyInput().appendTitle(new Blockly.FieldDropdown(this.componentNames), 'NAME');
 		this.appendValueInput("mesh").setCheck(String).appendTitle("mesh");
-		this.setOutput(true, String);
+		this.setOutput(true, Array);
 		this.setTooltip('Returns a mesh component');
 	}
 };
