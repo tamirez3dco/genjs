@@ -30,6 +30,7 @@ Ext.define('GEN.ui.values.Panel', {
 							vals : 'Block Produce No Values'
 						});
 					} else {
+						//return;
 						var values = Blockly.debug.tracedBlocks[blockId];
 						//console.log(values);
 						//TODO: Is this a hack? find proper way, or document
@@ -37,7 +38,14 @@ Ext.define('GEN.ui.values.Panel', {
 							values = values[0];
 						}
 						//console.log(values);
-						var vals = values.join('<br>');
+						var len = values.length;
+						if(len>300){
+							var vals = _.initial(values,300).join('<br>');
+							vals += "<br>more...";
+						}else {
+							var vals = values.join('<br>');
+						}
+						vals = len + " defined values<br>"+vals;
 						self.update({
 							vals : vals
 						});
