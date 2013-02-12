@@ -222,6 +222,9 @@ Ext.define('GEN.ui.three.Panel', {
 			if((this.renderOnlySelected == true) && (id != this.selectedBlock))
 				return;
 			var values = Blockly.debug.tracedBlocks[id];
+			if(_.isArray(values) && values.length==1 && _.isArray(values[0])) {
+				values = values[0];
+			}
 			_.each(values, function(val) {
 				if(val.toRenderable) {
 					var rendered = null;

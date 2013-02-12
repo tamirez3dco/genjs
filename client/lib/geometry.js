@@ -7,6 +7,7 @@ toxi.geom.Sphere.prototype.RENDER_TYPE = "Mesh";
 toxi.geom.AABB.prototype.RENDER_TYPE = "Mesh";
 toxi.geom.mesh.TriangleMesh.prototype.RENDER_TYPE = "Mesh";
 //THREE render types
+THREE.Vector3.prototype.RENDER_TYPE = "Point";
 THREE.Geometry.prototype.RENDER_TYPE = "Mesh";
 /*
 THREE.TextGeometry.prototype.RENDER_TYPE = "Mesh";
@@ -16,6 +17,9 @@ THREE.ParametricGeometry.prototype.RENDER_TYPE = "Mesh";
 //Points
 toxi.geom.Vec3D.prototype.toRenderable = function() {
 	return new THREE.Vector3(this.x, this.y, this.z);
+}
+THREE.Vector3.prototype.toRenderable = function() {
+	return this;
 }
 THREE.Vector3.prototype.toString = function() {
 	return 'Vec3D: [x: ' +this.x.toFixed(2)+ ', y: ' +this.y.toFixed(2) + ', z: ' +this.z.toFixed(2) + ']';
