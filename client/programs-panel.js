@@ -17,9 +17,11 @@ Ext.define('GEN.ui.programs.Panel', {
 		}
 	}, {
 		xtype : 'actioncolumn',
-		width : 40,
+		width : 45,
+		text: 'Delete',
+		align: 'center',
 		items : [{
-			title: 'Delete',
+			//title: 'Delete',
 			icon : '/img/delete.gif',
 			handler : function(grid, rowIndex, colindex) {
 				Programs.remove(grid.getStore().getAt(rowIndex).getData()._id);

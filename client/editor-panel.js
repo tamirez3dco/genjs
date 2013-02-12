@@ -196,6 +196,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 			width : 75,
 			itemId : category,
 			menu : {
+				//showSeparator: false,
 				id : category + '-menu',
 				items : items,
 			}

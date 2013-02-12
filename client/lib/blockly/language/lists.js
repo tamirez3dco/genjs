@@ -29,6 +29,7 @@ goog.require('Blockly.Language');
 
 Blockly.Language.lists_create_empty = {
   // Create an empty list.
+  title: 'Create Empty',
   category: Blockly.LANG_CATEGORY_LISTS,
   helpUrl: Blockly.LANG_LISTS_CREATE_EMPTY_HELPURL,
   init: function() {
@@ -42,6 +43,7 @@ Blockly.Language.lists_create_empty = {
 
 Blockly.Language.lists_create_with = {
   // Create a list with any number of elements of any type.
+  title: 'Create With',
   category: Blockly.LANG_CATEGORY_LISTS,
   helpUrl: '',
   init: function() {
@@ -160,6 +162,7 @@ Blockly.Language.lists_create_with_item = {
 
 Blockly.Language.lists_repeat = {
   // Create a list with one element repeated.
+  title: 'Create Repeated',
   category: Blockly.LANG_CATEGORY_LISTS,
   helpUrl: Blockly.LANG_LISTS_REPEAT_HELPURL,
   init: function() {
@@ -179,6 +182,7 @@ Blockly.Language.lists_repeat = {
 
 Blockly.Language.lists_length = {
   // List length.
+  title: 'Length',
   category: Blockly.LANG_CATEGORY_LISTS,
   helpUrl: Blockly.LANG_LISTS_LENGTH_HELPURL,
   init: function() {
@@ -193,6 +197,7 @@ Blockly.Language.lists_length = {
 
 Blockly.Language.lists_isEmpty = {
   // Is the list empty?
+  title: 'Is Empty',
   category: Blockly.LANG_CATEGORY_LISTS,
   helpUrl: Blockly.LANG_LISTS_IS_EMPTY_HELPURL,
   init: function() {
@@ -207,6 +212,7 @@ Blockly.Language.lists_isEmpty = {
 
 Blockly.Language.lists_indexOf = {
   // Find an item in the list.
+  title: 'Find Item',
   category: Blockly.LANG_CATEGORY_LISTS,
   helpUrl: Blockly.LANG_LISTS_INDEX_OF_HELPURL,
   init: function() {
@@ -230,6 +236,7 @@ Blockly.Language.lists_indexOf.OPERATORS =
 
 Blockly.Language.lists_getIndex = {
   // Get element at index.
+  title: 'Get At',
   category: Blockly.LANG_CATEGORY_LISTS,
   helpUrl: Blockly.LANG_LISTS_GET_INDEX_HELPURL,
   init: function() {
@@ -332,6 +339,7 @@ Blockly.Language.lists_getIndex.WHERE =
 
 Blockly.Language.lists_setIndex = {
   // Set element at index.
+  title: 'Set At',
   category: Blockly.LANG_CATEGORY_LISTS,
   helpUrl: Blockly.LANG_LISTS_SET_INDEX_HELPURL,
   init: function() {
