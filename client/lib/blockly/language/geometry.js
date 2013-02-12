@@ -32,7 +32,7 @@ Blockly.Language.geometry_circle = {
 };
 
 Blockly.Language.geometry_sphere = {
-	category : 'Mesh',
+	category : 'Surface',
 	title : 'Sphere',
 	init : function() {
 		this.setColour(160);
@@ -80,17 +80,17 @@ Blockly.Language.geometry_parametricSurface.surfaceNames = [
 	['Helicoidal Surface', 'helicoidal']];
 
 Blockly.Language.geometry_cube = {
-	category : 'Mesh',
-	title : 'Cube',
+	category : 'Surface',
+	title : 'Box',
 	init : function() {
 		this.setColour(160);
-		this.appendDummyInput().appendTitle('Cube')
+		this.appendDummyInput().appendTitle('Box')
 		this.appendValueInput("width").setCheck(Number).appendTitle("width");
 		this.appendValueInput("height").setCheck(Number).appendTitle("height");
 		this.appendValueInput("depth").setCheck(Number).appendTitle("depth");
 		this.appendValueInput("origin").setCheck(String).appendTitle("origin");
 		this.setOutput(true, String);
-		this.setTooltip('Returns a cube');
+		this.setTooltip('Returns a box');
 	}
 };
 

@@ -17,6 +17,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		'Math': {position: 20, title: 'Math', tbarId: 'tbar1'},
 		'Text': {position: 60, title: 'Text', tbarId: 'tbar1'},
 		'Mesh': {position: 30, title: 'Mesh', tbarId: 'tbar2'},
+		'Surface': {position: 25, title: 'Surface', tbarId: 'tbar2'},
 		'Curve': {position: 20, title: 'Curve', tbarId: 'tbar2'},
 		'Vector': {position: 10, title: 'Vector', tbarId: 'tbar2'},
 		'Transform': {position: 40, title: 'Transform', tbarId: 'tbar2'},
