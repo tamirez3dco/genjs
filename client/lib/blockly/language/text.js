@@ -27,8 +27,9 @@ goog.provide('Blockly.Language.text');
 
 goog.require('Blockly.Language');
 
-Blockly.Language.text = {
+Blockly.Language.text_text = {
   // Text value.
+  title: 'Text',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_TEXT_HELPURL,
   init: function() {
@@ -46,6 +47,7 @@ Blockly.Language.text = {
 
 Blockly.Language.text_join = {
   // Create a string made up of any number of elements of any type.
+  title: 'Join',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_JOIN_HELPURL,
   init: function() {
@@ -144,6 +146,7 @@ Blockly.Language.text_join = {
 
 Blockly.Language.text_create_join_container = {
   // Container.
+  title: 'Container',
   init: function() {
     this.setColour(160);
     this.appendDummyInput()
@@ -156,6 +159,7 @@ Blockly.Language.text_create_join_container = {
 
 Blockly.Language.text_create_join_item = {
   // Add items.
+  title: 'Add items',
   init: function() {
     this.setColour(160);
     this.appendDummyInput()
@@ -169,6 +173,7 @@ Blockly.Language.text_create_join_item = {
 
 Blockly.Language.text_append = {
   // Append to a variable in place.
+  title: 'Append',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_APPEND_HELPURL,
   init: function() {
@@ -199,6 +204,7 @@ Blockly.Language.text_append = {
 
 Blockly.Language.text_length = {
   // String length.
+  title: 'Length',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_LENGTH_HELPURL,
   init: function() {
@@ -213,6 +219,7 @@ Blockly.Language.text_length = {
 
 Blockly.Language.text_isEmpty = {
   // Is the string null?
+  title: 'Is Empty',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_ISEMPTY_HELPURL,
   init: function() {
@@ -227,6 +234,7 @@ Blockly.Language.text_isEmpty = {
 
 Blockly.Language.text_endString = {
   // Return a leading or trailing substring.
+  title: 'Substring',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_ENDSTRING_HELPURL,
   init: function() {
@@ -250,6 +258,7 @@ Blockly.Language.text_endString.OPERATORS =
 
 Blockly.Language.text_indexOf = {
   // Find a substring in the text.
+  title: 'Find',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_INDEXOF_HELPURL,
   init: function() {
@@ -274,6 +283,7 @@ Blockly.Language.text_indexOf.OPERATORS =
 
 Blockly.Language.text_charAt = {
   // Get a character from the string.
+  title: 'Get Character',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_CHARAT_HELPURL,
   init: function() {
@@ -338,6 +348,7 @@ Blockly.Language.text_charAt.WHERE =
 
 Blockly.Language.text_changeCase = {
   // Change capitalization.
+  title: 'Change Case',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_CHANGECASE_HELPURL,
   init: function() {
@@ -358,6 +369,7 @@ Blockly.Language.text_changeCase.OPERATORS =
 
 Blockly.Language.text_trim = {
   // Trim spaces.
+  title: 'Trim Spaces',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_TRIM_HELPURL,
   init: function() {
@@ -398,8 +410,10 @@ Blockly.Language.text_trim.OPERATORS =
      [Blockly.LANG_TEXT_TRIM_OPERATOR_LEFT, 'LEFT'],
      [Blockly.LANG_TEXT_TRIM_OPERATOR_RIGHT, 'RIGHT']];
 
+/*
 Blockly.Language.text_print = {
   // Print statement.
+  title: '',
   category: Blockly.LANG_CATEGORY_TEXT,
   helpUrl: Blockly.LANG_TEXT_PRINT_HELPURL,
   init: function() {
@@ -411,7 +425,8 @@ Blockly.Language.text_print = {
     this.setTooltip(Blockly.LANG_TEXT_PRINT_TOOLTIP);
   }
 };
-
+*/
+/*
 Blockly.Language.text_prompt = {
   // Prompt function.
   category: Blockly.LANG_CATEGORY_TEXT,
@@ -435,3 +450,4 @@ Blockly.Language.text_prompt = {
 Blockly.Language.text_prompt.TYPES =
     [[Blockly.LANG_TEXT_PROMPT_TYPE_TEXT, 'TEXT'],
      [Blockly.LANG_TEXT_PROMPT_TYPE_NUMBER, 'NUMBER']];
+*/

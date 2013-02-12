@@ -46,15 +46,15 @@ Blockly.Language.geometry_sphere = {
 
 Blockly.Language.geometry_textGeo = {
 	category : 'Mesh',
-	title : 'TextGeo',
+	title : 'Text',
 	init : function() {
 		this.setColour(160);
-		this.appendDummyInput().appendTitle('TextGeo')
-		this.appendValueInput("size").setCheck(Number).appendTitle("size");
+		this.appendDummyInput().appendTitle('Text Mesh');
 		this.appendValueInput("text").setCheck(String).appendTitle("text");
+		this.appendValueInput("size").setCheck(Number).appendTitle("size");
 		this.appendValueInput("height").setCheck(Number).appendTitle("height");
 		this.setOutput(true, String);
-		this.setTooltip('Returns a Text Geometry');
+		this.setTooltip('Returns a Text Mesh');
 	}
 };
 

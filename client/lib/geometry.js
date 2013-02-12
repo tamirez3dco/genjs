@@ -244,17 +244,12 @@ GEN.Geometry.Surfaces.enneper = function(scale) {
 		var y = -v + (Math.pow(v, 3) / 3) - (v * Math.pow(u, 2));
 		var z = Math.pow(u, 2) - Math.pow(v, 2);
 
-		x *= scale;
-		y *= scale;
-		z *= scale;
-		return new THREE.Vector3(x, y, z);
+		return new THREE.Vector3(x*scale, y*scale, z*scale);
 	}
 }
 
 GEN.Geometry.Surfaces.catenoid = function(scale) {
 	return function(v, u) {
-		var t = 5;
-		
 		u = (u * 2 * Math.PI) - Math.PI;
 		v = (v * 2 * Math.PI) - Math.PI;
 		
@@ -262,17 +257,12 @@ GEN.Geometry.Surfaces.catenoid = function(scale) {
 		var z = v;
 		var y = 2*cosh(v/2)*sin(u)
 
-		x *= scale;
-		y *= scale;
-		z *= scale;
-		return new THREE.Vector3(x, y, z);
+		return new THREE.Vector3(x*scale, y*scale, z*scale);
 	}
 }
 
 GEN.Geometry.Surfaces.helicoidal = function(scale) {
 	return function(v, u) {
-		var t = 5;
-		
 		u = (u * 2 * Math.PI) - Math.PI;
 		v = (v * 2 * Math.PI) - Math.PI;
 		
@@ -280,16 +270,11 @@ GEN.Geometry.Surfaces.helicoidal = function(scale) {
 		var z = 3*u;
 		var y = -sinh(v)*cos(u);
 
-		x *= scale;
-		y *= scale;
-		z *= scale;
-		return new THREE.Vector3(x, y, z);
+		return new THREE.Vector3(x*scale, y*scale, z*scale);
 	}
 }
 GEN.Geometry.Surfaces.torus = function(scale) {
 	return function(v, u) {
-		var t = 5;
-		
 		u = (u * 2 * Math.PI);
 		v = (v * 2 * Math.PI);
 		
@@ -297,10 +282,7 @@ GEN.Geometry.Surfaces.torus = function(scale) {
 		var z = 0.5*sin(u);
 		var y = (1+0.5*cos(u))*sin(v);
 
-		x *= scale;
-		y *= scale;
-		z *= scale;
-		return new THREE.Vector3(x, y, z);
+		return new THREE.Vector3(x*scale, y*scale, z*scale);
 	}
 }
 /*

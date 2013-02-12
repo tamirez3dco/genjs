@@ -83,10 +83,11 @@ Blockly.Generator.get = function(name) {
  * @param {string} name Language name (e.g. 'JavaScript').
  * @return {string} Generated code.
  */
-Blockly.Generator.workspaceToCode = function(name) {
+Blockly.Generator.workspaceToCode = function(name, trace) {
   var code = [];
   var generator = Blockly.Generator.get(name);
   generator.init();
+  generator.traceOn = trace;
   var blocks = Blockly.mainWorkspace.getTopBlocks(true);
   for (var x = 0, block; block = blocks[x]; x++) {
     var line = generator.blockToCode(block);
@@ -94,7 +95,10 @@ Blockly.Generator.workspaceToCode = function(name) {
       // Value blocks return tuples of code and operator order.
       // Top-level blocks don't care about operator order.
       line = line[0];
-      line = "Blockly.debug.trace(" + line + ","+ block.id + ")";
+      //var cleanLine
+      if (trace) {
+      	line = "Blockly.debug.trace(" + line + ","+ block.id + ")";
+      }
     }
     if (line) {
       if (block.outputConnection && generator.scrubNakedValue) {
@@ -222,8 +226,9 @@ Blockly.CodeGenerator.prototype.valueToCode = function(block, name, order) {
     throw 'Expecting valid order from value block "' + targetBlock.type + '".';
   }
   
-  code = "Blockly.debug.trace(" + code +","+ targetBlock.id + ")";
-  
+  if (this.trace) {
+  	code = "Blockly.debug.trace(" + code +","+ targetBlock.id + ")";
+  }
   if (code && order <= innerOrder) {
     // The operators outside this code are stonger than the operators
     // inside this code.  To prevent the code from being pulled apart,

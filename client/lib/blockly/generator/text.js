@@ -27,7 +27,7 @@ goog.provide('Blockly.JavaScript.text');
 
 goog.require('Blockly.JavaScript');
 
-Blockly.JavaScript.text = function() {
+Blockly.JavaScript.text_text = function() {
   // Text value.
   var code = Blockly.JavaScript.quote_(this.getTitleValue('TEXT'));
   return [code, Blockly.JavaScript.ORDER_ATOMIC];
