@@ -77,12 +77,16 @@ toxi.geom.Sphere.prototype.toRenderable = function() {
 	return this.toMesh(20).toRenderable();
 }
 toxi.geom.Sphere.prototype.toString = function() {
-	return 'Sphere: [origin: [x: ' +this.x+ ', y: ' +this.y + ', z: ' +this.z + '], radius: '+ this.radius +']';
+	return 'Sphere: [origin: [x: ' +this.x.toFixed(2)+ ', y: ' +this.y.toFixed(2) + ', z: ' +this.z.toFixed(2) + '], radius: '+ this.radius.toFixed(2) +']';
 }
 toxi.geom.AABB.prototype.toRenderable = function() {
 	return this.toMesh().toRenderable();
 }
-
+toxi.geom.AABB.prototype.toString = function() {
+	//console.log(_.keys(this));
+	//console.log(this.extent);
+	return  'Box: [origin: [x: ' +this.x.toFixed(2)+ ', y: ' +this.y.toFixed(2) + ', z: ' +this.z.toFixed(2) + ']]';
+}
 
 THREE.Geometry.prototype.toToxic = function() {
 	var toxicGeo = new toxi.geom.mesh.TriangleMesh();
