@@ -17,6 +17,9 @@ THREE.ParametricGeometry.prototype.RENDER_TYPE = "Mesh";
 toxi.geom.Vec3D.prototype.toRenderable = function() {
 	return new THREE.Vector3(this.x, this.y, this.z);
 }
+THREE.Vector3.prototype.toString = function() {
+	return 'Vec3D: [x: ' +this.x.toFixed(2)+ ', y: ' +this.y.toFixed(2) + ', z: ' +this.z.toFixed(2) + ']';
+}
 //Lines
 toxi.geom.Polygon2D.prototype.toRenderable = function() {
 	var geometry = new THREE.Geometry();
@@ -218,6 +221,19 @@ GEN.Geometry.prototype.scale = function(geometry, vecOrFactor) {
 	
 	return ng;
 }
+
+GEN.Geometry.prototype.meshComponents = function(args) {
+	console.log(args);
+	if( args.mesh instanceof THREE.Geometry) {
+		var comp = args.mesh[args.componentType];
+		//console.log(comp);
+	} else {
+		var comp = null;
+	}
+	
+	return comp;
+}
+
 //Parametric surface functions
 GEN.Geometry.Surfaces = {}
 

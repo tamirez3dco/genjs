@@ -64,15 +64,16 @@ Meteor.startup(function() {
 					//minHeight : 75,
 					maxHeight : 400,
 					margins : "0 0 0 0",
-					bodyPadding : 0,
+					bodyPadding : "0 0 10 0",
 					frame : false,
 					//layout: 'fit
 					layout : 'border',
 					defaults : {
 						frame : false,
 						margins : "0 0 0 0",
-						bodyPadding : 0,
-						split : true
+						bodyPadding : 4,
+						split : true,
+						autoScroll: true,
 					},
 					items : [{
 						region : 'west',
@@ -80,11 +81,12 @@ Meteor.startup(function() {
 						width : '40%',
 						title : 'Javascript Code',
 						xtype : 'jscode-panel',
-						autoscroll: true,
+						//autoscroll: true,
 						data: {code: 'No code generated'}
 					}, {
 						region : 'center',
 						width : '30%',
+						//autoScroll: true,
 						title : 'Selected Values',
 						xtype : 'values-panel'
 					}, {

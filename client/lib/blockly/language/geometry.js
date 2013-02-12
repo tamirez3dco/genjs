@@ -94,6 +94,26 @@ Blockly.Language.geometry_cube = {
 	}
 };
 
+Blockly.Language.geometry_meshComponents = {
+	category : 'Mesh',
+	title : 'Components',
+	init : function() {
+		this.setColour(160);
+		//this.appendDummyInput().appendTitle('Cube')
+		this.appendDummyInput().appendTitle(new Blockly.FieldDropdown(this.componentNames), 'NAME');
+		this.appendValueInput("mesh").setCheck(String).appendTitle("mesh");
+		this.setOutput(true, String);
+		this.setTooltip('Returns a mesh component');
+	}
+};
+
+Blockly.Language.geometry_meshComponents.componentNames = [
+	['Mesh Faces', 'faces'],
+	/*['Mesh Edges', 'edges'], */ //TODO: Implement get edges 
+	['Mesh Vertices', 'vertices'],
+	
+];
+
 Blockly.Language.geometry_move = {
 	category : 'Transform',
 	title : 'Move',
@@ -255,6 +275,15 @@ Blockly.JavaScript.geometry_textGeo = function() {
 		return "";
 
 	var code = "_g.createTextGeo(" + text + ',' + size + "," + height +")";
+	return [code, orderNone];
+};
+
+Blockly.JavaScript.geometry_meshComponents = function() {
+	var componentType = this.getTitleValue('NAME');
+	var mesh = valueToCode(this, 'mesh', orderNone);
+	if(mesh == null)
+		return "";
+	var code = "_g.meshComponents({mesh: "+mesh+", componentType: '"+componentType+"'})";
 	return [code, orderNone];
 };
 
