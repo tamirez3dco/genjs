@@ -191,119 +191,120 @@ Blockly.Language.geometry_mesh_subdivide.STRATEGIES = [['Midpoint', 'Midpoint'],
 
 
 ///Generators
-
+var valueToCode = function(a,b,c) {return Blockly.JavaScript.valueToCode(a,b,c)};
+var orderNone = Blockly.JavaScript.ORDER_NONE;
 //Primitives - points, vectors, etc
 Blockly.JavaScript.geometry_point = function() {
-	var x = Blockly.JavaScript.valueToCode(this, 'X', Blockly.JavaScript.ORDER_NONE) || 0;
-	var y = Blockly.JavaScript.valueToCode(this, 'Y', Blockly.JavaScript.ORDER_NONE) || 0;
-	var z = Blockly.JavaScript.valueToCode(this, 'Z', Blockly.JavaScript.ORDER_NONE) || 0;
+	var x = valueToCode(this, 'X', orderNone) || 0;
+	var y = valueToCode(this, 'Y', orderNone) || 0;
+	var z = valueToCode(this, 'Z', orderNone) || 0;
 	if((x == null) || (y == null) || (z == null))
 		return '';
 
 	var code = "_g.createPoint(" + x + ',' + y + ',' + z + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
+	return [code, orderNone];
 };
 
 //Primitives - 2D
 Blockly.JavaScript.geometry_circle = function() {
-	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	var radius = valueToCode(this, 'radius', orderNone) || 10;
+	var origin = valueToCode(this, 'origin', orderNone) || '_g.createPoint(0,0,0)';
 
 	var code = "_g.createCircle(" + origin + ',' + radius + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
+	return [code, orderNone];
 };
 
 //Primitives - surfaces
 Blockly.JavaScript.geometry_cube = function() {
-	var width = Blockly.JavaScript.valueToCode(this, 'width', Blockly.JavaScript.ORDER_NONE) || 10;
-	var height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_NONE) || 10;
-	var depth = Blockly.JavaScript.valueToCode(this, 'depth', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	var width = valueToCode(this, 'width', orderNone) || 10;
+	var height = valueToCode(this, 'height', orderNone) || 10;
+	var depth = valueToCode(this, 'depth', orderNone) || 10;
+	var origin = valueToCode(this, 'origin', orderNone) || '_g.createPoint(0,0,0)';
 	if(origin == null)
 		return "";
 	var code = "_g.createCube(" + origin + ',' + width + ',' + depth + ',' + height + ")";
 
-	return [code, Blockly.JavaScript.ORDER_NONE];
+	return [code, orderNone];
 };
 
 Blockly.JavaScript.geometry_sphere = function() {
-	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 10;
-	var origin = Blockly.JavaScript.valueToCode(this, 'origin', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	var radius = valueToCode(this, 'radius', orderNone) || 10;
+	var origin = valueToCode(this, 'origin', orderNone) || '_g.createPoint(0,0,0)';
 	if((origin == null) || (radius == null))
 		return "";
 
 	var code = "_g.createSphere(\n    " + origin + ',\n    ' + radius + "\n)";
-	return [code, Blockly.JavaScript.ORDER_NONE];
+	return [code, orderNone];
 };
 
 //Primitives - meshes
 Blockly.JavaScript.geometry_parametricSurface = function() {
 	var name = this.getTitleValue('NAME');
-	var udiv = Blockly.JavaScript.valueToCode(this, 'udiv', Blockly.JavaScript.ORDER_NONE) || 20;
-	var vdiv = Blockly.JavaScript.valueToCode(this, 'vdiv', Blockly.JavaScript.ORDER_NONE) || 20;
+	var udiv = valueToCode(this, 'udiv', orderNone) || 20;
+	var vdiv = valueToCode(this, 'vdiv', orderNone) || 20;
 	
 	var code = "_g.createParametricSurface('" + name + "'," + udiv + "," + vdiv + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
+	return [code, orderNone];
 };
 
 Blockly.JavaScript.geometry_textGeo = function() {
-	var size = Blockly.JavaScript.valueToCode(this, 'size', Blockly.JavaScript.ORDER_NONE) || 10;
-	var text = Blockly.JavaScript.valueToCode(this, 'text', Blockly.JavaScript.ORDER_NONE) || 'Blockly.debug.trace(\"mussa\")';
-	var height = Blockly.JavaScript.valueToCode(this, 'height', Blockly.JavaScript.ORDER_NONE) || 5;
+	var size = valueToCode(this, 'size', orderNone) || 10;
+	var text = valueToCode(this, 'text', orderNone) || '"mussa"';
+	var height = valueToCode(this, 'height', orderNone) || 5;
 	if((size == null) || (text == null))
 		return "";
 
 	var code = "_g.createTextGeo(" + text + ',' + size + "," + height +")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
+	return [code, orderNone];
 };
 
 //Transform - basic
 Blockly.JavaScript.geometry_move = function() {
-	var geometry = Blockly.JavaScript.valueToCode(this, 'geometry', Blockly.JavaScript.ORDER_NONE) || null;
-	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
+	var geometry = valueToCode(this, 'geometry', orderNone) || null;
+	var vector = valueToCode(this, 'vector', orderNone) || '_g.createPoint(0,0,0)';
 	if((geometry == null))
 		return "";
 	
 	var code = "_g.move(" + geometry + "," + vector + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
+	return [code, orderNone];
 };
 
 
 Blockly.JavaScript.geometry_scale = function() {
-	var geometry = Blockly.JavaScript.valueToCode(this, 'geometry', Blockly.JavaScript.ORDER_NONE) || null;
-	var vector = Blockly.JavaScript.valueToCode(this, 'vector', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(2,2,2)';
+	var geometry = valueToCode(this, 'geometry', orderNone) || null;
+	var vector = valueToCode(this, 'vector', orderNone) || '_g.createPoint(2,2,2)';
 	if((geometry == null))
 		return "";
 	
 	var code = "_g.scale(" + geometry + "," + vector + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
+	return [code, orderNone];
 };
 
 
 //TODO: reimplement
 /*
 Blockly.JavaScript.line = function() {
-	var p1 = Blockly.JavaScript.valueToCode(this, 'P1', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(0,0,0)';
-	var p2 = Blockly.JavaScript.valueToCode(this, 'P2', Blockly.JavaScript.ORDER_NONE) || '_g.createPoint(10,10,10)';
+	var p1 = valueToCode(this, 'P1', orderNone) || '_g.createPoint(0,0,0)';
+	var p2 = valueToCode(this, 'P2', orderNone) || '_g.createPoint(10,10,10)';
 	if((p1 == null) || (p2 == null))
 		return '';
 	var code = "addLine(" + p1 + ',' + p2 + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
+	return [code, orderNone];
 };
 
 Blockly.JavaScript.divideCurve = function() {
-	var curve = Blockly.JavaScript.valueToCode(this, 'curve', Blockly.JavaScript.ORDER_NONE) || null;
-	var segments = Blockly.JavaScript.valueToCode(this, 'segments', Blockly.JavaScript.ORDER_NONE) || 10;
+	var curve = valueToCode(this, 'curve', orderNone) || null;
+	var segments = valueToCode(this, 'segments', orderNone) || 10;
 	if(curve == null)
 		return '';
 	var code = "divideCurve(" + curve + ',' + segments + ")";
-	return [code, Blockly.JavaScript.ORDER_NONE];
+	return [code, orderNone];
 };
 
 Blockly.JavaScript.pipe = function() {
-	var curve = Blockly.JavaScript.valueToCode(this, 'curve', Blockly.JavaScript.ORDER_NONE) || null;
-	var radius = Blockly.JavaScript.valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 3;
-	var sides = Blockly.JavaScript.valueToCode(this, 'sides', Blockly.JavaScript.ORDER_NONE) || 12;
+	var curve = valueToCode(this, 'curve', Blockly.JavaScript.ORDER_NONE) || null;
+	var radius = valueToCode(this, 'radius', Blockly.JavaScript.ORDER_NONE) || 3;
+	var sides = valueToCode(this, 'sides', Blockly.JavaScript.ORDER_NONE) || 12;
 	if(curve == null)
 		return '';
 	var code = "addTube(" + curve + ',' + radius + ',' + sides + ")";
@@ -311,7 +312,7 @@ Blockly.JavaScript.pipe = function() {
 };
 
 Blockly.JavaScript.geometry_mesh_fromsurface = function() {
-	var surface = Blockly.JavaScript.valueToCode(this, 'surface', Blockly.JavaScript.ORDER_NONE) || null;
+	var surface = valueToCode(this, 'surface', Blockly.JavaScript.ORDER_NONE) || null;
 	if(surface == null)
 		return "";
 	var code = "GEN.runner.run("+ surface + ".toMesh(20))";
@@ -320,7 +321,7 @@ Blockly.JavaScript.geometry_mesh_fromsurface = function() {
 }
 
 Blockly.JavaScript.geometry_mesh_subdivide = function() {
-	var mesh = Blockly.JavaScript.valueToCode(this, 'mesh', Blockly.JavaScript.ORDER_NONE) || null;
+	var mesh = valueToCode(this, 'mesh', Blockly.JavaScript.ORDER_NONE) || null;
 	var strategy = this.getTitleValue('STRATEGY');
 	//console.log('kkk');
 	//console.log(mesh);
