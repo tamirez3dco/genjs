@@ -5,7 +5,7 @@ toxi.geom.Ellipse.prototype.RENDER_TYPE = "Line";
 toxi.geom.Circle.prototype.RENDER_TYPE = "Line";
 toxi.geom.Sphere.prototype.RENDER_TYPE = "Mesh";
 toxi.geom.AABB.prototype.RENDER_TYPE = "Mesh";
-
+toxi.geom.mesh.TriangleMesh.prototype.RENDER_TYPE = "Mesh";
 //THREE render types
 THREE.Geometry.prototype.RENDER_TYPE = "Mesh";
 /*
@@ -58,6 +58,7 @@ toxi.geom.mesh.TriangleMesh.prototype.toRenderable = function() {
 		addFace(this.faces[j]);
 	}
 
+    
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
 	geometry.computeVertexNormals();
@@ -71,6 +72,36 @@ toxi.geom.Sphere.prototype.toRenderable = function() {
 
 toxi.geom.AABB.prototype.toRenderable = function() {
 	return this.toMesh().toRenderable();
+}
+
+
+THREE.Geometry.prototype.toToxic = function() {
+	var toxicGeo = new toxi.geom.mesh.TriangleMesh();
+	for(var j = 0, flen = this.faces.length; j < flen; j++) {
+		var threeFace = this.faces[j];
+		var x1 = this.vertices[threeFace.a].x;
+		var y1 = this.vertices[threeFace.a].y;
+		var z1 = this.vertices[threeFace.a].z;
+		var toxV1 = new toxi.geom.Vec3D(x1,y1,z1);
+
+		var x2 = this.vertices[threeFace.b].x;
+		var y2 = this.vertices[threeFace.b].y;
+		var z2 = this.vertices[threeFace.b].z;
+		var toxV2 = new toxi.geom.Vec3D(x2,y2,z2);
+
+		var x3 = this.vertices[threeFace.c].x;
+		var y3 = this.vertices[threeFace.c].y;
+		var z3 = this.vertices[threeFace.c].z;
+		var toxV3 = new toxi.geom.Vec3D(x3,y3,z3);
+
+		toxicGeo.addFace(toxV1,toxV2,toxV3);
+
+	}
+	toxicGeo.computeCentroid();
+	toxicGeo.computeFaceNormals();
+	toxicGeo.computeVertexNormals();	
+	
+	return toxicGeo;		
 }
 
 THREE.Geometry.prototype.toRenderable = function() {
@@ -136,7 +167,9 @@ GEN.Geometry.prototype.createTextGeo = function(text, size, height) {
 		material : 0,
 		extrudeMaterial : 1
 	});
-	return c;
+
+	var toxic = c.toToxic();
+	return toxic;
 };
 
 GEN.Geometry.prototype.createCube = function(origin, width, depth, height) {
