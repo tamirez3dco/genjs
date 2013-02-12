@@ -170,8 +170,9 @@ GEN.Geometry.prototype.createTextGeo = function(text, size, height) {
 		extrudeMaterial : 1
 	});
 
-	var toxic = c.toToxic();
-	return toxic;
+	//var toxic = c.toToxic();
+	//return toxic;
+	return c;
 };
 
 GEN.Geometry.prototype.createCube = function(origin, width, depth, height) {
