@@ -1,16 +1,29 @@
-//TODO: put somewhere..
-var cellEditing = Ext.create('Ext.grid.plugin.CellEditing', {
-	clicksToEdit : 2
-});
-
 Ext.define('GEN.ui.programs.Panel', {
 	extend : 'Ext.grid.Panel',
 	id : 'programsPanel',
 	alias : 'widget.programs-panel',
-	plugins : [cellEditing],
+	plugins : [{
+		ptype : 'cellediting',
+		pluginId : 'cellEditing',
+		clicksToEdit : 2
+	}],
+	dockedItems : [{
+		xtype : 'toolbar',
+		dock : 'top',
+		itemId : 'toolbar1',
+		items : [{
+			xtype : 'button',
+			//text: 'new',
+			cls : 'x-btn-default-small',
+			icon : '/img/file-empty.png',
+			tooltip : 'New program',
+			itemId : 'newProgram',
+		}],
+	}],
 	columns : [{
 		'text' : 'Name',
 		dataIndex : 'name',
+		itemId : 'nameColumn',
 		editor : {
 			xtype : 'textfield',
 			allowBlank : false
@@ -18,11 +31,11 @@ Ext.define('GEN.ui.programs.Panel', {
 	}, {
 		xtype : 'actioncolumn',
 		width : 45,
-		text: 'Delete',
-		align: 'center',
+		text : 'Delete',
+		align : 'center',
 		items : [{
 			//title: 'Delete',
-			icon : '/img/delete.gif',
+			icon : '/img/file-remove.png',
 			handler : function(grid, rowIndex, colindex) {
 				Programs.remove(grid.getStore().getAt(rowIndex).getData()._id);
 				grid.getStore().removeAt(rowIndex);
@@ -35,7 +48,7 @@ Ext.define('GEN.ui.programs.Panel', {
 				console.log(e);
 				d = e.record.getData();
 				fields = {}
-				fields[e.field]=e.value;
+				fields[e.field] = e.value;
 				Programs.update(Programs.findOne(d._id), {
 					$set : fields
 				});
@@ -56,5 +69,49 @@ Ext.define('GEN.ui.programs.Panel', {
 				}
 			}
 		});
+		var self = this;
+		Meteor.autorun(function() {
+			console.log('hi');
+			try {
+				var programId = Session.get("currentProgram");
+				if(_.isUndefined(programId))
+					return;
+					
+				var currentId = self.getSelectedId();
+				if(currentId==programId) return;
+				
+				var rec = self.store.getById(programId);
+				self.getSelectionModel().select(rec);
+			
+				if(rec.data.name=="New Program") {
+					var p = self.getPlugin('cellEditing');
+					p.startEdit(rec, self.columns[0]);
+					
+				}
+			} catch(err) {
+				console.log(err);
+			}
+		});
+
+		this.getComponent('toolbar1').getComponent('newProgram').on('click', this.onNewProgram, this);
+	},
+	getSelectedId : function() {
+		current = this.getSelectionModel().selected.items[0];
+		if(_.isUndefined(current))
+			return null;
+		return this.getSelectionModel().selected.items[0].data._id;
+	},
+	onNewProgram : function() {
+		var programs = this.store.addSave([{
+			name : 'New Program',
+			xml : '<xml></xml>',
+		}]);
+		console.log('onNewProgram');
+		console.log(programs);
+		console.log(this.columns[0]);
+		console.log(this.getPlugin('cellEditing'));
+		var p = this.getPlugin('cellEditing');
+		p.startEdit(programs[0], this.columns[0]);
+		Session.set("currentProgram", programs[0]._id);
 	}
 });

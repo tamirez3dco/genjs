@@ -2,7 +2,7 @@ Meteor.startup(function() {
 	Ext.create('GEN.store.Programs', {});
 	Session.set("currentXML", '<xml></xml>');
 	Session.set("selectedBlock", -1);
-	
+
 	Blockly.debug = new Blockly.Debugger();
 	_g = new GEN.Geometry();
 	Ext.application({
@@ -50,7 +50,7 @@ Meteor.startup(function() {
 					margins : '5 0 0 0',
 					//width : '10%',
 					//minWidth: '200',
-					width: 146,
+					width : 146,
 					bodyPadding : 0,
 					xtype : 'programs-panel',
 					store : Ext.data.StoreManager.lookup('GEN.store.Programs'),
@@ -73,7 +73,7 @@ Meteor.startup(function() {
 						margins : "0 0 0 0",
 						bodyPadding : 4,
 						split : true,
-						autoScroll: true,
+						autoScroll : true,
 					},
 					items : [{
 						region : 'west',
@@ -82,7 +82,9 @@ Meteor.startup(function() {
 						title : 'Javascript Code',
 						xtype : 'jscode-panel',
 						//autoscroll: true,
-						data: {code: 'No code generated'}
+						data : {
+							code : 'No code generated'
+						}
 					}, {
 						region : 'center',
 						width : '30%',
@@ -102,14 +104,15 @@ Meteor.startup(function() {
 					collapsible : false,
 					split : false,
 					html : '',
+					/*tools : [{
+						type : 'refresh',
+						tooltip : 'Refresh form Data',
+						handler : function(event, toolEl, panel) {
+						}
+					}],
 					listeners : {
-						/*'afterrender': {
-						 fn: function(){
-						 var el = document.getElementById('sign-in-div');
-						 el.appendChild()
-						 }
-						 }*/
-					}
+						
+					}*/
 				}]
 			});
 		}
