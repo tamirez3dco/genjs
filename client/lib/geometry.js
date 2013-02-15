@@ -198,23 +198,32 @@ toxi.geom.AABB.prototype.toString = function() {
 
 
 THREE.Geometry.prototype.toCSG_Mesh = function() {
-	this.computeFaceNormals();
-	this.computeVertexNormals();
-	THREE.GeometryUtils.triangulateQuads(this);
+	var temp = this.clone();
+	temp.computeFaceNormals();
+	temp.computeVertexNormals();
+	try
+  	{
+  		THREE.GeometryUtils.triangulateQuads(temp);
+  	}
+	catch(err)
+  	{
+  		console.log("Error description: " + err.message + "\n\n");
+  	}
+	
 	var csg_polygons = [];
-	for(var j = 0, flen = this.faces.length; j < flen; j++) {
-		var face = this.faces[j];
+	for(var j = 0, flen = temp.faces.length; j < flen; j++) {
+		var face = temp.faces[j];
 		if (face instanceof THREE.Face3){
-			var csg_vertex_a = this.vertices[face.a].toCSG_Vertex();
-			var csg_vertex_b = this.vertices[face.b].toCSG_Vertex();
-			var csg_vertex_c = this.vertices[face.c].toCSG_Vertex();
+			var csg_vertex_a = temp.vertices[face.a].toCSG_Vertex();
+			var csg_vertex_b = temp.vertices[face.b].toCSG_Vertex();
+			var csg_vertex_c = temp.vertices[face.c].toCSG_Vertex();
 			csg_polygons.push(new CSG.Polygon([csg_vertex_a,csg_vertex_b,csg_vertex_c]));
 		}
 		else if (face instanceof THREE.Face4){
-			var csg_vertex_a = this.vertices[face.a].toCSG_Vertex();
-			var csg_vertex_b = this.vertices[face.b].toCSG_Vertex();
-			var csg_vertex_c = this.vertices[face.c].toCSG_Vertex();
-			var csg_vertex_d = this.vertices[face.d].toCSG_Vertex();
+			var csg_vertex_a = temp.vertices[face.a].toCSG_Vertex();
+			var csg_vertex_b = temp.vertices[face.b].toCSG_Vertex();
+			var csg_vertex_c = temp.vertices[face.c].toCSG_Vertex();
+			var csg_vertex_d = temp.vertices[face.d].toCSG_Vertex();
 			csg_polygons.push(new CSG.Polygon([csg_vertex_a,csg_vertex_b,csg_vertex_c,csg_vertex_d]));
 		}
 		else{
