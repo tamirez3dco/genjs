@@ -114,6 +114,20 @@ Blockly.Language.geometry_meshComponents.componentNames = [
 	
 ];
 
+Blockly.Language.geometry_union = {
+	category : 'Transform',
+	title : 'Union',
+	init : function() {
+		this.setColour(160);
+		this.appendDummyInput().appendTitle('Union')
+		this.appendValueInput("geometry1").setCheck(String).appendTitle("geometry1");
+		this.appendValueInput("geometry2").setCheck(String).appendTitle("geometry2");
+		this.setOutput(true, String);
+		this.setTooltip('Unions two geometries');
+	}
+};
+
+
 Blockly.Language.geometry_move = {
 	category : 'Transform',
 	title : 'Move',
@@ -322,6 +336,21 @@ Blockly.JavaScript.geometry_move = function() {
 		return "";
 	
 	var code = "_g.move(" + geometry + "," + vector + ")";
+	return [code, orderNone];
+};
+
+Blockly.JavaScript.geometry_union = function() {
+	console.log("Blockly.JavaScript.geometry_union");
+	var geometry1 = valueToCode(this, 'geometry1', orderNone) || null;
+	var geometry2 = valueToCode(this, 'geometry2', orderNone) || null;
+	if((geometry1 == null) || (geometry2 == null))
+		return "";
+	console.log("geometry1=");
+	console.log(geometry1);
+	console.log("geometry2=");
+	console.log(geometry2);
+
+	var code = "_g.union(" + geometry1 + "," + geometry2 + ")";
 	return [code, orderNone];
 };
 
