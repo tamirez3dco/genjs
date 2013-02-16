@@ -436,6 +436,31 @@ GEN.Geometry.prototype.union = function(geometry1, geometry2) {
 };
 
 
+GEN.Geometry.prototype.booleanOperation = function(op,geometry1, geometry2) {
+	console.log("geometry1=");
+	console.log(geometry1);
+	console.log("geometry2=");
+	console.log(geometry2);
+	console.log("op="+op);
+
+
+	var csg1 = 	geometry1.toCSG_Mesh();
+	console.log("csg1=");
+	console.log(csg1);
+	var csg2 = 	geometry2.toCSG_Mesh();
+	console.log("csg2=");
+	console.log(csg2);
+	
+	var csg_op = csg1[op](csg2);
+	console.log("csg_op=");
+	console.log(csg_op);
+	
+	var renderableOutput = csg_op.toRenderable();
+	console.log("renderableOutput=");
+	console.log(renderableOutput);
+	return renderableOutput;
+};
+
 
 
 //TODO: only works for mesh
