@@ -173,10 +173,13 @@ toxi.geom.mesh.TriangleMesh.prototype.toRenderable = function() {
 }
 
 toxi.geom.Sphere.prototype.toRenderable = function() {
-	return this.toMesh(20).toRenderable();
+	var toxicMesh = this.toMesh(20);
+	console.log("flipping faces on toxic.geom.Sphere...")
+	toxicMesh.flipVertexOrder();
+	return toxicMesh.toRenderable();
 }
 toxi.geom.Sphere.prototype.toCSG_Mesh = function() {
-	return this.toMesh(20).toCSG_Mesh();
+	return this.toRenderable().toCSG_Mesh();
 }
 
 toxi.geom.Sphere.prototype.toString = function() {
