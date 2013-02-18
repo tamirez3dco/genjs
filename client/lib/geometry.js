@@ -346,6 +346,11 @@ GEN.Geometry = function() {
 GEN.Geometry.GLOBAL_OBJECT_NAME = '_g';
 GEN.Geometry.UNMEMOIZED_PREFIX = '__';
 
+GEN.Geometry.initGlobal = function(){
+	GEN.Geometry.buildAPI();
+	window[GEN.Geometry.GLOBAL_OBJECT_NAME] = new GEN.Geometry();
+}
+
 //meomize all API functions, renaming to internal name and exposing memoized functions.
 GEN.Geometry.buildAPI = function() {
 	var funz = _.functions(GEN.Geometry.prototype);
