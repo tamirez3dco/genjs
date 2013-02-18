@@ -330,32 +330,61 @@ THREE.Geometry.prototype.scale = function(vec) {
 	this.applyMatrix(mat);
 	return this;
 }
-//GEN Geometry API
 
+////////////////////////////////////////
+//GEN Geometry API
+////////////////////////////////////////
 GEN = {};
 
 GEN.Geometry = function() {
 };
 
-GEN.Geometry.prototype.createPoint = function(pX, pY, pZ) {
-	var p = new toxi.geom.Vec3D(pX, pY, pZ);
+//API creation utilities
+GEN.Geometry.GLOBAL_OBJECT_NAME = '_g';
+GEN.Geometry.UNMEMOIZED_PREFIX = '__';
+
+//meomize all API functions, renaming to internal name and exposing memoized functions.
+GEN.Geometry.buildAPI = function() {
+	var funz = _.functions(GEN.Geometry.prototype);
+	_.each(funz, function(fnName){
+		GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName] = GEN.Geometry.prototype[fnName];
+		GEN.Geometry.prototype[fnName] = goog.memoize(GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName]);
+	});
+};
+
+//Generate text represenrarion of an API function call
+//Assumes **ONE** arguments object
+GEN.Geometry.generateCodeForFunction = function(fnName, argsObject) {
+	var l = _.map(_.keys(argsObject), function(k){
+		 return ("   " + k + ': ' + argsObject[k]);
+	});
+	var argsStr = "{\n"+ l.join(",\n") + "}";
+	
+	var code = GEN.Geometry.GLOBAL_OBJECT_NAME + '.' + fnName + '(' + argsStr + ')';
+	return code;
+};
+
+
+//API functions
+GEN.Geometry.prototype.createPoint = function(args) {
+	var p = new toxi.geom.Vec3D(args.x, args.y, args.z);
 	return p;
 };
 
-GEN.Geometry.prototype.createCircle = function(origin, radius) {
-	var c = new toxi.geom.Circle(origin, radius);
+GEN.Geometry.prototype.createCircle = function(args) {
+	var c = new toxi.geom.Circle(args.origin, args.radius);
 	return c;
 };
 
-GEN.Geometry.prototype.createSphere = function(origin, radius) {
-	var c = new toxi.geom.Sphere(origin, radius);
+GEN.Geometry.prototype.createSphere = function(args) {
+	var c = new toxi.geom.Sphere(args.origin, args.radius);
 	return c;
 };
 //TODO: add font selection, bevel?
-GEN.Geometry.prototype.createTextGeo = function(text, size, height) {
-	var c = new THREE.TextGeometry(text, {
-		size : size,
-		height : height,
+GEN.Geometry.prototype.createTextGeo = function(args) {
+	var c = new THREE.TextGeometry(args.text, {
+		size : args.size,
+		height : args.height,
 		curveSegments : 4,
 
 		font : "optimer",
@@ -372,26 +401,31 @@ GEN.Geometry.prototype.createTextGeo = function(text, size, height) {
 
 	return c;
 };
-
-GEN.Geometry.prototype.createCube = function(origin, width, depth, height) {
-	var c = new toxi.geom.AABB(origin, this.createPoint(width, depth, height));
+/*
+ * 
+ */
+GEN.Geometry.prototype.createCube = function(args) {
+	var c = new toxi.geom.AABB(args.origin, this.createPoint({x: args.width, y: args.depth, z: args.height}));
 	return c;
 };
 
-GEN.Geometry.prototype.createParametricSurface = function(name, udiv, vdiv) {
-	var geo = new THREE.ParametricGeometry(GEN.Geometry.Surfaces[name](5), udiv, vdiv);
+GEN.Geometry.prototype.createParametricSurface = function(args) {
+	console.log('running createParametricSurface');
+	var geo = new THREE.ParametricGeometry(GEN.Geometry.Surfaces[args.name](5), args.udiv, args.vdiv);
 	return geo;
 };
 
-GEN.Geometry.prototype.createPipe = function(curve, radius, sides) {
+GEN.Geometry.prototype.createPipe = function(args) {
 	//console.log('hi');
 	//console.log(curve);
-	var pipe = new THREE.TubeGeometry(curve, 2, radius, sides, false, false);
+	var pipe = new THREE.TubeGeometry(args.curve, 2, args.radius, args.sides, false, false);
 	return pipe;
 };
 
 //TODO: Not nice + take care of all types
-GEN.Geometry.prototype.move = function(geometry, translation) {
+GEN.Geometry.prototype.move = function(args) {
+	var geometry = args.geometry;
+	var translation = args.translation;
 	if( geometry instanceof toxi.geom.Circle) {
 		var vec = geometry.add(translation);
 		var ng = new toxi.geom.Circle(vec, geometry.radius);
@@ -408,17 +442,16 @@ GEN.Geometry.prototype.move = function(geometry, translation) {
 };
 
 
-GEN.Geometry.prototype.union = function(geometry1, geometry2) {
+GEN.Geometry.prototype.union = function(args) {
 	console.log("geometry1=");
-	console.log(geometry1);
+	console.log(args.geometry1);
 	console.log("geometry2=");
-	console.log(geometry2);
+	console.log(args.geometry2);
 
-
-	var csg1 = 	geometry1.toCSG_Mesh();
+	var csg1 = 	args.geometry1.toCSG_Mesh();
 	console.log("csg1=");
 	console.log(csg1);
-	var csg2 = 	geometry2.toCSG_Mesh();
+	var csg2 = 	args.geometry2.toCSG_Mesh();
 	console.log("csg2=");
 	console.log(csg2);
 	
@@ -432,29 +465,26 @@ GEN.Geometry.prototype.union = function(geometry1, geometry2) {
 	return renderableUnion;
 };
 
-
-
-
 //TODO: only works for mesh
-GEN.Geometry.prototype.scale = function(geometry, vecOrFactor) {
-	var vec = vecOrFactor;
+GEN.Geometry.prototype.scale = function(args) {
+	var vec = args.vecOrFactor;
 	if(_.isNumber(vec)) {
 		vec = this.createPoint(vec);
 	}
 	console.log(vec);
 
-	if( geometry instanceof THREE.Geometry) {
-		var ng = geometry.clone();
+	if( args.geometry instanceof THREE.Geometry) {
+		var ng = args.geometry.clone();
 		ng.scale(vec);
 	} else {
-		ng = geometry;
+		ng = args.geometry;
 	}
 
 	return ng;
 }
 
 GEN.Geometry.prototype.meshComponents = function(args) {
-	//console.log(args);
+	console.log('running meshComponents');
 	if(args.mesh instanceof THREE.Geometry) {
 		if(args.componentType == 'edges') {
 			//console.log(args.mesh);
@@ -469,7 +499,10 @@ GEN.Geometry.prototype.meshComponents = function(args) {
 
 	return comp;
 }
+
+/////////////////////////////////////////
 //Parametric surface functions
+
 GEN.Geometry.Surfaces = {}
 
 GEN.Geometry.Surfaces.klein = function(scale) {
