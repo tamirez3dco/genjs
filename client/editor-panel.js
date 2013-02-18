@@ -131,9 +131,13 @@ Ext.define('GEN.ui.blockly.Panel', {
 	onInitialLayout : function() {
 		this.injectBlockly();
 		this.initLanguageMenus();
-		Ext.fly(document.getElementById('blockly-inner')).on('blocklyWorkspaceChange', function() {
-			this.onWorkspaceChange();
-		}, this);
+		Ext.fly(document.getElementById('blockly-inner')).on({
+			'blocklyWorkspaceChange': {
+				fn: this.onWorkspaceChange,
+				scope: this,
+				buffer: 300
+			}
+		});
 		Ext.fly(document.getElementById('blockly-inner')).on('blocklySelectChange', function(a, b, c) {
 			if(_.isUndefined(Blockly.selected) || Blockly.selected == null) {
 				Session.set("selectedBlock", -1);
