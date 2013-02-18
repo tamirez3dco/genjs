@@ -259,6 +259,7 @@ var valueToCode = function(a,b,c) {return Blockly.JavaScript.valueToCode(a,b,c)}
 var orderNone = Blockly.JavaScript.ORDER_NONE;
 var codeForFunction = function(a,b) {return GEN.Geometry.generateCodeForFunction(a,b)};
 var stringifyString = function(s){return '"'+s+'"';};
+
 //Primitives - points, vectors, etc
 Blockly.JavaScript.geometry_point = function() {
 	var x = valueToCode(this, 'X', orderNone) || 0;
@@ -334,7 +335,7 @@ Blockly.JavaScript.geometry_textGeo = function() {
 	if((size == null) || (text == null))
 		return "";
 	
-	var code = codeForFunction('createParametricSurface', {size: size, text: text, height: height});
+	var code = codeForFunction('createTextGeo', {size: size, text: text, height: height});
 	return [code, orderNone];
 };
 

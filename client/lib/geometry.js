@@ -424,8 +424,6 @@ GEN.Geometry.prototype.createParametricSurface = function(args) {
 };
 
 GEN.Geometry.prototype.createPipe = function(args) {
-	//console.log('hi');
-	//console.log(curve);
 	var pipe = new THREE.TubeGeometry(args.curve, 2, args.radius, args.sides, false, false);
 	return pipe;
 };
