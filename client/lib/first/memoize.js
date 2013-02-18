@@ -18,11 +18,18 @@ goog.memoize = function(f, opt_serializer) {
       // In the strict mode, when this function is called as a global function,
       // the value of 'this' is undefined instead of a global object. See:
       // https://developer.mozilla.org/en/JavaScript/Strict_mode
-      var thisOrGlobal = this || goog.global;
+      //var thisOrGlobal = this || goog.global;
+      var thisOrGlobal = goog.global;
       // Maps the serialized list of args to the corresponding return value.
       var cache = thisOrGlobal[goog.memoize.CACHE_PROPERTY_] ||
           (thisOrGlobal[goog.memoize.CACHE_PROPERTY_] = {});
+          
+      var cache_use = thisOrGlobal[goog.memoize.CACHE_USE_PROPERTY_] ||
+          (thisOrGlobal[goog.memoize.CACHE_USE_PROPERTY_] = {});
+          
       var key = serializer(functionUid, arguments);
+      cache_use[key] = goog.memoize.USAGE_COUNTER;
+      
       return cache.hasOwnProperty(key) ? cache[key] :
           (cache[key] = f.apply(this, arguments));
     } else {
@@ -31,7 +38,7 @@ goog.memoize = function(f, opt_serializer) {
   };
 };
 
-
+goog.memoize.USAGE_COUNTER = 0;
 /**
  * @define {boolean} Flag to disable memoization in unit tests.
  */
@@ -45,8 +52,25 @@ goog.memoize.ENABLE_MEMOIZE = true;
  */
 goog.memoize.clearCache = function(cacheOwner) {
   cacheOwner[goog.memoize.CACHE_PROPERTY_] = {};
+  cacheOwner[goog.memoize.CACHE_USE_PROPERTY_] = {};
 };
 
+goog.memoize.clearUnused = function(period) {
+	var thisOrGlobal = goog.global;
+  	
+  _.each(_.keys(thisOrGlobal[goog.memoize.CACHE_USE_PROPERTY_]), function(k){
+  		if((thisOrGlobal[goog.memoize.CACHE_USE_PROPERTY_][k] + period)  < goog.memoize.USAGE_COUNTER){
+  			delete thisOrGlobal[goog.memoize.CACHE_USE_PROPERTY_][k];
+  			delete thisOrGlobal[goog.memoize.CACHE_PROPERTY_][k];
+  		}
+  });
+};
+
+goog.memoize.dumpCache = function() {
+	var thisOrGlobal = goog.global;
+  	console.log(thisOrGlobal[goog.memoize.CACHE_PROPERTY_]);
+  	console.log(thisOrGlobal[goog.memoize.CACHE_USE_PROPERTY_]);
+};
 
 /**
  * Name of the property used by goog.memoize as cache.
@@ -54,7 +78,7 @@ goog.memoize.clearCache = function(cacheOwner) {
  * @private
  */
 goog.memoize.CACHE_PROPERTY_ = 'closure_memoize_cache_';
-
+goog.memoize.CACHE_USE_PROPERTY_ = 'closure_memoize_cache_use_';
 
 /**
  * Simple and fast argument serializer function for goog.memoize.

@@ -418,7 +418,6 @@ GEN.Geometry.prototype.createCube = function(args) {
 };
 
 GEN.Geometry.prototype.createParametricSurface = function(args) {
-	console.log('running createParametricSurface');
 	var geo = new THREE.ParametricGeometry(GEN.Geometry.Surfaces[args.name](5), args.udiv, args.vdiv);
 	return geo;
 };

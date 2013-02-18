@@ -104,7 +104,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 				single : true
 			}
 		});
-
+		goog.memoize.USAGE_COUNTER = 0;
 		Meteor.autorun(function() {
 			try {
 				var current = Session.get("currentProgram");
@@ -351,7 +351,8 @@ Ext.define('GEN.ui.blockly.Panel', {
 		Session.set('cleanCode', this.cleanCode);
 	},
 	execCode : function() {
-		console.log('Execute Code:');
+		//Ext.log({msg: 'Execute Code', dump: this.tracedCode});
+		console.log("Execute Code");
 		console.log(this.tracedCode);
 		Blockly.debug.start();
 		try {
@@ -361,6 +362,11 @@ Ext.define('GEN.ui.blockly.Panel', {
 			console.log(e);
 			return;
 		}
+		console.log("Cache");
+		goog.memoize.dumpCache();
+		
+		goog.memoize.clearUnused(5);
+		goog.memoize.USAGE_COUNTER += 1;
 		Blockly.debug.stop();
 	},
 });
