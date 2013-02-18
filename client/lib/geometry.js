@@ -173,10 +173,13 @@ toxi.geom.mesh.TriangleMesh.prototype.toRenderable = function() {
 }
 
 toxi.geom.Sphere.prototype.toRenderable = function() {
-	return this.toMesh(20).toRenderable();
+	var toxicMesh = this.toMesh(20);
+	console.log("flipping faces on toxic.geom.Sphere...")
+	toxicMesh.flipVertexOrder();
+	return toxicMesh.toRenderable();
 }
 toxi.geom.Sphere.prototype.toCSG_Mesh = function() {
-	return this.toMesh(20).toCSG_Mesh();
+	return this.toRenderable().toCSG_Mesh();
 }
 
 toxi.geom.Sphere.prototype.toString = function() {
@@ -463,6 +466,15 @@ GEN.Geometry.prototype.union = function(args) {
 	console.log("renderableUnion=");
 	console.log(renderableUnion);
 	return renderableUnion;
+};
+
+GEN.Geometry.prototype.booleanOperation = function(args) {
+	var csg1 = 	args.geometry1.toCSG_Mesh();
+	var csg2 = 	args.geometry2.toCSG_Mesh();
+	var csg_op = csg1[args.operation](csg2);
+	var renderableOutput = csg_op.toRenderable();
+	
+	return renderableOutput;
 };
 
 //TODO: only works for mesh

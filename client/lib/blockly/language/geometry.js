@@ -113,7 +113,7 @@ Blockly.Language.geometry_meshComponents.componentNames = [
 	['Mesh Vertices', 'vertices'],
 	
 ];
-
+/*
 Blockly.Language.geometry_union = {
 	category : 'Transform',
 	title : 'Union',
@@ -126,7 +126,24 @@ Blockly.Language.geometry_union = {
 		this.setTooltip('Unions two geometries');
 	}
 };
-
+*/
+Blockly.Language.geometry_booleanOperation = {
+	category : 'Transform',
+	title : 'Boolean Operations',
+	init : function() {
+		console.log('init language: geometry_booleanOperation');
+		this.setColour(160);
+		this.appendDummyInput().appendTitle(new Blockly.FieldDropdown(this.operationNames), 'NAME');
+		this.appendValueInput("geometry1").setCheck(String).appendTitle("geometry1");
+		this.appendValueInput("geometry2").setCheck(String).appendTitle("geometry2");
+		this.setOutput(true, String);
+		this.setTooltip('Performs boolean operations');
+	}
+};
+Blockly.Language.geometry_booleanOperation.operationNames = [
+	['Union', 'union'],
+	['Intersect', 'intersect'], 
+	['Subtract', 'subtract']];
 
 Blockly.Language.geometry_move = {
 	category : 'Transform',
@@ -295,6 +312,20 @@ Blockly.JavaScript.geometry_parametricSurface = function() {
 	var code = codeForFunction('createParametricSurface', {name: stringifyString(name), udiv: udiv, vdiv: vdiv});
 	return [code, orderNone];
 };
+
+
+Blockly.JavaScript.geometry_booleanOperation = function() {
+	console.log("Blockly.JavaScript.geometry_booleanOperation");
+	var operation = this.getTitleValue('NAME');
+	var geometry1 = valueToCode(this, 'geometry1', orderNone) || null;
+	var geometry2 = valueToCode(this, 'geometry2', orderNone) || null;
+	if((geometry1 == null) || (geometry2 == null))
+		return "";
+	
+	var code = codeForFunction('booleanOperation', {operation: stringifyString(operation), geometry1: geometry1, geometry2: geometry2});
+	return [code, orderNone];
+};
+
 
 Blockly.JavaScript.geometry_textGeo = function() {
 	var size = valueToCode(this, 'size', orderNone) || 10;
