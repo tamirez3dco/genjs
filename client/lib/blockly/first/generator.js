@@ -102,7 +102,7 @@ Blockly.Generator.workspaceToCode = function(name) {
       line = line[0];
       //var cleanLine
       if (Blockly.debug.traceOn) {
-      	line = "Blockly.debug.trace(" + line + ","+ block.id + ")";
+      	line = "GEN.debug.trace(" + line + ","+ block.id + ")";
       }
     }
     if (line) {
@@ -232,7 +232,7 @@ Blockly.CodeGenerator.prototype.valueToCode = function(block, name, order) {
   }
   
   if (Blockly.debug.traceOn) {
-  	code = "Blockly.debug.trace(" + code +","+ targetBlock.id + ")";
+  	code = "GEN.debug.trace(" + code +","+ targetBlock.id + ")";
   }
   if (code && order <= innerOrder) {
     // The operators outside this code are stonger than the operators

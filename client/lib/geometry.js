@@ -47,9 +47,22 @@ THREE.Vector3.prototype.toCSG_Vertex = function() {
 THREE.Vector3.prototype.toRenderable = function() {
 	return this;
 }
-
+THREE.Vector3.prototype.toJSON = function() {
+	return [this.x,this.y,this.z];
+}
+THREE.Vector3.prototype.encode = function(precision,type) {
+	var g = new THREE.Geometry();
+	g.vertices.push(this);
+	return g.encode(precision,type);
+	//return [this.x,this.y,this.z];
+}
+/*
 THREE.Vector3.prototype.toString = function() {
-	return 'Vec3D: [x: ' + this.x.toFixed(2) + ', y: ' + this.y.toFixed(2) + ', z: ' + this.z.toFixed(2) + ']';
+	return '[x: ' + this.x.toFixed(2) + ', y: ' + this.y.toFixed(2) + ', z: ' + this.z.toFixed(2) + ']';
+}
+*/	
+THREE.Vector3.prototype.toString = function(){
+	return "[ x: "+this.x+ ", y: "+this.y+ ", z: "+this.z+"]";
 }
 //Lines
 toxi.geom.Polygon2D.prototype.toRenderable = function() {
@@ -135,7 +148,7 @@ toxi.geom.mesh.TriangleMesh.prototype.toCSG_Mesh = function() {
 	}
 	var csg_mesh = new CSG.fromPolygons(csg_polygons);
 
-	console.log(csg_mesh);
+	//console.log(csg_mesh);
 	return csg_mesh;
 }
 
@@ -174,7 +187,7 @@ toxi.geom.mesh.TriangleMesh.prototype.toRenderable = function() {
 
 toxi.geom.Sphere.prototype.toRenderable = function() {
 	var toxicMesh = this.toMesh(20);
-	console.log("flipping faces on toxic.geom.Sphere...")
+	//console.log("flipping faces on toxic.geom.Sphere...")
 	toxicMesh.flipVertexOrder();
 	return toxicMesh.toRenderable();
 }
@@ -210,7 +223,7 @@ THREE.Geometry.prototype.toCSG_Mesh = function() {
   	}
 	catch(err)
   	{
-  		console.log("Error description: " + err.message + "\n\n");
+  		//console.log("Error description: " + err.message + "\n\n");
   	}
 	
 	var csg_polygons = [];
@@ -230,13 +243,13 @@ THREE.Geometry.prototype.toCSG_Mesh = function() {
 			csg_polygons.push(new CSG.Polygon([csg_vertex_a,csg_vertex_b,csg_vertex_c,csg_vertex_d]));
 		}
 		else{
-			console.log("ERROR in face # " + j + " -- neither Face3 nor Face4");
-			console.log(face);
+			//console.log("ERROR in face # " + j + " -- neither Face3 nor Face4");
+			//console.log(face);
 		}
 	}
 	var csg_mesh = new CSG.fromPolygons(csg_polygons);
 
-	console.log(csg_mesh);
+	//console.log(csg_mesh);
 	return csg_mesh;
 }
 
@@ -271,6 +284,9 @@ THREE.Geometry.prototype.toToxic = function() {
 	return toxicGeo;
 }
 //var spline = new THREE.SplineCurve3([p1, p2]);
+/*THREE.Geometry.prototype.toJSON = function() {
+	return {v: this.vertices, f: this.faces};
+}*/
 
 THREE.Geometry.prototype.toRenderable = function() {
 	return this;
@@ -310,6 +326,75 @@ THREE.Geometry.prototype.getEdges = function() {
 	}
 	return edges;
 }
+
+THREE.Geometry.prototype.encode = function(precision, render_type) {
+	var vertices = this.vertices;
+	var faces = this.faces;
+	
+	var vco = [];
+	for(var i=0; i< vertices.length; i++) {
+		vco.push(vertices[i].x.toFixed(precision),vertices[i].y.toFixed(precision),vertices[i].z.toFixed(precision));
+	}
+	//vstr = vco.join(',');
+	//vstr = JSON.stringify(vco);
+	//return vstr;
+	
+	var fco = [];
+	for(var i=0; i< faces.length; i++) {
+		var f = [faces[i].a,faces[i].b,faces[i].c];
+		if(faces[i].d) f.push(faces[i].d);
+		fco.push(f);
+	}
+	//fstr = 	fco.join(';');	
+	
+	//var encoded = fstr + '#' + vstr;
+	//var encoded = JSON.stringify({type: type, data: {v: vco, f: fco}});
+	var encoded = {render_type: render_type, data: {v: vco, f: fco}};
+	return encoded;
+	
+}
+
+THREE.Geometry.decode = function(json) {
+	var geometry = new THREE.Geometry();
+	var f3 = function(g, i1, i2, i3) {
+		//unlike toxiclibs, a face in three.js are indices related to the vertices array
+		g.faces.push(new THREE.Face3(i1, i2, i3));
+	};
+	var f4= function(g, i1, i2, i3, i4) {
+		//unlike toxiclibs, a face in three.js are indices related to the vertices array
+		g.faces.push(new THREE.Face4(i1, i2, i3, i4));
+	};
+	var v3 = function(g, x,y,z) {
+		var threeV = new THREE.Vector3(x, y, z);
+		g.vertices.push(threeV);
+	};
+	
+	//var coded = JSON.parse(str);//str.split("#");
+	var coded = json.data;
+	
+	//var vertices = coded[1].split(',');
+	var vertices = coded.v;
+	for(var i=0; i< vertices.length; i+=3) {
+		v3(geometry, vertices[i], vertices[i+1], vertices[i+2]);
+	}
+	
+	var faces = coded.f;
+	for(var i=0; i< faces.length; i++) {
+		vcs = faces[i];
+		if(vcs.length==3) {
+			f3(geometry, vcs[0], vcs[1], vcs[2]);
+		}else{
+			f4(geometry,vcs[0], vcs[1], vcs[2], vcs[3]);
+		}
+	}
+	//console.log(vertices);
+	//console.log(geometry);
+	geometry.computeCentroids();
+	geometry.computeFaceNormals();
+	geometry.computeVertexNormals();
+
+	return {render_type: json.render_type, geometry: geometry};
+}
 /*
  THREE.TextGeometry.prototype.toRenderable = function() {
  return this;
@@ -338,17 +423,42 @@ THREE.Geometry.prototype.scale = function(vec) {
 //GEN Geometry API
 ////////////////////////////////////////
 GEN = {};
+GEN.Debugger = function(){
+	this.tracedValues = [];
+	this.tracedBlocks = {};
+	this.traceOn=false;
+};
+GEN.Debugger.prototype.trace = function(value, blockId) {
+	//console.log('trc');
+	this.tracedValues.push(value);
+	//console.log(blockId);
+	if(_.isUndefined(this.tracedBlocks[blockId])) {
+		this.tracedBlocks[blockId] = [value];
+	} else {
+		this.tracedBlocks[blockId].push(value);
+	}
+	return value;
+}
+GEN.Debugger.prototype.start = function() {
+	//this.traceOn=true;
+	this.tracedValues = [];
+	this.tracedBlocks = {};
+}
+GEN.Debugger.prototype.stop = function() {
+	//this.traceOn=false;
+}
 
 GEN.Geometry = function() {
 };
 
+GEN.global = this;
 //API creation utilities
 GEN.Geometry.GLOBAL_OBJECT_NAME = '_g';
 GEN.Geometry.UNMEMOIZED_PREFIX = '__';
 
 GEN.Geometry.initGlobal = function(){
 	GEN.Geometry.buildAPI();
-	window[GEN.Geometry.GLOBAL_OBJECT_NAME] = new GEN.Geometry();
+	GEN.global[GEN.Geometry.GLOBAL_OBJECT_NAME] = new GEN.Geometry();
 }
 
 //meomize all API functions, renaming to internal name and exposing memoized functions.
@@ -448,25 +558,13 @@ GEN.Geometry.prototype.move = function(args) {
 
 
 GEN.Geometry.prototype.union = function(args) {
-	console.log("geometry1=");
-	console.log(args.geometry1);
-	console.log("geometry2=");
-	console.log(args.geometry2);
-
 	var csg1 = 	args.geometry1.toCSG_Mesh();
-	console.log("csg1=");
-	console.log(csg1);
 	var csg2 = 	args.geometry2.toCSG_Mesh();
-	console.log("csg2=");
-	console.log(csg2);
 	
 	var csg_union = csg1.union(csg2);
-	console.log("csg_union=");
-	console.log(csg_union);
-	
+
 	var renderableUnion = csg_union.toRenderable();
-	console.log("renderableUnion=");
-	console.log(renderableUnion);
+	
 	return renderableUnion;
 };
 
@@ -498,7 +596,7 @@ GEN.Geometry.prototype.scale = function(args) {
 }
 
 GEN.Geometry.prototype.meshComponents = function(args) {
-	console.log('running meshComponents');
+	//console.log('running meshComponents');
 	if(args.mesh instanceof THREE.Geometry) {
 		if(args.componentType == 'edges') {
 			//console.log(args.mesh);

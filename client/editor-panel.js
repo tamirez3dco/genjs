@@ -90,9 +90,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		}]
 	}],
 	initComponent : function() {
-		var self = this;
 		this.callParent();
-		//this.languageToolbar = this.getDockedComponent('tbar1');
 		this.on({
 			'mousewheel' : {
 				element : 'el',
@@ -104,7 +102,12 @@ Ext.define('GEN.ui.blockly.Panel', {
 				single : true
 			}
 		});
-		goog.memoize.USAGE_COUNTER = 0;
+		this.initProgramChangeHandler();
+		this.initWorker();
+	},
+	//This happens when the selected program changed locally, or when the xml changed remotely
+	initProgramChangeHandler : function() {
+		var self = this;
 		Meteor.autorun(function() {
 			try {
 				var current = Session.get("currentProgram");
@@ -122,20 +125,18 @@ Ext.define('GEN.ui.blockly.Panel', {
 				Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
 				self.xmlChanged();
 			} catch(err) {
-				console.log('Editor panel: Error while program changed');
+				console.log('Editor panel: Error while program changed' + err.message);
 			}
 		});
 	},
-	/*initWorkspaceChangeHandler : function() {
-	 },*/
 	onInitialLayout : function() {
 		this.injectBlockly();
 		this.initLanguageMenus();
 		Ext.fly(document.getElementById('blockly-inner')).on({
-			'blocklyWorkspaceChange': {
-				fn: this.onWorkspaceChange,
-				scope: this,
-				buffer: 300
+			'blocklyWorkspaceChange' : {
+				fn : this.onWorkspaceChange,
+				scope : this,
+				buffer : 250
 			}
 		});
 		Ext.fly(document.getElementById('blockly-inner')).on('blocklySelectChange', function(a, b, c) {
@@ -179,14 +180,12 @@ Ext.define('GEN.ui.blockly.Panel', {
 	initLanguageMenus : function() {
 		this.getComponent('tbar1').removeAll();
 		this.getComponent('tbar2').removeAll();
-		//var menuList = [];
 
 		var tbar = this.getComponent(this.langCategories['Variables'].tbarId);
 		tbar.add(this.buildCategoryMenu('Variables', this.variablesMenu()));
 
 		var tree = Blockly.Toolbox.buildTree_();
 		_.each(_.keys(tree), function(cat) {
-			//var tbar = this.getComponent(this.langCategories[variablesCatName].tbarId);
 			var catName = cat.replace('cat_', '');
 			var tbar = this.getComponent(this.langCategories[catName].tbarId);
 			var menuItems = this.langCategories[catName].tbarId == 'tbar1' ? [this.emptyMenuItem] : [];
@@ -201,14 +200,10 @@ Ext.define('GEN.ui.blockly.Panel', {
 			}, this);
 			var menu = this.buildCategoryMenu(catName, menuItems);
 			tbar.add([menu]);
-			//menuList.push(menu)
 		}, this);
-		//this.languageToolbar.add(menuList);
 	},
 	variablesMenu : function() {
-		//var tbar = this.languageToolbar;
 		var variablesCatName = "Variables";
-		//var tbar = this.getComponent('tbar1');
 		var tbar = this.getComponent(this.langCategories[variablesCatName].tbarId);
 		var menuItems = [this.emptyMenuItem];
 
@@ -292,8 +287,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 	},
 	onWorkspaceChange : function() {
 		var newVarList = _.union(Blockly.Variables.allVariables(), ['item']);
-		//console.log(newVarList);
-		//console.log(this.varList);
+
 		if(!_.isEqual(this.varList, newVarList)) {
 			this.varList = newVarList;
 			Ext.getCmp('Variables-menu').removeAll();
@@ -345,28 +339,56 @@ Ext.define('GEN.ui.blockly.Panel', {
 		}
 		this.cleanCode = cleanCode;
 
-		this.execCode();
+		this.runWorker(this.tracedCode);
+		//this.execCode();
 
 		Session.set('tracedCode', this.tracedCode);
 		Session.set('cleanCode', this.cleanCode);
 	},
-	execCode : function() {
-		//Ext.log({msg: 'Execute Code', dump: this.tracedCode});
-		console.log("Execute Code");
-		console.log(this.tracedCode);
-		Blockly.debug.start();
-		try {
-			eval(this.tracedCode);
-		} catch (e) {
-			console.log('Error executing:');
-			console.log(e);
-			return;
-		}
-		console.log("Cache");
-		goog.memoize.dumpCache();
-		
-		goog.memoize.clearUnused(5);
-		goog.memoize.USAGE_COUNTER += 1;
-		Blockly.debug.stop();
+	initWorker : function() {
+		//not sure we need this here, need to check scope.
+		var self=this;
+		this.worker = new SharedWorker('/client/code-worker.js');
+		this.worker.port.addEventListener("message", function(event) {
+			self.getWorkerMessage(event);
+		}, false);
+
+		this.worker.port.start();
 	},
+	runWorker : function(code) {
+		console.log("Execute Code");
+		console.log(code);
+		console.log('sending');
+		this.worker.port.postMessage(code);
+	},
+	getWorkerMessage : function(event) {
+		console.log("Worker says: ");
+		var renderableBlocks = JSON.parse(event.data);
+		console.log(renderableBlocks);
+		Session.set('renderableBlocks', renderableBlocks)
+
+	},
+		/*
+	 execCode : function() {
+	 //Ext.log({msg: 'Execute Code', dump: this.tracedCode});
+	 //console.log("Execute Code");
+	 this.runWorker(this.tracedCode);
+
+	 //console.log("Execute Code");
+	 //console.log(this.tracedCode);
+	 Blockly.debug.start(this.tracedCode);
+	 try {
+	 eval(this.tracedCode);
+	 } catch (e) {
+	 console.log('Error executing:');
+	 console.log(e);
+	 return;
+	 }
+	 //console.log("Cache");
+	 //goog.memoize.dumpCache();
+
+	 goog.memoize.clearUnused(5);
+	 goog.memoize.USAGE_COUNTER += 1;
+	 Blockly.debug.stop();
+	 },*/
 });

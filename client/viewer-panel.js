@@ -65,9 +65,12 @@ Ext.define('GEN.ui.three.Panel', {
 	initProgramChangeHandler : function() {
 		var self = this;
 		Meteor.autorun(function() {
+			console.log('yeah');
 			try {
-				var code = Session.get("tracedCode");
-				if(_.isUndefined(code))
+				var blocks = Session.get("renderableBlocks");
+				console.log(blocks);
+				self.blocks = blocks;
+				if(_.isUndefined(blocks))
 					return;
 				self.reRenderScene();
 			} catch(err) {
@@ -98,18 +101,6 @@ Ext.define('GEN.ui.three.Panel', {
 				console.log(err);
 			}
 		});
-	},
-	execCode : function() {
-		console.log('Execute Code:');
-		console.log(this.code);
-		Blockly.debug.start();
-		try {
-			eval(this.code);
-		} catch (e) {
-			console.log('Error executing:');
-			console.log(e);
-			return;
-		}
 	},
 	//Scene initializations
 	createAxis : function() {
@@ -228,35 +219,35 @@ Ext.define('GEN.ui.three.Panel', {
 		this.geometries.push(renderable);
 	},
 	addGeometries : function() {
-		var blocksIds = _.keys(Blockly.debug.tracedBlocks);
+		var blocksIds = _.keys(this.blocks);
 		_.each(blocksIds, function(id) {
 			if((this.renderOnlySelected == true) && (id != this.selectedBlock))
 				return;
-			var values = Blockly.debug.tracedBlocks[id];
+			var values = this.blocks[id];
 			if(_.isArray(values) && values.length == 1 && _.isArray(values[0])) {
 				values = values[0];
 			}
 			_.each(values, function(val) {
-				if(val.toRenderable) {
-					var rendered = null;
-					var geometry = val.toRenderable();
-					if(val.RENDER_TYPE == "Point") {
-						this.particleSystem.geometry.vertices.push(geometry);
-						return;
-					} else if(val.RENDER_TYPE == "Line") {
-						rendered = new THREE.Line(geometry, this.lineMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
-						//console.log(rendered);
-					} else if(val.RENDER_TYPE == "Mesh") {
-						rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
-					}
+				var decoded = THREE.Geometry.decode(val);
+				var geometry = decoded.geometry;
+				var rendered = null;
 
-					if(this.geometries[id]) {
-						this.geometries[id].push(rendered);
-					} else {
-						this.geometries[id] = [rendered];
-					}
-					this.scene.add(rendered);
+				if(decoded.render_type == "Point") {
+					this.particleSystem.geometry.vertices.push(geometry.vertices[0]);
+					return;
+				} else if(decoded.render_type == "Line") {
+					rendered = new THREE.Line(geometry, this.lineMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
+				} else if(decoded.render_type == "Mesh") {
+					rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
 				}
+
+				if(this.geometries[id]) {
+					this.geometries[id].push(rendered);
+				} else {
+					this.geometries[id] = [rendered];
+				}
+				this.scene.add(rendered);
+
 			}, this);
 		}, this);
 	},
