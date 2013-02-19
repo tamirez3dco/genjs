@@ -4,7 +4,8 @@ Meteor.startup(function() {
 	Session.set("selectedBlock", -1);
 
 	Blockly.debug = new Blockly.Debugger();
-	GEN.Geometry.initGlobal();
+	//GEN.Geometry.initGlobal();
+	GEN.Geometry.buildLanguage();
 	
 	Ext.application({
 		name : 'GENJS',

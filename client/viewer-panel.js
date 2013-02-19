@@ -308,6 +308,7 @@ Ext.define('GEN.ui.three.Panel', {
 	},
 	startAnimate : function() {
 		var self = this;
+		//return;
 		var animate = function() {
 			requestAnimationFrame(animate);
 			self.controls.update();

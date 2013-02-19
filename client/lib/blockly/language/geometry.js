@@ -3,7 +3,7 @@
 // Extensions to Blockly's language and JavaScript generator.
 
 Blockly.JavaScript = Blockly.Generator.get('JavaScript');
-
+/*
 Blockly.Language.geometry_point = {
 	category : 'Vector',
 	title : 'Point',
@@ -15,6 +15,8 @@ Blockly.Language.geometry_point = {
 		this.appendValueInput("Z").setCheck(Number).appendTitle("Z");
 		this.setOutput(true, String);
 		this.setTooltip('Returns a point');
+		console.log('Language Point');
+		console.log(this);
 	}
 };
 
@@ -73,9 +75,9 @@ Blockly.Language.geometry_parametricSurface = {
 	}
 };
 Blockly.Language.geometry_parametricSurface.surfaceNames = [
-	['Torus', 'torus'],
-	['Klein Surface', 'klein'], 
-	['Enneper Surface', 'enneper'],
+	['Torus', '"torus"'],
+	['Klein Surface', '"klein"'], 
+	['Enneper Surface', '"enneper"'],
 	['Catenoid Surface', 'catenoid'],
 	['Helicoidal Surface', 'helicoidal']];
 
@@ -113,7 +115,7 @@ Blockly.Language.geometry_meshComponents.componentNames = [
 	['Mesh Vertices', 'vertices'],
 	
 ];
-/*
+
 Blockly.Language.geometry_union = {
 	category : 'Transform',
 	title : 'Union',
@@ -126,7 +128,7 @@ Blockly.Language.geometry_union = {
 		this.setTooltip('Unions two geometries');
 	}
 };
-*/
+
 Blockly.Language.geometry_booleanOperation = {
 	category : 'Transform',
 	title : 'Boolean Operations',
@@ -141,8 +143,8 @@ Blockly.Language.geometry_booleanOperation = {
 	}
 };
 Blockly.Language.geometry_booleanOperation.operationNames = [
-	['Union', 'union'],
-	['Intersect', 'intersect'], 
+	['Union', '"union"'],
+	['Intersect', '"intersect"'], 
 	['Subtract', 'subtract']];
 
 Blockly.Language.geometry_move = {
@@ -185,7 +187,7 @@ Blockly.Language.geometry_pipe = {
 		this.setTooltip('Creates a pipe');
 	}
 };
-
+*/
 /*
 Blockly.Language.geometry_circle = {
 	category : 'Curve',
@@ -253,7 +255,7 @@ Blockly.Language.geometry_mesh_subdivide = {
 Blockly.Language.geometry_mesh_subdivide.STRATEGIES = [['Midpoint', 'Midpoint'], ['Dual', 'Dual'],['Tri','Tri']];
 */
 
-
+/*
 ///Generators
 var valueToCode = function(a,b,c) {return Blockly.JavaScript.valueToCode(a,b,c)};
 var orderNone = Blockly.JavaScript.ORDER_NONE;
@@ -310,7 +312,7 @@ Blockly.JavaScript.geometry_parametricSurface = function() {
 	var udiv = valueToCode(this, 'udiv', orderNone) || 20;
 	var vdiv = valueToCode(this, 'vdiv', orderNone) || 20;
 	
-	var code = codeForFunction('createParametricSurface', {name: stringifyString(name), udiv: udiv, vdiv: vdiv});
+	var code = codeForFunction('createParametricSurface', {name: name, udiv: udiv, vdiv: vdiv});
 	return [code, orderNone];
 };
 
@@ -395,7 +397,6 @@ Blockly.JavaScript.geometry_pipe = function() {
 
 
 //TODO: reimplement
-/*
 Blockly.JavaScript.line = function() {
 	var p1 = valueToCode(this, 'P1', orderNone) || codeForFunction('createPoint', {x: 0, y: 0, z: 0});
 	var p2 = valueToCode(this, 'P2', orderNone) || '_g.createPoint(10,10,10)';

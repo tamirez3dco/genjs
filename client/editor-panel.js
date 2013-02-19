@@ -330,6 +330,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		if(code == this.tracedCode)
 			return;
 		this.tracedCode = code;
+		console.log(code);
 
 		try {
 			Blockly.debug.traceOn = false;
