@@ -432,7 +432,7 @@ GEN.Geometry.API.meshComponents = {
 		name : 'mesh',
 		type : GEN.types.Mesh
 	}],
-	outputType : String,
+	outputType : Array,
 	fn : function(args) {
 		if(args.mesh instanceof THREE.Geometry) {
 			if(args.componentType == 'edges') {
