@@ -12902,3 +12902,1039 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 	}
 };
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.GeometryUtils = {
+
+	// Merge two geometries or geometry and geometry from object (using object's transform)
+
+	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
+
+		var matrix, normalMatrix,
+		vertexOffset = geometry1.vertices.length,
+		uvPosition = geometry1.faceVertexUvs[ 0 ].length,
+		geometry2 = object2 instanceof THREE.Mesh ? object2.geometry : object2,
+		vertices1 = geometry1.vertices,
+		vertices2 = geometry2.vertices,
+		faces1 = geometry1.faces,
+		faces2 = geometry2.faces,
+		uvs1 = geometry1.faceVertexUvs[ 0 ],
+		uvs2 = geometry2.faceVertexUvs[ 0 ];
+
+		if ( object2 instanceof THREE.Mesh ) {
+
+			object2.matrixAutoUpdate && object2.updateMatrix();
+
+			matrix = object2.matrix;
+
+			normalMatrix = new THREE.Matrix3();
+			normalMatrix.getInverse( matrix );
+			normalMatrix.transpose();
+
+		}
+
+		// vertices
+
+		for ( var i = 0, il = vertices2.length; i < il; i ++ ) {
+
+			var vertex = vertices2[ i ];
+
+			var vertexCopy = vertex.clone();
+
+			if ( matrix ) vertexCopy.applyMatrix4( matrix );
+
+			vertices1.push( vertexCopy );
+
+		}
+
+		// faces
+
+		for ( i = 0, il = faces2.length; i < il; i ++ ) {
+
+			var face = faces2[ i ], faceCopy, normal, color,
+			faceVertexNormals = face.vertexNormals,
+			faceVertexColors = face.vertexColors;
+
+			if ( face instanceof THREE.Face3 ) {
+
+				faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				faceCopy = new THREE.Face4( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset, face.d + vertexOffset );
+
+			}
+
+			faceCopy.normal.copy( face.normal );
+
+			if ( normalMatrix ) {
+
+				faceCopy.normal.applyMatrix3( normalMatrix ).normalize();
+
+			}
+
+			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
+
+				normal = faceVertexNormals[ j ].clone();
+
+				if ( normalMatrix ) {
+
+					normal.applyMatrix3( normalMatrix ).normalize();
+
+				}
+
+				faceCopy.vertexNormals.push( normal );
+
+			}
+
+			faceCopy.color.copy( face.color );
+
+			for ( var j = 0, jl = faceVertexColors.length; j < jl; j ++ ) {
+
+				color = faceVertexColors[ j ];
+				faceCopy.vertexColors.push( color.clone() );
+
+			}
+
+			faceCopy.materialIndex = face.materialIndex;
+
+			faceCopy.centroid.copy( face.centroid );
+
+			if ( matrix ) {
+
+				faceCopy.centroid.applyMatrix4( matrix );
+
+			}
+
+			faces1.push( faceCopy );
+
+		}
+
+		// uvs
+
+		for ( i = 0, il = uvs2.length; i < il; i ++ ) {
+
+			var uv = uvs2[ i ], uvCopy = [];
+
+			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
+
+				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
+
+			}
+
+			uvs1.push( uvCopy );
+
+		}
+
+	},
+
+	removeMaterials: function ( geometry, materialIndexArray ) {
+
+		var materialIndexMap = {};
+
+		for ( var i = 0, il = materialIndexArray.length; i < il; i ++ ) {
+
+			materialIndexMap[ materialIndexArray[i] ] = true;
+
+		}
+
+		var face, newFaces = [];
+
+		for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
+
+			face = geometry.faces[ i ];
+			if ( ! ( face.materialIndex in materialIndexMap ) ) newFaces.push( face );
+
+		}
+
+		geometry.faces = newFaces;
+
+	},
+
+	// Get random point in triangle (via barycentric coordinates)
+	// 	(uniform distribution)
+	// 	http://www.cgafaq.info/wiki/Random_Point_In_Triangle
+
+	randomPointInTriangle: function ( vectorA, vectorB, vectorC ) {
+
+		var a, b, c,
+			point = new THREE.Vector3(),
+			tmp = THREE.GeometryUtils.__v1;
+
+		a = THREE.GeometryUtils.random();
+		b = THREE.GeometryUtils.random();
+
+		if ( ( a + b ) > 1 ) {
+
+			a = 1 - a;
+			b = 1 - b;
+
+		}
+
+		c = 1 - a - b;
+
+		point.copy( vectorA );
+		point.multiplyScalar( a );
+
+		tmp.copy( vectorB );
+		tmp.multiplyScalar( b );
+
+		point.add( tmp );
+
+		tmp.copy( vectorC );
+		tmp.multiplyScalar( c );
+
+		point.add( tmp );
+
+		return point;
+
+	},
+
+	// Get random point in face (triangle / quad)
+	// (uniform distribution)
+
+	randomPointInFace: function ( face, geometry, useCachedAreas ) {
+
+		var vA, vB, vC, vD;
+
+		if ( face instanceof THREE.Face3 ) {
+
+			vA = geometry.vertices[ face.a ];
+			vB = geometry.vertices[ face.b ];
+			vC = geometry.vertices[ face.c ];
+
+			return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
+
+		} else if ( face instanceof THREE.Face4 ) {
+
+			vA = geometry.vertices[ face.a ];
+			vB = geometry.vertices[ face.b ];
+			vC = geometry.vertices[ face.c ];
+			vD = geometry.vertices[ face.d ];
+
+			var area1, area2;
+
+			if ( useCachedAreas ) {
+
+				if ( face._area1 && face._area2 ) {
+
+					area1 = face._area1;
+					area2 = face._area2;
+
+				} else {
+
+					area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
+					area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
+
+					face._area1 = area1;
+					face._area2 = area2;
+
+				}
+
+			} else {
+
+				area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD ),
+				area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
+
+			}
+
+			var r = THREE.GeometryUtils.random() * ( area1 + area2 );
+
+			if ( r < area1 ) {
+
+				return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vD );
+
+			} else {
+
+				return THREE.GeometryUtils.randomPointInTriangle( vB, vC, vD );
+
+			}
+
+		}
+
+	},
+
+	// Get uniformly distributed random points in mesh
+	// 	- create array with cumulative sums of face areas
+	//  - pick random number from 0 to total area
+	//  - find corresponding place in area array by binary search
+	//	- get random point in face
+
+	randomPointsInGeometry: function ( geometry, n ) {
+
+		var face, i,
+			faces = geometry.faces,
+			vertices = geometry.vertices,
+			il = faces.length,
+			totalArea = 0,
+			cumulativeAreas = [],
+			vA, vB, vC, vD;
+
+		// precompute face areas
+
+		for ( i = 0; i < il; i ++ ) {
+
+			face = faces[ i ];
+
+			if ( face instanceof THREE.Face3 ) {
+
+				vA = vertices[ face.a ];
+				vB = vertices[ face.b ];
+				vC = vertices[ face.c ];
+
+				face._area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				vA = vertices[ face.a ];
+				vB = vertices[ face.b ];
+				vC = vertices[ face.c ];
+				vD = vertices[ face.d ];
+
+				face._area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
+				face._area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
+
+				face._area = face._area1 + face._area2;
+
+			}
+
+			totalArea += face._area;
+
+			cumulativeAreas[ i ] = totalArea;
+
+		}
+
+		// binary search cumulative areas array
+
+		function binarySearchIndices( value ) {
+
+			function binarySearch( start, end ) {
+
+				// return closest larger index
+				// if exact number is not found
+
+				if ( end < start )
+					return start;
+
+				var mid = start + Math.floor( ( end - start ) / 2 );
+
+				if ( cumulativeAreas[ mid ] > value ) {
+
+					return binarySearch( start, mid - 1 );
+
+				} else if ( cumulativeAreas[ mid ] < value ) {
+
+					return binarySearch( mid + 1, end );
+
+				} else {
+
+					return mid;
+
+				}
+
+			}
+
+			var result = binarySearch( 0, cumulativeAreas.length - 1 )
+			return result;
+
+		}
+
+		// pick random face weighted by face area
+
+		var r, index,
+			result = [];
+
+		var stats = {};
+
+		for ( i = 0; i < n; i ++ ) {
+
+			r = THREE.GeometryUtils.random() * totalArea;
+
+			index = binarySearchIndices( r );
+
+			result[ i ] = THREE.GeometryUtils.randomPointInFace( faces[ index ], geometry, true );
+
+			if ( ! stats[ index ] ) {
+
+				stats[ index ] = 1;
+
+			} else {
+
+				stats[ index ] += 1;
+
+			}
+
+		}
+
+		return result;
+
+	},
+
+	// Get triangle area (half of parallelogram)
+	//	http://mathworld.wolfram.com/TriangleArea.html
+
+	triangleArea: function ( vectorA, vectorB, vectorC ) {
+
+		var tmp1 = THREE.GeometryUtils.__v1,
+			tmp2 = THREE.GeometryUtils.__v2;
+
+		tmp1.subVectors( vectorB, vectorA );
+		tmp2.subVectors( vectorC, vectorA );
+		tmp1.cross( tmp2 );
+
+		return 0.5 * tmp1.length();
+
+	},
+
+	// Center geometry so that 0,0,0 is in center of bounding box
+
+	center: function ( geometry ) {
+
+		geometry.computeBoundingBox();
+
+		var bb = geometry.boundingBox;
+
+		var offset = new THREE.Vector3();
+
+		offset.addVectors( bb.min, bb.max );
+		offset.multiplyScalar( -0.5 );
+
+		geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
+		geometry.computeBoundingBox();
+
+		return offset;
+
+	},
+
+	// Normalize UVs to be from <0,1>
+	// (for now just the first set of UVs)
+
+	normalizeUVs: function ( geometry ) {
+
+		var uvSet = geometry.faceVertexUvs[ 0 ];
+
+		for ( var i = 0, il = uvSet.length; i < il; i ++ ) {
+
+			var uvs = uvSet[ i ];
+
+			for ( var j = 0, jl = uvs.length; j < jl; j ++ ) {
+
+				// texture repeat
+
+				if( uvs[ j ].x !== 1.0 ) uvs[ j ].x = uvs[ j ].x - Math.floor( uvs[ j ].x );
+				if( uvs[ j ].y !== 1.0 ) uvs[ j ].y = uvs[ j ].y - Math.floor( uvs[ j ].y );
+
+			}
+
+		}
+
+	},
+
+	triangulateQuads: function ( geometry ) {
+
+		var i, il, j, jl;
+
+		var faces = [];
+		var faceUvs = [];
+		var faceVertexUvs = [];
+
+		for ( i = 0, il = geometry.faceUvs.length; i < il; i ++ ) {
+
+			faceUvs[ i ] = [];
+
+		}
+
+		for ( i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
+
+			faceVertexUvs[ i ] = [];
+
+		}
+
+		for ( i = 0, il = geometry.faces.length; i < il; i ++ ) {
+
+			var face = geometry.faces[ i ];
+
+			if ( face instanceof THREE.Face4 ) {
+
+				var a = face.a;
+				var b = face.b;
+				var c = face.c;
+				var d = face.d;
+
+				var triA = new THREE.Face3();
+				var triB = new THREE.Face3();
+
+				triA.color.copy( face.color );
+				triB.color.copy( face.color );
+
+				triA.materialIndex = face.materialIndex;
+				triB.materialIndex = face.materialIndex;
+
+				triA.a = a;
+				triA.b = b;
+				triA.c = d;
+
+				triB.a = b;
+				triB.b = c;
+				triB.c = d;
+
+				if ( face.vertexColors.length === 4 ) {
+
+					triA.vertexColors[ 0 ] = face.vertexColors[ 0 ].clone();
+					triA.vertexColors[ 1 ] = face.vertexColors[ 1 ].clone();
+					triA.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
+
+					triB.vertexColors[ 0 ] = face.vertexColors[ 1 ].clone();
+					triB.vertexColors[ 1 ] = face.vertexColors[ 2 ].clone();
+					triB.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
+
+				}
+
+				faces.push( triA, triB );
+
+				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
+
+					if ( geometry.faceVertexUvs[ j ].length ) {
+
+						var uvs = geometry.faceVertexUvs[ j ][ i ];
+
+						var uvA = uvs[ 0 ];
+						var uvB = uvs[ 1 ];
+						var uvC = uvs[ 2 ];
+						var uvD = uvs[ 3 ];
+
+						var uvsTriA = [ uvA.clone(), uvB.clone(), uvD.clone() ];
+						var uvsTriB = [ uvB.clone(), uvC.clone(), uvD.clone() ];
+
+						faceVertexUvs[ j ].push( uvsTriA, uvsTriB );
+
+					}
+
+				}
+
+				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
+
+					if ( geometry.faceUvs[ j ].length ) {
+
+						var faceUv = geometry.faceUvs[ j ][ i ];
+
+						faceUvs[ j ].push( faceUv, faceUv );
+
+					}
+
+				}
+
+			} else {
+
+				faces.push( face );
+
+				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
+
+					faceUvs[ j ].push( geometry.faceUvs[ j ][ i ] );
+
+				}
+
+				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
+
+					faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
+
+				}
+
+			}
+
+		}
+
+		geometry.faces = faces;
+		geometry.faceUvs = faceUvs;
+		geometry.faceVertexUvs = faceVertexUvs;
+
+		geometry.computeCentroids();
+		geometry.computeFaceNormals();
+		geometry.computeVertexNormals();
+
+		if ( geometry.hasTangents ) geometry.computeTangents();
+
+	},
+
+	setMaterialIndex: function ( geometry, index, startFace, endFace ){
+
+		var faces = geometry.faces;
+		var start = startFace || 0;
+		var end = endFace || faces.length - 1;
+
+		for ( var i = start; i <= end; i ++ ) {
+
+			faces[i].materialIndex = index;
+
+		}
+
+    }
+
+};
+
+THREE.GeometryUtils.random = THREE.Math.random16;
+
+THREE.GeometryUtils.__v1 = new THREE.Vector3();
+THREE.GeometryUtils.__v2 = new THREE.Vector3();
+/**
+ * @author zz85 / http://www.lab4games.net/zz85/blog
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * For Text operations in three.js (See TextGeometry)
+ *
+ * It uses techniques used in:
+ *
+ * 	typeface.js and canvastext
+ * 		For converting fonts and rendering with javascript
+ *		http://typeface.neocracy.org
+ *
+ *	Triangulation ported from AS3
+ *		Simple Polygon Triangulation
+ *		http://actionsnippet.com/?p=1462
+ *
+ * 	A Method to triangulate shapes with holes
+ *		http://www.sakri.net/blog/2009/06/12/an-approach-to-triangulating-polygons-with-holes/
+ *
+ */
+
+THREE.FontUtils = {
+
+	faces : {},
+
+	// Just for now. face[weight][style]
+
+	face : "helvetiker",
+	weight: "normal",
+	style : "normal",
+	size : 150,
+	divisions : 10,
+
+	getFace : function() {
+
+		return this.faces[ this.face ][ this.weight ][ this.style ];
+
+	},
+
+	loadFace : function( data ) {
+
+		var family = data.familyName.toLowerCase();
+
+		var ThreeFont = this;
+
+		ThreeFont.faces[ family ] = ThreeFont.faces[ family ] || {};
+
+		ThreeFont.faces[ family ][ data.cssFontWeight ] = ThreeFont.faces[ family ][ data.cssFontWeight ] || {};
+		ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
+
+		var face = ThreeFont.faces[ family ][ data.cssFontWeight ][ data.cssFontStyle ] = data;
+
+		return data;
+
+	},
+
+	drawText : function( text ) {
+
+		var characterPts = [], allPts = [];
+
+		// RenderText
+
+		var i, p,
+			face = this.getFace(),
+			scale = this.size / face.resolution,
+			offset = 0,
+			chars = String( text ).split( '' ),
+			length = chars.length;
+
+		var fontPaths = [];
+
+		for ( i = 0; i < length; i ++ ) {
+
+			var path = new THREE.Path();
+
+			var ret = this.extractGlyphPoints( chars[ i ], face, scale, offset, path );
+			offset += ret.offset;
+
+			fontPaths.push( ret.path );
+
+		}
+
+		// get the width
+
+		var width = offset / 2;
+		//
+		// for ( p = 0; p < allPts.length; p++ ) {
+		//
+		// 	allPts[ p ].x -= width;
+		//
+		// }
+
+		//var extract = this.extractPoints( allPts, characterPts );
+		//extract.contour = allPts;
+
+		//extract.paths = fontPaths;
+		//extract.offset = width;
+
+		return { paths : fontPaths, offset : width };
+
+	},
+
+
+
+
+	extractGlyphPoints : function( c, face, scale, offset, path ) {
+
+		var pts = [];
+
+		var i, i2, divisions,
+			outline, action, length,
+			scaleX, scaleY,
+			x, y, cpx, cpy, cpx0, cpy0, cpx1, cpy1, cpx2, cpy2,
+			laste,
+			glyph = face.glyphs[ c ] || face.glyphs[ '?' ];
+
+		if ( !glyph ) return;
+
+		if ( glyph.o ) {
+
+			outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
+			length = outline.length;
+
+			scaleX = scale;
+			scaleY = scale;
+
+			for ( i = 0; i < length; ) {
+
+				action = outline[ i ++ ];
+
+				//console.log( action );
+
+				switch( action ) {
+
+				case 'm':
+
+					// Move To
+
+					x = outline[ i++ ] * scaleX + offset;
+					y = outline[ i++ ] * scaleY;
+
+					path.moveTo( x, y );
+					break;
+
+				case 'l':
+
+					// Line To
+
+					x = outline[ i++ ] * scaleX + offset;
+					y = outline[ i++ ] * scaleY;
+					path.lineTo(x,y);
+					break;
+
+				case 'q':
+
+					// QuadraticCurveTo
+
+					cpx  = outline[ i++ ] * scaleX + offset;
+					cpy  = outline[ i++ ] * scaleY;
+					cpx1 = outline[ i++ ] * scaleX + offset;
+					cpy1 = outline[ i++ ] * scaleY;
+
+					path.quadraticCurveTo(cpx1, cpy1, cpx, cpy);
+
+					laste = pts[ pts.length - 1 ];
+
+					if ( laste ) {
+
+						cpx0 = laste.x;
+						cpy0 = laste.y;
+
+						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
+
+							var t = i2 / divisions;
+							var tx = THREE.Shape.Utils.b2( t, cpx0, cpx1, cpx );
+							var ty = THREE.Shape.Utils.b2( t, cpy0, cpy1, cpy );
+					  }
+
+				  }
+
+				  break;
+
+				case 'b':
+
+					// Cubic Bezier Curve
+
+					cpx  = outline[ i++ ] *  scaleX + offset;
+					cpy  = outline[ i++ ] *  scaleY;
+					cpx1 = outline[ i++ ] *  scaleX + offset;
+					cpy1 = outline[ i++ ] * -scaleY;
+					cpx2 = outline[ i++ ] *  scaleX + offset;
+					cpy2 = outline[ i++ ] * -scaleY;
+
+					path.bezierCurveTo( cpx, cpy, cpx1, cpy1, cpx2, cpy2 );
+
+					laste = pts[ pts.length - 1 ];
+
+					if ( laste ) {
+
+						cpx0 = laste.x;
+						cpy0 = laste.y;
+
+						for ( i2 = 1, divisions = this.divisions; i2 <= divisions; i2 ++ ) {
+
+							var t = i2 / divisions;
+							var tx = THREE.Shape.Utils.b3( t, cpx0, cpx1, cpx2, cpx );
+							var ty = THREE.Shape.Utils.b3( t, cpy0, cpy1, cpy2, cpy );
+
+						}
+
+					}
+
+					break;
+
+				}
+
+			}
+		}
+
+
+
+		return { offset: glyph.ha*scale, path:path};
+	}
+
+};
+
+
+THREE.FontUtils.generateShapes = function( text, parameters ) {
+
+	// Parameters 
+
+	parameters = parameters || {};
+
+	var size = parameters.size !== undefined ? parameters.size : 100;
+	var curveSegments = parameters.curveSegments !== undefined ? parameters.curveSegments: 4;
+
+	var font = parameters.font !== undefined ? parameters.font : "helvetiker";
+	var weight = parameters.weight !== undefined ? parameters.weight : "normal";
+	var style = parameters.style !== undefined ? parameters.style : "normal";
+
+	THREE.FontUtils.size = size;
+	THREE.FontUtils.divisions = curveSegments;
+
+	THREE.FontUtils.face = font;
+	THREE.FontUtils.weight = weight;
+	THREE.FontUtils.style = style;
+
+	// Get a Font data json object
+
+	var data = THREE.FontUtils.drawText( text );
+
+	var paths = data.paths;
+	var shapes = [];
+
+	for ( var p = 0, pl = paths.length; p < pl; p ++ ) {
+
+		Array.prototype.push.apply( shapes, paths[ p ].toShapes() );
+
+	}
+
+	return shapes;
+
+};
+
+
+/**
+ * This code is a quick port of code written in C++ which was submitted to
+ * flipcode.com by John W. Ratcliff  // July 22, 2000
+ * See original code and more information here:
+ * http://www.flipcode.com/archives/Efficient_Polygon_Triangulation.shtml
+ *
+ * ported to actionscript by Zevan Rosser
+ * www.actionsnippet.com
+ *
+ * ported to javascript by Joshua Koo
+ * http://www.lab4games.net/zz85/blog
+ *
+ */
+
+
+( function( namespace ) {
+
+	var EPSILON = 0.0000000001;
+
+	// takes in an contour array and returns
+
+	var process = function( contour, indices ) {
+
+		var n = contour.length;
+
+		if ( n < 3 ) return null;
+
+		var result = [],
+			verts = [],
+			vertIndices = [];
+
+		/* we want a counter-clockwise polygon in verts */
+
+		var u, v, w;
+
+		if ( area( contour ) > 0.0 ) {
+
+			for ( v = 0; v < n; v++ ) verts[ v ] = v;
+
+		} else {
+
+			for ( v = 0; v < n; v++ ) verts[ v ] = ( n - 1 ) - v;
+
+		}
+
+		var nv = n;
+
+		/*  remove nv - 2 vertices, creating 1 triangle every time */
+
+		var count = 2 * nv;   /* error detection */
+
+		for( v = nv - 1; nv > 2; ) {
+
+			/* if we loop, it is probably a non-simple polygon */
+
+			if ( ( count-- ) <= 0 ) {
+
+				//** Triangulate: ERROR - probable bad polygon!
+
+				//throw ( "Warning, unable to triangulate polygon!" );
+				//return null;
+				// Sometimes warning is fine, especially polygons are triangulated in reverse.
+				console.log( "Warning, unable to triangulate polygon!" );
+
+				if ( indices ) return vertIndices;
+				return result;
+
+			}
+
+			/* three consecutive vertices in current polygon, <u,v,w> */
+
+			u = v; 	 	if ( nv <= u ) u = 0;     /* previous */
+			v = u + 1;  if ( nv <= v ) v = 0;     /* new v    */
+			w = v + 1;  if ( nv <= w ) w = 0;     /* next     */
+
+			if ( snip( contour, u, v, w, nv, verts ) ) {
+
+				var a, b, c, s, t;
+
+				/* true names of the vertices */
+
+				a = verts[ u ];
+				b = verts[ v ];
+				c = verts[ w ];
+
+				/* output Triangle */
+
+				result.push( [ contour[ a ],
+					contour[ b ],
+					contour[ c ] ] );
+
+
+				vertIndices.push( [ verts[ u ], verts[ v ], verts[ w ] ] );
+
+				/* remove v from the remaining polygon */
+
+				for( s = v, t = v + 1; t < nv; s++, t++ ) {
+
+					verts[ s ] = verts[ t ];
+
+				}
+
+				nv--;
+
+				/* reset error detection counter */
+
+				count = 2 * nv;
+
+			}
+
+		}
+
+		if ( indices ) return vertIndices;
+		return result;
+
+	};
+
+	// calculate area of the contour polygon
+
+	var area = function ( contour ) {
+
+		var n = contour.length;
+		var a = 0.0;
+
+		for( var p = n - 1, q = 0; q < n; p = q++ ) {
+
+			a += contour[ p ].x * contour[ q ].y - contour[ q ].x * contour[ p ].y;
+
+		}
+
+		return a * 0.5;
+
+	};
+
+	var snip = function ( contour, u, v, w, n, verts ) {
+
+		var p;
+		var ax, ay, bx, by;
+		var cx, cy, px, py;
+
+		ax = contour[ verts[ u ] ].x;
+		ay = contour[ verts[ u ] ].y;
+
+		bx = contour[ verts[ v ] ].x;
+		by = contour[ verts[ v ] ].y;
+
+		cx = contour[ verts[ w ] ].x;
+		cy = contour[ verts[ w ] ].y;
+
+		if ( EPSILON > (((bx-ax)*(cy-ay)) - ((by-ay)*(cx-ax))) ) return false;
+
+		var aX, aY, bX, bY, cX, cY;
+		var apx, apy, bpx, bpy, cpx, cpy;
+		var cCROSSap, bCROSScp, aCROSSbp;
+
+		aX = cx - bx;  aY = cy - by;
+		bX = ax - cx;  bY = ay - cy;
+		cX = bx - ax;  cY = by - ay;
+
+		for ( p = 0; p < n; p++ ) {
+
+			if( (p === u) || (p === v) || (p === w) ) continue;
+
+			px = contour[ verts[ p ] ].x
+			py = contour[ verts[ p ] ].y
+
+			apx = px - ax;  apy = py - ay;
+			bpx = px - bx;  bpy = py - by;
+			cpx = px - cx;  cpy = py - cy;
+
+			// see if p is inside triangle abc
+
+			aCROSSbp = aX*bpy - aY*bpx;
+			cCROSSap = cX*apy - cY*apx;
+			bCROSScp = bX*cpy - bY*cpx;
+
+			if ( (aCROSSbp >= 0.0) && (bCROSScp >= 0.0) && (cCROSSap >= 0.0) ) return false;
+
+		}
+
+		return true;
+
+	};
+
+
+	namespace.Triangulate = process;
+	namespace.Triangulate.area = area;
+
+	return namespace;
+
+})(THREE.FontUtils);
+
+// To use the typeface.js face files, hook up the API
+self._typeface_js = { faces: THREE.FontUtils.faces, loadFace: THREE.FontUtils.loadFace };

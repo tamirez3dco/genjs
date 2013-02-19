@@ -251,6 +251,20 @@ Ext.define('GEN.ui.three.Panel', {
 			}, this);
 		}, this);
 	},
+	setRenderableBlocks: function(blocks){
+		var blocksIds = _.keys(blocks);
+		_.each(blocksIds, function(id) {
+			var values = blocks[id];
+			if(_.isArray(values) && values.length == 1 && _.isArray(values[0])) {
+				values = values[0];
+			}
+			_.each(values, function(val) {
+				
+				
+				
+			},this);
+		}, this);				
+	},
 	clearSelectionColor : function() {
 		if(this.selectedBlock == -1)
 			return;

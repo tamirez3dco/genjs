@@ -6,6 +6,8 @@ try {
 	importScripts('/client/lib/first/worker/memoize.js');
 	importScripts('/client/lib/first/worker/csg.js');
 	importScripts('/client/lib/first/worker/math_functions.js');
+	importScripts('/client/lib/first/worker/z.optimer_bold.typeface.js');
+	importScripts('/client/lib/first/worker/z.optimer_regular.typeface.js');
 	importScripts('/client/lib/geometry.js');
 	isWorker = true;
 } catch(err) {
@@ -19,6 +21,8 @@ if(isWorker) {
 	importScripts('/client/lib/first/worker/memoize.js');
 	importScripts('/client/lib/first/worker/csg.js');
 	importScripts('/client/lib/first/worker/math_functions.js');
+	importScripts('/client/lib/first/worker/z.optimer_bold.typeface.js');
+	importScripts('/client/lib/first/worker/z.optimer_regular.typeface.js');
 	importScripts('/client/lib/geometry.js');
 	GEN.debug = new GEN.Debugger();
 	GEN.Geometry.initGlobal();
