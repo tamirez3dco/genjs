@@ -370,7 +370,7 @@ GEN.Geometry.API.booleanOperation = {
 	tooltip : "Boolean operations with mesh",
 	inputs : [{
 		name : 'operation',
-		options : [['Union', '"union"'], ['Intersect', '"intersect"'], ['Subtract', 'subtract']]
+		options : [['Union', '"union"'], ['Intersect', '"intersect"'], ['Subtract', '"subtract"']]
 	}, {
 		name : 'geometry1',
 		type : GEN.types.Mesh
