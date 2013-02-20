@@ -7,6 +7,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 	},
 	xml : '<xml></xml>',
 	scale : 1,
+	useWorker: true,
 	varList : ['item'],
 	alias : 'widget.blockly-panel',
 	langCategories : {
@@ -322,7 +323,8 @@ Ext.define('GEN.ui.blockly.Panel', {
 	},
 	xmlChanged : function() {
 		try {
-			Blockly.debug.traceOn = true;
+			//GEN.debug.traceOn = true;
+			Blockly.Generator.TRACE = true;
 			var code = Blockly.Generator.workspaceToCode('JavaScript');
 		} catch(err) {
 			return;
@@ -334,18 +336,31 @@ Ext.define('GEN.ui.blockly.Panel', {
 		console.log(code);
 
 		try {
-			Blockly.debug.traceOn = false;
+			//GEN.debug.traceOn = false;
+			Blockly.Generator.TRACE = false;
 			var cleanCode = Blockly.Generator.workspaceToCode('JavaScript');
 		} catch(err) {
 			return;
 		}
 		this.cleanCode = cleanCode;
 
-		this.runWorker(this.tracedCode);
-		//this.execCode();
+		//this.runWorker(this.tracedCode);
+		this.execCode(this.tracedCode);
 
 		Session.set('tracedCode', this.tracedCode);
 		Session.set('cleanCode', this.cleanCode);
+	},
+	execCode: function(code) {
+		if(this.useWorker==true){
+			this.runWorker(code);
+		}else{
+			this.getExecutionResult(GEN.Runner.run(code));		
+		}
+	},
+	getExecutionResult: function(result) {
+		console.log('execution result');
+		console.log(result);
+		Session.set('renderableBlocks', result);
 	},
 	initWorker : function() {
 		//not sure we need this here, need to check scope.
@@ -364,11 +379,9 @@ Ext.define('GEN.ui.blockly.Panel', {
 		this.worker.port.postMessage(code);
 	},
 	getWorkerMessage : function(event) {
-		console.log("Worker says: ");
-		var renderableBlocks = JSON.parse(event.data);
-		console.log(renderableBlocks);
-		Session.set('renderableBlocks', renderableBlocks)
-
+		console.log("Worker sent message");
+		result = JSON.parse(event.data);
+		this.getExecutionResult(result);	
 	},
 		/*
 	 execCode : function() {

@@ -28,7 +28,7 @@ goog.provide('Blockly.CodeGenerator');
 goog.provide('Blockly.Generator');
 
 goog.require('Blockly.Block');
-
+/*
 Blockly.Debugger = function(){
 	this.tracedValues = [];
 	this.tracedBlocks = {};
@@ -54,7 +54,7 @@ Blockly.Debugger.prototype.stop = function() {
 	//this.traceOn=false;
 }
 
-
+*/
 /**
  * Name space for the generator singleton.
  */
@@ -64,7 +64,7 @@ Blockly.Generator = {};
  * Category to separate generated function names from variables and procedures.
  */
 Blockly.Generator.NAME_TYPE = 'generated_function';
-
+Blockly.Generator.TRACE = false;
 /**
  * Database of code generators, one for each language.
  */
@@ -101,7 +101,7 @@ Blockly.Generator.workspaceToCode = function(name) {
       // Top-level blocks don't care about operator order.
       line = line[0];
       //var cleanLine
-      if (Blockly.debug.traceOn) {
+      if (Blockly.Generator.TRACE) {
       	line = "GEN.debug.trace(" + line + ","+ block.id + ")";
       }
     }
@@ -231,7 +231,7 @@ Blockly.CodeGenerator.prototype.valueToCode = function(block, name, order) {
     throw 'Expecting valid order from value block "' + targetBlock.type + '".';
   }
   
-  if (Blockly.debug.traceOn) {
+  if (Blockly.Generator.TRACE) {
   	code = "GEN.debug.trace(" + code +","+ targetBlock.id + ")";
   }
   if (code && order <= innerOrder) {
