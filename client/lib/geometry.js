@@ -364,8 +364,8 @@ GEN.Geometry.API.createPipe = {
 	}],
 	outputType : GEN.types.Mesh,
 	fn : function(args) {
-		var curve = args.curve.toRenderable();
-		var pipe = new THREE.TubeGeometry(curve, 2, args.radius, args.sides, false, false);
+		//var curve = args.curve.toRenderable();
+		var pipe = new THREE.TubeGeometry(args.curve, 2, args.radius, args.sides, false, false);
 		return pipe;
 	}
 };
