@@ -350,7 +350,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 	initWorker : function() {
 		//not sure we need this here, need to check scope.
 		var self=this;
-		this.worker = new SharedWorker('/client/code-worker.js');
+		this.worker = new SharedWorker('/worker/code-worker.js');
 		this.worker.port.addEventListener("message", function(event) {
 			self.getWorkerMessage(event);
 		}, false);

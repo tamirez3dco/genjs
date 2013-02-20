@@ -1,13 +1,13 @@
 var isWorker = false;
 try {
-	importScripts('/client/lib/first/worker/underscore-min.js');
-	importScripts('/client/lib/first/worker/three-core1.js');
-	importScripts('/client/lib/first/worker/toxiclibs.js');
-	importScripts('/client/lib/first/worker/memoize.js');
-	importScripts('/client/lib/first/worker/csg.js');
-	importScripts('/client/lib/first/worker/math_functions.js');
-	importScripts('/client/lib/first/worker/z.optimer_bold.typeface.js');
-	importScripts('/client/lib/first/worker/z.optimer_regular.typeface.js');
+	importScripts('/worker/underscore-min.js');
+	importScripts('/worker/three-core1.js');
+	importScripts('/worker/toxiclibs.js');
+	importScripts('/worker/memoize.js');
+	importScripts('/worker/csg.js');
+	importScripts('/worker/math_functions.js');
+	importScripts('/worker/z.optimer_bold.typeface.js');
+	importScripts('/worker/z.optimer_regular.typeface.js');
 	importScripts('/client/lib/extend-geometry.js')
 	importScripts('/client/lib/geometry.js');
 	isWorker = true;
@@ -16,14 +16,14 @@ try {
 }
 
 if(isWorker) {
-	importScripts('/client/lib/first/worker/underscore-min.js');
-	importScripts('/client/lib/first/worker/three-core1.js');
-	importScripts('/client/lib/first/worker/toxiclibs.js');
-	importScripts('/client/lib/first/worker/memoize.js');
-	importScripts('/client/lib/first/worker/csg.js');
-	importScripts('/client/lib/first/worker/math_functions.js');
-	importScripts('/client/lib/first/worker/z.optimer_bold.typeface.js');
-	importScripts('/client/lib/first/worker/z.optimer_regular.typeface.js');
+	importScripts('/worker/underscore-min.js');
+	importScripts('/worker/three-core1.js');
+	importScripts('/worker/toxiclibs.js');
+	importScripts('/worker/memoize.js');
+	importScripts('/worker/csg.js');
+	importScripts('/worker/math_functions.js');
+	importScripts('/worker/z.optimer_bold.typeface.js');
+	importScripts('/worker/z.optimer_regular.typeface.js');
 	importScripts('/client/lib/extend-geometry.js');
 	importScripts('/client/lib/geometry.js');
 	GEN.debug = new GEN.Debugger();
