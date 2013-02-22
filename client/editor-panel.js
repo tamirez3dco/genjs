@@ -7,7 +7,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 	},
 	xml : '<xml></xml>',
 	scale : 1,
-	useWorker: true,
+	useWorker: false,
 	varList : ['item'],
 	alias : 'widget.blockly-panel',
 	langCategories : {
@@ -110,7 +110,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 	initProgramChangeHandler : function() {
 		var self = this;
 		Meteor.autorun(function() {
-			try {
+			//try {
 				var current = Session.get("currentProgram");
 				if(_.isUndefined(current))
 					return;
@@ -125,9 +125,9 @@ Ext.define('GEN.ui.blockly.Panel', {
 				//TODO: prevent 'blocklyWorkspaceChange' event here.
 				Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
 				self.xmlChanged();
-			} catch(err) {
-				console.log('Editor panel: Error while program changed' + err.message);
-			}
+			//} catch(err) {
+			//	console.log('Editor panel: Error while program changed' + err.message);
+			//}
 		});
 	},
 	onInitialLayout : function() {

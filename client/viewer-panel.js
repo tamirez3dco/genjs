@@ -24,6 +24,16 @@ Ext.define('GEN.ui.three.Panel', {
 				Ext.getCmp('threePanel').renderOnlySelected = this.pressed;
 				Ext.getCmp('threePanel').reRenderScene();
 			}
+		},{
+			text : 'Disable',
+			enableToggle : true,
+			cls : 'x-btn-default-small',
+			toggleHandler : function() {
+				Ext.getCmp('threePanel').disableAnimation = this.pressed;
+				if(this.pressed==false){
+					Ext.getCmp('threePanel').startAnimate();
+				}
+			}
 		}]
 	},
 	initComponent : function() {
@@ -310,6 +320,7 @@ Ext.define('GEN.ui.three.Panel', {
 		var self = this;
 		//return;
 		var animate = function() {
+			if(self.disableAnimation) return;
 			requestAnimationFrame(animate);
 			self.controls.update();
 		};

@@ -13,19 +13,21 @@ GEN.types = {
 }
 
 GEN.Runner = {};
-GEN.Runner.init = function(){
+GEN.Runner.init = function() {
 	GEN.debug = new GEN.Debugger();
 	GEN.Geometry.initGlobal();
 	goog.memoize.USAGE_COUNTER = 0;
 };
-GEN.Runner.run = function(code){
+GEN.Runner.run = function(code) {
 	GEN.debug.start();
 	var fn = new Function(code);
 	fn();
 	GEN.debug.stop();
 	var renderableBlocks = GEN.Runner.encodeRenderables(GEN.debug.tracedBlocks);
-	goog.memoize.clearUnused(5);
-	goog.memoize.USAGE_COUNTER += 1;
+	if(GEN.Geometry.MEMOIZE) {
+		goog.memoize.clearUnused(5);
+		goog.memoize.USAGE_COUNTER += 1;
+	}
 	return renderableBlocks;
 };
 GEN.Runner.encodeRenderables = function(blocks) {
@@ -39,6 +41,8 @@ GEN.Runner.encodeRenderables = function(blocks) {
 			values = values[0];
 		}
 		_.each(values, function(val) {
+			if(val == null)
+				return;
 			if(val.toRenderable) {
 				var geometry = val.toRenderable();
 				var encoded = geometry.encode(5, val.RENDER_TYPE);
@@ -78,10 +82,10 @@ GEN.Debugger.prototype.stop = function() {
 
 GEN.Geometry = function() {
 };
-
 //API creation utilities
 GEN.Geometry.GLOBAL_OBJECT_NAME = '_g';
 GEN.Geometry.UNMEMOIZED_PREFIX = '__';
+GEN.Geometry.MEMOIZE = true;
 
 GEN.Geometry.initGlobal = function() {
 	GEN.Geometry.exportAPI();
@@ -93,7 +97,11 @@ GEN.Geometry.exportAPI = function() {
 	_.each(funz, function(fnName) {
 		apiDef = GEN.Geometry.API[fnName];
 		GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName] = apiDef.fn;
-		GEN.Geometry.prototype[fnName] = goog.memoize(GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName]);
+		if(GEN.Geometry.MEMOIZE) {
+			GEN.Geometry.prototype[fnName] = goog.memoize(GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName]);
+		} else {
+			GEN.Geometry.prototype[fnName] = GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName];
+		}
 	});
 };
 GEN.Geometry.buildLanguage = function() {
@@ -225,7 +233,28 @@ GEN.Geometry.API.createCircle = {
 		return c;
 	}
 };
-
+GEN.Geometry.API.createCircleThree = {
+	category : 'Curve',
+	menuTitle : 'Circle Three',
+	tooltip : "Create a circle",
+	inputs : [{
+		name : 'origin',
+		type : GEN.types.Vector,
+		defaultVal : GEN.Geometry.generateCodeForFunction('createPoint', {
+			x : 0,
+			y : 0,
+			z : 0
+		})
+	}, {
+		name : 'radius',
+		defaultVal : 20
+	}],
+	outputType : GEN.types.Curve,
+	fn : function(args) {
+		var c = new THREE.EllipseCurve3(args.origin, args.radius, args.radius, 0, 2 * Math.PI, true);
+		return c;
+	}
+};
 GEN.Geometry.API.createSphere = {
 	category : 'Surface',
 	menuTitle : 'Sphere',
@@ -364,8 +393,15 @@ GEN.Geometry.API.createPipe = {
 	}],
 	outputType : GEN.types.Mesh,
 	fn : function(args) {
+		console.log(args.curve);
 		//var curve = args.curve.toRenderable();
-		var pipe = new THREE.TubeGeometry(args.curve, 2, args.radius, args.sides, false, false);
+		if(args.curve == null)
+			return null;
+		if(args.curve.toThreeCurve == undefined)
+			return null;
+		var curve = args.curve.toThreeCurve();
+		console.log(curve);
+		var pipe = new THREE.TubeGeometry(curve, 18, args.radius, args.sides, false, false);
 		return pipe;
 	}
 };
@@ -379,7 +415,12 @@ GEN.Geometry.API.move = {
 		type : GEN.types.Geometry,
 	}, {
 		name : 'translation',
-		type : GEN.types.Vector
+		type : GEN.types.Vector,
+		defaultVal : GEN.Geometry.generateCodeForFunction('createPoint', {
+			x : 0,
+			y : 0,
+			z : 0
+		})
 	}],
 	outputType : GEN.types.Geometry,
 
@@ -393,6 +434,10 @@ GEN.Geometry.API.move = {
 		} else if( geometry instanceof toxi.geom.Sphere) {
 			var vec = geometry.add(translation);
 			var ng = new toxi.geom.Sphere(vec, geometry.radius);
+		} else if( geometry instanceof THREE.EllipseCurve3) {
+			console.log(geometry);
+			geometry.translate(translation);
+			var ng = geometry.clone();
 		} else if( geometry instanceof THREE.Geometry) {
 			var ng = geometry.clone();
 			ng.translate(translation);

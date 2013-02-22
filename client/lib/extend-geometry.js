@@ -22,6 +22,9 @@ toxi.geom.Vec3D.prototype.toRenderable = function() {
 toxi.geom.Vec3D.prototype.toCSG = function() {
 	return new CSG.Vector(this.x, this.y, this.z);
 }
+toxi.geom.Vec3D.prototype.toTHREE = function() {
+	return new THREE.Vector3(this.x, this.y, this.z);
+}
 toxi.geom.Vec3D.prototype.toCSG_Vertex = function() {
 	var CSG_pos = new CSG.Vector(this.x, this.y, this.z);
 	var CSG_normal = new CSG.Vector(this.normal.x, this.normal.y, this.normal.z);
@@ -44,6 +47,9 @@ THREE.Vector3.prototype.toCSG_Vertex = function() {
 }
 
 THREE.Vector3.prototype.toRenderable = function() {
+	return this;
+}
+THREE.Vector3.prototype.toTHREE = function() {
 	return this;
 }
 THREE.Vector3.prototype.toJSON = function() {
@@ -77,6 +83,26 @@ toxi.geom.Polygon2D.prototype.toRenderable = function() {
 
 toxi.geom.Circle.prototype.toRenderable = function() {
 	return this.toPolygon2D(30).toRenderable();
+}
+
+toxi.geom.Circle.prototype.toThreeCurve = function() {
+	console.log(this);
+	return new THREE.EllipseCurve3( this.x, this.y, this.radius.x, this.radius.y,
+							0, 2*Math.PI,
+							true );
+}
+THREE.Curve.prototype.toThreeCurve = function() {
+	return this;
+}
+THREE.Curve.prototype.toRenderable = function() {
+	var geometry = new THREE.Geometry();
+	var points = this.getPoints(36);
+	//console.log(points);
+	for(var i = 0; i < points.length; i++) {
+		geometry.vertices.push(new THREE.Vector3(points[i].x, points[i].y, points[i].z));
+	}
+
+	return geometry;
 }
 
 THREE.LineCurve.prototype.toRenderable = function() {
@@ -415,3 +441,74 @@ THREE.Geometry.prototype.scale = function(vec) {
 	this.applyMatrix(mat);
 	return this;
 }
+
+
+
+
+
+
+
+
+
+THREE.EllipseCurve3 = function ( origin, xRadius, yRadius,
+							aStartAngle, aEndAngle,
+							aClockwise, frame ) {
+
+	origin = origin.toTHREE();
+	this.origin = origin;
+	this._origin = origin;
+
+	this.xRadius = xRadius;
+	this.yRadius = yRadius;
+	this._xRadius = xRadius;
+	this._yRadius = yRadius;
+
+
+	this.aStartAngle = aStartAngle;
+	this.aEndAngle = aEndAngle;
+
+	this.aClockwise = aClockwise;
+	this.matrix = frame || new THREE.Matrix4().identity(); 
+
+};
+
+THREE.EllipseCurve3.prototype = Object.create( THREE.Curve.prototype );
+
+THREE.EllipseCurve3.prototype.getPoint = function ( t ) {
+
+	var deltaAngle = this.aEndAngle - this.aStartAngle;
+
+	if ( !this.aClockwise ) {
+
+		t = 1 - t;
+
+	}
+
+	var angle = this.aStartAngle + t * deltaAngle;
+
+	var tx = this._origin.x + this._xRadius * Math.cos( angle );
+	var ty = this._origin.y + this._yRadius * Math.sin( angle );
+	//console.log(this.matrix);
+	var vec = new THREE.Vector3( tx, ty , 0 );
+	//console.log(vec);
+	vec.applyMatrix4(this.matrix);
+	//console.log(vec);
+	return vec;
+};
+THREE.EllipseCurve3.prototype.clone = function(){
+	var ell = new THREE.EllipseCurve3(this._origin, this._xRadius, this._yRadius, this.aStartAngle, this.aEndAngle, this.aClockwise, this.matrix);
+	return ell;
+};
+THREE.EllipseCurve3.prototype.translate = function ( vec ) {
+	var matrix = new THREE.Matrix4();
+	matrix.makeTranslation(vec.x, vec.y, vec.z);
+	this.matrix.multiplyMatrices( matrix, this.matrix );
+	this.xRadius = this._origin.distanceTo((new THREE.Vector3(this._xRadius, 0, 0)).applyMatrix4(this.matrix));
+	this.yRadius = this._origin.distanceTo((new THREE.Vector3(0, this._yRadius, 0)).applyMatrix4(this.matrix));
+	console.log(this._origin);
+	this.origin = this._origin.applyMatrix4(this.matrix);
+	console.log(this.origin);
+	return this;
+	//this.applyMatrix(mat);
+};
+
