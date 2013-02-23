@@ -496,19 +496,28 @@ THREE.EllipseCurve3.prototype.getPoint = function ( t ) {
 	return vec;
 };
 THREE.EllipseCurve3.prototype.clone = function(){
-	var ell = new THREE.EllipseCurve3(this._origin, this._xRadius, this._yRadius, this.aStartAngle, this.aEndAngle, this.aClockwise, this.matrix);
+	var ell = new THREE.EllipseCurve3(this._origin.clone(), this._xRadius, this._yRadius, this.aStartAngle, this.aEndAngle, this.aClockwise, this.matrix.clone());
 	return ell;
 };
-THREE.EllipseCurve3.prototype.translate = function ( vec ) {
-	var matrix = new THREE.Matrix4();
-	matrix.makeTranslation(vec.x, vec.y, vec.z);
+
+THREE.EllipseCurve3.prototype.applyMatrix = function(matrix){
 	this.matrix.multiplyMatrices( matrix, this.matrix );
 	this.xRadius = this._origin.distanceTo((new THREE.Vector3(this._xRadius, 0, 0)).applyMatrix4(this.matrix));
 	this.yRadius = this._origin.distanceTo((new THREE.Vector3(0, this._yRadius, 0)).applyMatrix4(this.matrix));
-	console.log(this._origin);
 	this.origin = this._origin.applyMatrix4(this.matrix);
-	console.log(this.origin);
+};
+THREE.EllipseCurve3.prototype.translate = function ( vec ) {
+	if (vec==null) return null;
+	var matrix = new THREE.Matrix4();
+	matrix.makeTranslation(vec.x, vec.y, vec.z);
+	this.applyMatrix(matrix);
 	return this;
-	//this.applyMatrix(mat);
 };
 
+THREE.EllipseCurve3.prototype.scale = function ( vec ) {
+	if (vec==null) return null;
+	var matrix = new THREE.Matrix4();
+	matrix.makeScale(vec.x, vec.y, vec.z);
+	this.applyMatrix(matrix);
+	return this;
+};

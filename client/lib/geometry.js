@@ -435,9 +435,8 @@ GEN.Geometry.API.move = {
 			var vec = geometry.add(translation);
 			var ng = new toxi.geom.Sphere(vec, geometry.radius);
 		} else if( geometry instanceof THREE.EllipseCurve3) {
-			console.log(geometry);
-			geometry.translate(translation);
 			var ng = geometry.clone();
+			ng.translate(translation);
 		} else if( geometry instanceof THREE.Geometry) {
 			var ng = geometry.clone();
 			ng.translate(translation);
@@ -494,7 +493,7 @@ GEN.Geometry.API.scale = {
 			vec = this.createPoint(vec);
 		}
 
-		if(args.geometry instanceof THREE.Geometry) {
+		if(args.geometry instanceof THREE.Geometry || args.geometry instanceof THREE.EllipseCurve3) {
 			var ng = args.geometry.clone();
 			ng.scale(vec);
 		} else {
