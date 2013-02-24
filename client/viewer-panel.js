@@ -75,7 +75,6 @@ Ext.define('GEN.ui.three.Panel', {
 	initProgramChangeHandler : function() {
 		var self = this;
 		Meteor.autorun(function() {
-			console.log('yeah');
 			try {
 				var blocks = Session.get("renderableBlocks");
 				console.log(blocks);

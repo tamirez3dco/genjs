@@ -7,7 +7,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 	},
 	xml : '<xml></xml>',
 	scale : 1,
-	useWorker: false,
+	useWorker : false,
 	varList : ['item'],
 	alias : 'widget.blockly-panel',
 	langCategories : {
@@ -110,7 +110,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 	initProgramChangeHandler : function() {
 		var self = this;
 		Meteor.autorun(function() {
-			//try {
+			try {
 				var current = Session.get("currentProgram");
 				if(_.isUndefined(current))
 					return;
@@ -125,9 +125,9 @@ Ext.define('GEN.ui.blockly.Panel', {
 				//TODO: prevent 'blocklyWorkspaceChange' event here.
 				Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
 				self.xmlChanged();
-			//} catch(err) {
-			//	console.log('Editor panel: Error while program changed' + err.message);
-			//}
+			} catch(err) {
+				console.log('Editor panel: Error while program changed' + err.message);
+			}
 		});
 	},
 	onInitialLayout : function() {
@@ -350,27 +350,31 @@ Ext.define('GEN.ui.blockly.Panel', {
 		Session.set('tracedCode', this.tracedCode);
 		Session.set('cleanCode', this.cleanCode);
 	},
-	execCode: function(code) {
-		if(this.useWorker==true){
+	execCode : function(code) {
+		if(this.useWorker == true) {
 			this.runWorker(code);
-		}else{
-			this.getExecutionResult(GEN.Runner.run(code));		
+		} else {
+			this.getExecutionResult(GEN.Runner.run(code));
 		}
 	},
-	getExecutionResult: function(result) {
+	getExecutionResult : function(result) {
 		console.log('execution result');
 		console.log(result);
 		Session.set('renderableBlocks', result);
 	},
 	initWorker : function() {
 		//not sure we need this here, need to check scope.
-		var self=this;
-		this.worker = new SharedWorker('/worker/code-worker.js');
-		this.worker.port.addEventListener("message", function(event) {
-			self.getWorkerMessage(event);
-		}, false);
+		var self = this;
+		try {
+			this.worker = new SharedWorker('/worker/code-worker.js');
+			this.worker.port.addEventListener("message", function(event) {
+				self.getWorkerMessage(event);
+			}, false);
 
-		this.worker.port.start();
+			this.worker.port.start();
+		} catch(err) {
+			this.useWorker = false;
+		}
 	},
 	runWorker : function(code) {
 		console.log("Execute Code");
@@ -381,9 +385,9 @@ Ext.define('GEN.ui.blockly.Panel', {
 	getWorkerMessage : function(event) {
 		console.log("Worker sent message");
 		result = JSON.parse(event.data);
-		this.getExecutionResult(result);	
+		this.getExecutionResult(result);
 	},
-		/*
+	/*
 	 execCode : function() {
 	 //Ext.log({msg: 'Execute Code', dump: this.tracedCode});
 	 //console.log("Execute Code");
