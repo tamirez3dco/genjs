@@ -71,7 +71,6 @@ Ext.define('GEN.ui.programs.Panel', {
 		});
 		var self = this;
 		Meteor.autorun(function() {
-			console.log('hi');
 			try {
 				var programId = Session.get("currentProgram");
 				if(_.isUndefined(programId))
@@ -81,6 +80,7 @@ Ext.define('GEN.ui.programs.Panel', {
 				if(currentId==programId) return;
 				
 				var rec = self.store.getById(programId);
+				if(rec==null) return;
 				self.getSelectionModel().select(rec);
 			
 				if(rec.data.name=="New Program") {

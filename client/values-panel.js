@@ -3,11 +3,11 @@ Ext.define('GEN.ui.values.Panel', {
 	alias : 'widget.values-panel',
 	tpl : new Ext.Template("{vals}"),
 	data : {
-		vals : 'No Block Selected'
+		vals : 'This panel is currently disabled'
 	},
 	initComponent : function() {
 		this.callParent();
-		this.initSelectionChangeHandler();
+		//this.initSelectionChangeHandler();
 	},
 	initSelectionChangeHandler : function() {
 		var self = this;

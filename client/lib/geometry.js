@@ -211,7 +211,7 @@ GEN.Geometry.API.createPoint = {
 		return p;
 	}
 };
-
+/*
 GEN.Geometry.API.createCircle = {
 	category : 'Curve',
 	menuTitle : 'Circle',
@@ -234,9 +234,10 @@ GEN.Geometry.API.createCircle = {
 		return c;
 	}
 };
+*/
 GEN.Geometry.API.createCircleThree = {
 	category : 'Curve',
-	menuTitle : 'Circle Three',
+	menuTitle : 'Circle',
 	tooltip : "Create a circle",
 	inputs : [{
 		name : 'origin',
@@ -284,6 +285,23 @@ GEN.Geometry.API.createLine = {
 		var v2 = args.end.toTHREE();
 		var c = new THREE.LineCurve3(v1, v2);
 		console.log(c);
+		return c;
+	}
+};
+
+
+GEN.Geometry.API.createSpline = {
+	category : 'Curve',
+	menuTitle : 'Spline',
+	tooltip : "Create a spline",
+	inputs : [{
+		name : 'points',
+		type : Array
+	}],
+	outputType : GEN.types.Curve,
+	fn : function(args) {
+		var points = _.map(args.points, function(p){return p.toTHREE()});
+		var c = new THREE.SplineCurve3(points);
 		return c;
 	}
 };
@@ -446,6 +464,9 @@ GEN.Geometry.API.createPipe = {
 	}, {
 		name : 'sides',
 		defaultVal : 6
+	}, {
+		name : 'segments',
+		defaultVal : 64
 	}],
 	outputType : GEN.types.Mesh,
 	fn : function(args) {
@@ -454,7 +475,7 @@ GEN.Geometry.API.createPipe = {
 		if(args.curve.toThreeCurve == undefined)
 			return null;
 		var curve = args.curve.toThreeCurve();
-		var pipe = new THREE.TubeGeometry(curve, 18, args.radius, args.sides, false, false);
+		var pipe = new THREE.TubeGeometry(curve, args.segments, args.radius, args.sides, false, false);
 		return pipe;
 	}
 };

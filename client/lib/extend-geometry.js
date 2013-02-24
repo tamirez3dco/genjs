@@ -103,7 +103,8 @@ THREE.Curve.prototype.toThreeCurve = function() {
 }
 THREE.Curve.prototype.toRenderable = function() {
 	var geometry = new THREE.Geometry();
-	var points = this.getPoints(36);
+	//var points = this.getPoints(300);
+	var points = this.getPointsByDistance(0.1);
 	//console.log(points);
 	for(var i = 0; i < points.length; i++) {
 		geometry.vertices.push(new THREE.Vector3(points[i].x, points[i].y, points[i].z));
@@ -461,7 +462,10 @@ THREE.Curve.prototype.scale = function ( vec ) {
 	return this;
 };
 
-
+THREE.Curve.prototype.getPointsByDistance = function ( distance ) {
+	var divisions = Math.round(this.getLength() / distance);
+	return this.getPoints(divisions);
+};
 
 /*
  * Ellipse
@@ -532,7 +536,25 @@ THREE.LineCurve3.prototype.applyMatrix = function(matrix){
 	this.v2.applyMatrix4(matrix);
 };
 
+/*
+ * Spline
+ */
 
+
+THREE.SplineCurve3.prototype.clone = function(){
+	var np = [];
+	for(var i=0; i<this.points.length; i++){
+		np.push(this.point[i].clone())
+	}
+	return new THREE.SplineCurve3(np);
+};
+
+
+THREE.SplineCurve3.prototype.applyMatrix = function(matrix){
+	for(var i=0; i<this.points.length; i++){
+		this.point[i].applyMatrix4(matrix);
+	}	
+};
 
 
 
