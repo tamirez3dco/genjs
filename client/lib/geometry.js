@@ -9,7 +9,8 @@ GEN.types = {
 	Mesh : String,
 	Curve : String,
 	Geometry : String,
-	Vector : String
+	Vector : String,
+	Shape : String,
 }
 
 GEN.Runner = {};
@@ -385,6 +386,29 @@ GEN.Geometry.API.createCube = {
 	}
 };
 
+
+GEN.Geometry.API.createShape2D = {
+	category : 'Curve',
+	menuTitle : 'Shape 2D',
+	tooltip : "Create a Shape on World-XY",
+	inputs : [{
+		name : 'points',
+		type : Array,
+		defaultVal : '[]'
+	}],
+	outputType : GEN.types.Curve,
+	fn : function(args) {
+		if (args.points.length < 3) return "";
+		var points2D = [];
+		for (var i = 0 ; i < args.points.length ; i++){
+			points2D.push(new THREE.Vector2(args.points[i].x,args.points[i].y));
+			
+		}
+		return new THREE.Shape(points2D);
+	}
+};
+
+
 GEN.Geometry.API.createParametricSurface = {
 	category : 'Mesh',
 	menuTitle : 'Parametric Mesh',
@@ -470,6 +494,29 @@ GEN.Geometry.API.move = {
 			ng = geometry;
 		}
 		return ng;
+	}
+};
+
+GEN.Geometry.API.Extrude = {
+	category : 'Mesh',
+	menuTitle : 'ExtrudeShape',
+	tooltip : "Extrudes a Shape 2D",
+	inputs : [{
+		name : 'Shape',
+		type : GEN.types.Shape,
+	}, {
+		name : 'extr',
+		type : Number,
+		defaultVal : 20
+	}],
+	outputType : GEN.types.Geometry,
+
+	fn : function(args) {
+		
+	if (args.Shape == null) return "";
+	var extrusionSettings = { amount: args.extr, bevelEnabled: false };
+	
+	return new THREE.ExtrudeGeometry( args.Shape, extrusionSettings );		
 	}
 };
 

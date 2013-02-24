@@ -2,6 +2,8 @@ Ext.define('GEN.ui.three.Panel', {
 	extend : 'Ext.panel.Panel',
 	alias : 'widget.three-panel',
 	id : 'threePanel',
+	shapeColorNormal:0xff0000,
+	shapeColorSelected:0x0000ff,
 	lineColorNormal : 0xff00ff,
 	lineColorSelected : 0x00ff00,
 	meshFaceColorNormal : 0xff00ff,
@@ -147,6 +149,26 @@ Ext.define('GEN.ui.three.Panel', {
 			color : this.lineColorSelected,
 		});
 
+		this.shapeMaterial = {};
+		this.shapeMaterial['normal'] = [new THREE.MeshLambertMaterial({
+			color : this.shapeColorNormal,
+			opacity : 0.8,
+			transparent : true
+		}), new THREE.MeshBasicMaterial({
+			color : this.meshEdgeColorNormal,
+			opacity : 0.5,
+			wireframe : true
+		})]; 
+		this.shapeMaterial['selected'] = [new THREE.MeshLambertMaterial({
+			color : this.shapeColorSelected,
+			opacity : 0.8,
+			transparent : true
+		}), new THREE.MeshBasicMaterial({
+			color : this.meshEdgeColorSelected,
+			opacity : 0.5,
+			wireframe : true
+		})];
+
 		this.meshMaterial = {};
 		this.meshMaterial['normal'] = [new THREE.MeshLambertMaterial({
 			color : this.meshFaceColorNormal,
@@ -247,6 +269,8 @@ Ext.define('GEN.ui.three.Panel', {
 					return;
 				} else if(decoded.render_type == "Line") {
 					rendered = new THREE.Line(geometry, this.lineMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
+				} else if(decoded.render_type == "Shape") {
+					rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.shapeMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
 				} else if(decoded.render_type == "Mesh") {
 					rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
 				}

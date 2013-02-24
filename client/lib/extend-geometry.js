@@ -7,6 +7,7 @@ toxi.geom.Sphere.prototype.RENDER_TYPE = "Mesh";
 toxi.geom.AABB.prototype.RENDER_TYPE = "Mesh";
 toxi.geom.mesh.TriangleMesh.prototype.RENDER_TYPE = "Mesh";
 //THREE render types
+THREE.Shape.prototype.RENDER_TYPE = "Shape";
 THREE.Vector3.prototype.RENDER_TYPE = "Point";
 THREE.Curve.prototype.RENDER_TYPE = "Line";
 THREE.Geometry.prototype.RENDER_TYPE = "Mesh";
@@ -48,6 +49,12 @@ THREE.Vector3.prototype.toCSG_Vertex = function() {
 
 THREE.Vector3.prototype.toRenderable = function() {
 	return this;
+}
+
+THREE.Shape.prototype.toRenderable = function() {
+	var ret = new THREE.ShapeGeometry(this);
+	ret.RENDER_TYPE = "Shape";
+	return ret;
 }
 THREE.Vector3.prototype.toTHREE = function() {
 	return this;
