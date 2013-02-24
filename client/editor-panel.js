@@ -169,7 +169,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 
 		Blockly.inject(this.blocklyWrapper, {
 			path : '/blockly/',
-			rtl: true,
+			//rtl: true,
 			showToolbox : false
 		});
 
