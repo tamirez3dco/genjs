@@ -110,13 +110,13 @@ Blockly.JavaScript.math_single = function() {
       code = 'Math.floor(' + arg + ')';
       break;
     case 'SIN':
-      code = 'Math.sin(' + arg + ' / 180 * Math.PI)';
+      code = 'Math.sin(' + arg + ')';
       break;
     case 'COS':
-      code = 'Math.cos(' + arg + ' / 180 * Math.PI)';
+      code = 'Math.cos(' + arg + ')';
       break;
     case 'TAN':
-      code = 'Math.tan(' + arg + ' / 180 * Math.PI)';
+      code = 'Math.tan(' + arg + ')';
       break;
   }
   if (code) {
@@ -129,13 +129,13 @@ Blockly.JavaScript.math_single = function() {
       code = 'Math.log(' + arg + ') / Math.log(10)';
       break;
     case 'ASIN':
-      code = 'Math.asin(' + arg + ') / Math.PI * 180';
+      code = 'Math.asin(' + arg + ')';
       break;
     case 'ACOS':
-      code = 'Math.acos(' + arg + ') / Math.PI * 180';
+      code = 'Math.acos(' + arg + ')';
       break;
     case 'ATAN':
-      code = 'Math.atan(' + arg + ') / Math.PI * 180';
+      code = 'Math.atan(' + arg + ')';
       break;
     default:
       throw 'Unknown math operator: ' + operator;

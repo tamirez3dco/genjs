@@ -96,7 +96,8 @@ THREE.Curve.prototype.toThreeCurve = function() {
 }
 THREE.Curve.prototype.toRenderable = function() {
 	var geometry = new THREE.Geometry();
-	var points = this.getPoints(36);
+	//var points = this.getPoints(300);
+	var points = this.getPointsByDistance(0.1);
 	//console.log(points);
 	for(var i = 0; i < points.length; i++) {
 		geometry.vertices.push(new THREE.Vector3(points[i].x, points[i].y, points[i].z));
@@ -454,7 +455,10 @@ THREE.Curve.prototype.scale = function ( vec ) {
 	return this;
 };
 
-
+THREE.Curve.prototype.getPointsByDistance = function ( distance ) {
+	var divisions = Math.round(this.getLength() / distance);
+	return this.getPoints(divisions);
+};
 
 /*
  * Ellipse
