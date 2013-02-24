@@ -525,7 +525,25 @@ THREE.LineCurve3.prototype.applyMatrix = function(matrix){
 	this.v2.applyMatrix4(matrix);
 };
 
+/*
+ * Spline
+ */
 
+
+THREE.SplineCurve3.prototype.clone = function(){
+	var np = [];
+	for(var i=0; i<this.points.length; i++){
+		np.push(this.point[i].clone())
+	}
+	return new THREE.SplineCurve3(np);
+};
+
+
+THREE.SplineCurve3.prototype.applyMatrix = function(matrix){
+	for(var i=0; i<this.points.length; i++){
+		this.point[i].applyMatrix4(matrix);
+	}	
+};
 
 
 
