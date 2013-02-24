@@ -407,8 +407,7 @@ THREE.Geometry.decode = function(json) {
 			f4(geometry, vcs[0], vcs[1], vcs[2], vcs[3]);
 		}
 	}
-	//console.log(vertices);
-	//console.log(geometry);
+	
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
 	geometry.computeVertexNormals();
@@ -418,17 +417,7 @@ THREE.Geometry.decode = function(json) {
 		geometry : geometry
 	};
 }
-/*
- THREE.TextGeometry.prototype.toRenderable = function() {
- return this;
- }
- THREE.CubeGeometry.prototype.toRenderable = function() {
- return this;
- }
- THREE.ParametricGeometry.prototype.toRenderable = function() {
- return this;
- }
- */
+
 THREE.Geometry.prototype.translate = function(vec) {
 	var mat = new THREE.Matrix4();
 	mat.makeTranslation(vec.x, vec.y, vec.z);
@@ -444,6 +433,9 @@ THREE.Geometry.prototype.scale = function(vec) {
 
 
 
+/*
+ * Abstract curve
+ */
 
 
 THREE.Curve.prototype.translate = function ( vec ) {
@@ -464,6 +456,9 @@ THREE.Curve.prototype.scale = function ( vec ) {
 
 
 
+/*
+ * Ellipse
+ */
 
 THREE.EllipseCurve3 = function ( origin, xRadius, yRadius,
 							aStartAngle, aEndAngle,
@@ -516,7 +511,9 @@ THREE.EllipseCurve3.prototype.applyMatrix = function(matrix){
 	this.origin = this._origin.applyMatrix4(this.matrix);
 };
 
-
+/*
+ * Line
+ */
 
 THREE.LineCurve3.prototype.clone = function(){
 	return new THREE.LineCurve3(this.v1.clone(), this.v2.clone());
