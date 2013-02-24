@@ -255,6 +255,38 @@ GEN.Geometry.API.createCircleThree = {
 		return c;
 	}
 };
+
+GEN.Geometry.API.createLine = {
+	category : 'Curve',
+	menuTitle : 'Line',
+	tooltip : "Create a line",
+	inputs : [{
+		name : 'start',
+		type : GEN.types.Vector,
+		defaultVal : GEN.Geometry.generateCodeForFunction('createPoint', {
+			x : 0,
+			y : 0,
+			z : 0
+		})
+	}, {
+		name : 'end',
+		type : GEN.types.Vector,
+		defaultVal : GEN.Geometry.generateCodeForFunction('createPoint', {
+			x : 20,
+			y : 20,
+			z : 20
+		})
+	}],
+	outputType : GEN.types.Curve,
+	fn : function(args) {
+		var v1 = args.start.toTHREE();
+		var v2 = args.end.toTHREE();
+		var c = new THREE.LineCurve3(v1, v2);
+		console.log(c);
+		return c;
+	}
+};
+
 GEN.Geometry.API.createSphere = {
 	category : 'Surface',
 	menuTitle : 'Sphere',
@@ -393,14 +425,11 @@ GEN.Geometry.API.createPipe = {
 	}],
 	outputType : GEN.types.Mesh,
 	fn : function(args) {
-		console.log(args.curve);
-		//var curve = args.curve.toRenderable();
 		if(args.curve == null)
 			return null;
 		if(args.curve.toThreeCurve == undefined)
 			return null;
 		var curve = args.curve.toThreeCurve();
-		console.log(curve);
 		var pipe = new THREE.TubeGeometry(curve, 18, args.radius, args.sides, false, false);
 		return pipe;
 	}
@@ -434,10 +463,7 @@ GEN.Geometry.API.move = {
 		} else if( geometry instanceof toxi.geom.Sphere) {
 			var vec = geometry.add(translation);
 			var ng = new toxi.geom.Sphere(vec, geometry.radius);
-		} else if( geometry instanceof THREE.EllipseCurve3) {
-			var ng = geometry.clone();
-			ng.translate(translation);
-		} else if( geometry instanceof THREE.Geometry) {
+		} else if( geometry instanceof THREE.Geometry || geometry instanceof THREE.Curve) {
 			var ng = geometry.clone();
 			ng.translate(translation);
 		} else {
@@ -482,18 +508,23 @@ GEN.Geometry.API.scale = {
 	}, {
 		name : 'vecOrFactor',
 		title : 'vector',
-		type : GEN.types.Vector
+		type : GEN.types.Vector,
+		defaultVal : GEN.Geometry.generateCodeForFunction('createPoint', {
+			x : 2,
+			y : 2,
+			z : 2
+		})
 	}],
 	outputType : GEN.types.Geometry,
 
-	//TODO: only works for mesh
+	//TODO: only works for mesh & threeCurve
 	fn : function(args) {
 		var vec = args.vecOrFactor;
 		if(_.isNumber(vec)) {
-			vec = this.createPoint(vec);
+			vec = this.createPoint(vec,vec,vec);
 		}
 
-		if(args.geometry instanceof THREE.Geometry || args.geometry instanceof THREE.EllipseCurve3) {
+		if(args.geometry instanceof THREE.Geometry || args.geometry instanceof THREE.Curve) {
 			var ng = args.geometry.clone();
 			ng.scale(vec);
 		} else {

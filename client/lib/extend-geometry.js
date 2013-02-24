@@ -446,6 +446,21 @@ THREE.Geometry.prototype.scale = function(vec) {
 
 
 
+THREE.Curve.prototype.translate = function ( vec ) {
+	if (vec==null) return null;
+	var matrix = new THREE.Matrix4();
+	matrix.makeTranslation(vec.x, vec.y, vec.z);
+	this.applyMatrix(matrix);
+	return this;
+};
+
+THREE.Curve.prototype.scale = function ( vec ) {
+	if (vec==null) return null;
+	var matrix = new THREE.Matrix4();
+	matrix.makeScale(vec.x, vec.y, vec.z);
+	this.applyMatrix(matrix);
+	return this;
+};
 
 
 
@@ -475,29 +490,23 @@ THREE.EllipseCurve3 = function ( origin, xRadius, yRadius,
 THREE.EllipseCurve3.prototype = Object.create( THREE.Curve.prototype );
 
 THREE.EllipseCurve3.prototype.getPoint = function ( t ) {
-
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
 
 	if ( !this.aClockwise ) {
-
 		t = 1 - t;
-
 	}
 
 	var angle = this.aStartAngle + t * deltaAngle;
 
 	var tx = this._origin.x + this._xRadius * Math.cos( angle );
 	var ty = this._origin.y + this._yRadius * Math.sin( angle );
-	//console.log(this.matrix);
 	var vec = new THREE.Vector3( tx, ty , 0 );
-	//console.log(vec);
 	vec.applyMatrix4(this.matrix);
-	//console.log(vec);
+	
 	return vec;
 };
 THREE.EllipseCurve3.prototype.clone = function(){
-	var ell = new THREE.EllipseCurve3(this._origin.clone(), this._xRadius, this._yRadius, this.aStartAngle, this.aEndAngle, this.aClockwise, this.matrix.clone());
-	return ell;
+	return new THREE.EllipseCurve3(this._origin.clone(), this._xRadius, this._yRadius, this.aStartAngle, this.aEndAngle, this.aClockwise, this.matrix.clone());
 };
 
 THREE.EllipseCurve3.prototype.applyMatrix = function(matrix){
@@ -506,18 +515,24 @@ THREE.EllipseCurve3.prototype.applyMatrix = function(matrix){
 	this.yRadius = this._origin.distanceTo((new THREE.Vector3(0, this._yRadius, 0)).applyMatrix4(this.matrix));
 	this.origin = this._origin.applyMatrix4(this.matrix);
 };
-THREE.EllipseCurve3.prototype.translate = function ( vec ) {
-	if (vec==null) return null;
-	var matrix = new THREE.Matrix4();
-	matrix.makeTranslation(vec.x, vec.y, vec.z);
-	this.applyMatrix(matrix);
-	return this;
+
+
+
+THREE.LineCurve3.prototype.clone = function(){
+	return new THREE.LineCurve3(this.v1.clone(), this.v2.clone());
 };
 
-THREE.EllipseCurve3.prototype.scale = function ( vec ) {
-	if (vec==null) return null;
-	var matrix = new THREE.Matrix4();
-	matrix.makeScale(vec.x, vec.y, vec.z);
-	this.applyMatrix(matrix);
-	return this;
+
+THREE.LineCurve3.prototype.applyMatrix = function(matrix){
+	this.v1.applyMatrix4(matrix);
+	this.v2.applyMatrix4(matrix);
 };
+
+
+
+
+
+
+
+
+
