@@ -7,7 +7,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 	},
 	xml : '<xml></xml>',
 	scale : 1,
-	useWorker : false,
+	useWorker : true,
 	varList : ['item'],
 	alias : 'widget.blockly-panel',
 	langCategories : {

@@ -1,10 +1,6 @@
 ////////////////////////////////////////
 //GEN Geometry API
 ////////////////////////////////////////
-GEN = {};
-
-GEN.global = this;
-
 GEN.types = {
 	Mesh : String,
 	Curve : String,
@@ -17,7 +13,7 @@ GEN.Runner = {};
 GEN.Runner.init = function() {
 	GEN.debug = new GEN.Debugger();
 	GEN.Geometry.initGlobal();
-	goog.memoize.USAGE_COUNTER = 0;
+	GEN.memoize.USAGE_COUNTER = 0;
 };
 GEN.Runner.run = function(code) {
 	GEN.debug.start();
@@ -26,8 +22,8 @@ GEN.Runner.run = function(code) {
 	GEN.debug.stop();
 	var renderableBlocks = GEN.Runner.encodeRenderables(GEN.debug.tracedBlocks);
 	if(GEN.Geometry.MEMOIZE) {
-		goog.memoize.clearUnused(5);
-		goog.memoize.USAGE_COUNTER += 1;
+		GEN.memoize.clearUnused(5);
+		GEN.memoize.USAGE_COUNTER += 1;
 	}
 	return renderableBlocks;
 };
@@ -94,7 +90,7 @@ GEN.Geometry.exportAPI = function() {
 		apiDef = GEN.Geometry.API[fnName];
 		GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName] = apiDef.fn;
 		if(GEN.Geometry.MEMOIZE) {
-			GEN.Geometry.prototype[fnName] = goog.memoize(GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName]);
+			GEN.Geometry.prototype[fnName] = GEN.memoize(GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName]);
 		} else {
 			GEN.Geometry.prototype[fnName] = GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName];
 		}

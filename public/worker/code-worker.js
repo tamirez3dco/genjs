@@ -4,8 +4,8 @@ importScripts('/worker/toxiclibs.js');
 importScripts('/worker/memoize.js');
 importScripts('/worker/csg.js');
 importScripts('/worker/math_functions.js');
-importScripts('/worker/z.optimer_bold.typeface.js');
-importScripts('/worker/z.optimer_regular.typeface.js');
+importScripts('/worker/optimer_bold.typeface.js');
+importScripts('/worker/optimer_regular.typeface.js');
 importScripts('/worker/extend-geometry.js');
 importScripts('/worker/geometry.js');
 
