@@ -11,10 +11,6 @@ THREE.Shape.prototype.RENDER_TYPE = "Shape";
 THREE.Vector3.prototype.RENDER_TYPE = "Point";
 THREE.Curve.prototype.RENDER_TYPE = "Line";
 THREE.Geometry.prototype.RENDER_TYPE = "Mesh";
-/*
-THREE.TextGeometry.prototype.RENDER_TYPE = "Mesh";
-THREE.ParametricGeometry.prototype.RENDER_TYPE = "Mesh";
-*/
 
 //Points
 toxi.geom.Vec3D.prototype.toRenderable = function() {
@@ -315,20 +311,6 @@ THREE.Geometry.prototype.toRenderable = function() {
 }
 
 THREE.Geometry.prototype.getEdges = function() {
-	var vertices = this.vertices;
-	var edges = [];
-	for(var i = 0, il = vertices.length; i < il; i++) {
-		if(i > 0) {
-			var edge = new THREE.LineCurve(vertices[i - 1], vertices[i]);
-			//vertices[i].distanceTo(vertices[i - 1]);
-			//console.log(edge);
-			edges.push(edge);
-		}
-
-	}
-	return edges;
-}
-THREE.Geometry.prototype.getEdges = function() {
 	var v = this.vertices;
 	var faces = this.faces;
 	var edges = [];
@@ -357,9 +339,6 @@ THREE.Geometry.prototype.encode = function(precision, render_type) {
 	for(var i = 0; i < vertices.length; i++) {
 		vco.push(vertices[i].x.toFixed(precision), vertices[i].y.toFixed(precision), vertices[i].z.toFixed(precision));
 	}
-	//vstr = vco.join(',');
-	//vstr = JSON.stringify(vco);
-	//return vstr;
 
 	var fco = [];
 	for(var i = 0; i < faces.length; i++) {
@@ -368,10 +347,7 @@ THREE.Geometry.prototype.encode = function(precision, render_type) {
 			f.push(faces[i].d);
 		fco.push(f);
 	}
-	//fstr = 	fco.join(';');
-
-	//var encoded = fstr + '#' + vstr;
-	//var encoded = JSON.stringify({type: type, data: {v: vco, f: fco}});
+	
 	var encoded = {
 		render_type : render_type,
 		data : {
@@ -380,7 +356,6 @@ THREE.Geometry.prototype.encode = function(precision, render_type) {
 		}
 	};
 	return encoded;
-
 }
 
 THREE.Geometry.decode = function(json) {

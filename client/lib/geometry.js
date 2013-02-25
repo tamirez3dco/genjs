@@ -60,9 +60,7 @@ GEN.Debugger = function() {
 	this.traceOn = false;
 };
 GEN.Debugger.prototype.trace = function(value, blockId) {
-	//console.log('trc');
 	this.tracedValues.push(value);
-	//console.log(blockId);
 	if(_.isUndefined(this.tracedBlocks[blockId])) {
 		this.tracedBlocks[blockId] = [value];
 	} else {
@@ -71,14 +69,11 @@ GEN.Debugger.prototype.trace = function(value, blockId) {
 	return value;
 }
 GEN.Debugger.prototype.start = function() {
-	//this.traceOn=true;
 	this.tracedValues = [];
 	this.tracedBlocks = {};
-	//Blockly.Generator.TRACE = true;
 }
 GEN.Debugger.prototype.stop = function() {
-	//Blockly.Generator.TRACE = false;
-	//this.traceOn=false;
+
 }
 
 GEN.Geometry = function() {
