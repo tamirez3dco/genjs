@@ -390,27 +390,4 @@ Ext.define('GEN.ui.blockly.Panel', {
 		result = JSON.parse(event.data);
 		this.getExecutionResult(result);
 	},
-	/*
-	 execCode : function() {
-	 //Ext.log({msg: 'Execute Code', dump: this.tracedCode});
-	 //console.log("Execute Code");
-	 this.runWorker(this.tracedCode);
-
-	 //console.log("Execute Code");
-	 //console.log(this.tracedCode);
-	 Blockly.debug.start(this.tracedCode);
-	 try {
-	 eval(this.tracedCode);
-	 } catch (e) {
-	 console.log('Error executing:');
-	 console.log(e);
-	 return;
-	 }
-	 //console.log("Cache");
-	 //goog.memoize.dumpCache();
-
-	 goog.memoize.clearUnused(5);
-	 goog.memoize.USAGE_COUNTER += 1;
-	 Blockly.debug.stop();
-	 },*/
 });

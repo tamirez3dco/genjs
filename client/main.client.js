@@ -3,8 +3,6 @@ Meteor.startup(function() {
 	Session.set("currentXML", '<xml></xml>');
 	Session.set("selectedBlock", -1);
 
-	//Blockly.debug = new Blockly.Debugger();
-	//GEN.Geometry.initGlobal();
 	GEN.Geometry.buildLanguage();
 	GEN.Runner.init();
 	

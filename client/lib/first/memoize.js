@@ -1,6 +1,5 @@
 var GEN = GEN || {}; 
 
-
 /**
  * Reference to the global context.  In most cases this will be 'window'.
  */
