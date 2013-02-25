@@ -133,6 +133,14 @@ Ext.define('GEN.ui.blockly.Panel', {
 	onInitialLayout : function() {
 		this.injectBlockly();
 		this.initLanguageMenus();
+		this.initWorkspaceEvents();
+		this.on({
+			'resize' : {
+				fn : this.onResize
+			}
+		});
+	},
+	initWorkspaceEvents : function() {
 		Ext.fly(document.getElementById('blockly-inner')).on({
 			'blocklyWorkspaceChange' : {
 				fn : this.onWorkspaceChange,
@@ -148,12 +156,6 @@ Ext.define('GEN.ui.blockly.Panel', {
 			}
 		}, this);
 		Ext.fly(document.getElementById('blockly-inner')).setStyle('zoom', this.scale);
-
-		this.on({
-			'resize' : {
-				fn : this.onResize
-			}
-		});
 	},
 	injectBlockly : function() {
 		var w = this.body.getWidth();
@@ -177,6 +179,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 	onResize : function() {
 		this.body.dom.removeChild(this.blocklyWrapper);
 		this.injectBlockly();
+		this.initWorkspaceEvents();
 		Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, Blockly.Xml.textToDom(this.xml));
 	},
 	initLanguageMenus : function() {

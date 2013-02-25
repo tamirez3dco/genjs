@@ -520,7 +520,7 @@ GEN.Geometry.API.move = {
 
 GEN.Geometry.API.Extrude = {
 	category : 'Mesh',
-	menuTitle : 'ExtrudeShape',
+	menuTitle : 'Extrude Shape',
 	tooltip : "Extrudes a Shape 2D",
 	inputs : [{
 		name : 'Shape',
