@@ -80,7 +80,12 @@ Ext.define('GEN.ui.blockly.Panel', {
         statusAlign: 'right',
         defaultText: '<span style="color: green">Ready</span>',
         busyText:'<span style="color: orange">Evaluating...</span>',
-		items : []
+		items : [{
+			xtype : 'button',
+			text : 'Dummy',
+			id: 'tbar1-dummy-item',
+			tooltip : 'Layout place holder'
+		}]
 	}, {
 		xtype : 'toolbar',
 		dock : 'top',
@@ -185,7 +190,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, Blockly.Xml.textToDom(this.xml));
 	},
 	initLanguageMenus : function() {
-		//this.getComponent('tbar1').removeAll();
+		this.getComponent('tbar1').remove(this.getComponent('tbar1').getComponent('tbar1-dummy-item'));
 		this.getComponent('tbar2').removeAll();
 
 		var tbar = this.getComponent(this.langCategories['Variables'].tbarId);
@@ -207,7 +212,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 			}, this);
 			var menu = this.buildCategoryMenu(catName, menuItems);
 			var count = tbar.items.getCount();
-			console.log(count);
+			
 			var position = this.langCategories[catName].tbarId == 'tbar1' ? count-2:count;
 			tbar.insert(position, menu);
 		}, this);
