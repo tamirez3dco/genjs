@@ -514,14 +514,31 @@ THREE.LineCurve3.prototype.applyMatrix = function(matrix){
 THREE.SplineCurve3.prototype.clone = function(){
 	var np = [];
 	for(var i=0; i<this.points.length; i++){
-		np.push(this.point[i].clone())
+		np.push(this.points[i].clone())
 	}
 	return new THREE.SplineCurve3(np);
 };
 
 THREE.SplineCurve3.prototype.applyMatrix = function(matrix){
 	for(var i=0; i<this.points.length; i++){
-		this.point[i].applyMatrix4(matrix);
+		this.points[i].applyMatrix4(matrix);
+	}	
+};
+
+/*
+ * Closed Spline
+ */
+THREE.ClosedSplineCurve3.prototype.clone = function(){
+	var np = [];
+	for(var i=0; i<this.points.length; i++){
+		np.push(this.points[i].clone())
+	}
+	return new THREE.ClosedSplineCurve3(np);
+};
+
+THREE.ClosedSplineCurve3.prototype.applyMatrix = function(matrix){
+	for(var i=0; i<this.points.length; i++){
+		this.points[i].applyMatrix4(matrix);
 	}	
 };
 

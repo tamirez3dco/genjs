@@ -287,13 +287,20 @@ GEN.Geometry.API.createSpline = {
 	inputs : [{
 		name : 'points',
 		type : Array
+	},{
+		name : 'closed',
+		type : Boolean,
+		options: [['Open', 'false'],['Closed', 'true']]
 	}],
 	outputType : GEN.types.Curve,
 	fn : function(args) {
+		if(args.points == null)
+			return null;
 		var points = _.map(args.points, function(p) {
 			return p.toTHREE()
 		});
-		var c = new THREE.SplineCurve3(points);
+		
+		var c = args.closed ? new THREE.ClosedSplineCurve3(points) : new THREE.SplineCurve3(points);
 		return c;
 	}
 };
