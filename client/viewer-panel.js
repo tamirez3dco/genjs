@@ -2,8 +2,8 @@ Ext.define('GEN.ui.three.Panel', {
 	extend : 'Ext.panel.Panel',
 	alias : 'widget.three-panel',
 	id : 'threePanel',
-	shapeColorNormal:0xff0000,
-	shapeColorSelected:0x0000ff,
+	shapeColorNormal : 0xff0000,
+	shapeColorSelected : 0x0000ff,
 	lineColorNormal : 0xff00ff,
 	lineColorSelected : 0x00ff00,
 	meshFaceColorNormal : 0xff00ff,
@@ -26,13 +26,32 @@ Ext.define('GEN.ui.three.Panel', {
 				Ext.getCmp('threePanel').renderOnlySelected = this.pressed;
 				Ext.getCmp('threePanel').reRenderScene();
 			}
-		},{
+		}, {
+			text : 'Hide Wireframe',
+			enableToggle : true,
+			cls : 'x-btn-default-small',
+			toggleHandler : function() {
+				var viewer = Ext.getCmp('threePanel');
+				if(this.pressed) {
+					viewer.meshMaterial = {
+						normal : viewer.createCleanMaterial(viewer.meshFaceColorNormal,1),
+						selected : viewer.createCleanMaterial(viewer.meshFaceColorSelected,1)
+					};
+				} else {
+					viewer.meshMaterial = {
+						normal : viewer.createWiredMaterial(viewer.meshFaceColorNormal, viewer.meshEdgeColorNormal),
+						selected : viewer.createWiredMaterial(viewer.meshFaceColorSelected, viewer.meshEdgeColorSelected)
+					};
+				}
+				Ext.getCmp('threePanel').reRenderScene();
+			}
+		}, {
 			text : 'Disable',
 			enableToggle : true,
 			cls : 'x-btn-default-small',
 			toggleHandler : function() {
 				Ext.getCmp('threePanel').disableAnimation = this.pressed;
-				if(this.pressed==false){
+				if(this.pressed == false) {
 					Ext.getCmp('threePanel').startAnimate();
 				}
 			}
@@ -148,45 +167,31 @@ Ext.define('GEN.ui.three.Panel', {
 			color : this.lineColorSelected,
 		});
 
-		this.shapeMaterial = {};
-		this.shapeMaterial['normal'] = [new THREE.MeshLambertMaterial({
-			color : this.shapeColorNormal,
+		this.shapeMaterial = {
+			normal : this.createWiredMaterial(this.shapeColorNormal, this.meshEdgeColorNormal),
+			selected : this.createWiredMaterial(this.shapeColorSelected, this.meshEdgeColorSelected)
+		};
+		this.meshMaterial = {
+			normal : this.createWiredMaterial(this.meshFaceColorNormal, this.meshEdgeColorNormal),
+			selected : this.createWiredMaterial(this.meshFaceColorSelected, this.meshEdgeColorSelected)
+		};
+	},
+	createWiredMaterial : function(faceColor, wireColor) {
+		return [new THREE.MeshLambertMaterial({
+			color : faceColor,
 			opacity : 0.8,
 			transparent : true
 		}), new THREE.MeshBasicMaterial({
-			color : this.meshEdgeColorNormal,
-			opacity : 0.5,
-			wireframe : true
-		})]; 
-		this.shapeMaterial['selected'] = [new THREE.MeshLambertMaterial({
-			color : this.shapeColorSelected,
-			opacity : 0.8,
-			transparent : true
-		}), new THREE.MeshBasicMaterial({
-			color : this.meshEdgeColorSelected,
-			opacity : 0.5,
-			wireframe : true
-		})];
-
-		this.meshMaterial = {};
-		this.meshMaterial['normal'] = [new THREE.MeshLambertMaterial({
-			color : this.meshFaceColorNormal,
-			opacity : 0.8,
-			transparent : true
-		}), new THREE.MeshBasicMaterial({
-			color : this.meshEdgeColorNormal,
+			color : wireColor,
 			opacity : 0.5,
 			wireframe : true
 		})];
-
-		this.meshMaterial['selected'] = [new THREE.MeshLambertMaterial({
-			color : this.meshFaceColorSelected,
-			opacity : 0.8,
+	},
+	createCleanMaterial : function(faceColor, opacity) {
+		return [new THREE.MeshLambertMaterial({
+			color : faceColor,
+			opacity : opacity,
 			transparent : true
-		}), new THREE.MeshBasicMaterial({
-			color : this.meshEdgeColorSelected,
-			opacity : 0.5,
-			wireframe : true
 		})];
 	},
 	initCamera : function(w, h) {
@@ -284,7 +289,7 @@ Ext.define('GEN.ui.three.Panel', {
 			}, this);
 		}, this);
 	},
-	setRenderableBlocks: function(blocks){
+	setRenderableBlocks : function(blocks) {
 		var blocksIds = _.keys(blocks);
 		_.each(blocksIds, function(id) {
 			var values = blocks[id];
@@ -292,11 +297,9 @@ Ext.define('GEN.ui.three.Panel', {
 				values = values[0];
 			}
 			_.each(values, function(val) {
-				
-				
-				
-			},this);
-		}, this);				
+
+			}, this);
+		}, this);
 	},
 	clearSelectionColor : function() {
 		if(this.selectedBlock == -1)
@@ -343,7 +346,8 @@ Ext.define('GEN.ui.three.Panel', {
 		var self = this;
 		//return;
 		var animate = function() {
-			if(self.disableAnimation) return;
+			if(self.disableAnimation)
+				return;
 			requestAnimationFrame(animate);
 			self.controls.update();
 		};
