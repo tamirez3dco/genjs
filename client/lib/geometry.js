@@ -351,7 +351,7 @@ GEN.Geometry.API.createTextGeo = {
 		var c = new THREE.TextGeometry(args.text, {
 			size : args.size,
 			height : args.height,
-			curveSegments : 2,
+			curveSegments : 3,
 
 			font : "optimer",
 
@@ -564,7 +564,27 @@ GEN.Geometry.API.divideCurveLength = {
 		return args.curve.getPointsByDistance(args.length);
 	}
 };
+GEN.Geometry.API.divideCurveSegments = {
+	category : 'Curve',
+	menuTitle : 'Divide Curve (segments)',
+	tooltip : "Divide a curve to a number of segments",
+	inputs : [{
+		name : 'curve',
+		type : GEN.types.Curve,
+	}, {
+		name : 'segments',
+		type : Number,
+		defaultVal : 10
+	}],
+	outputType : Array,
 
+	fn : function(args) {
+		if(args.curve == null)
+			return "";
+
+		return args.curve.getPoints(args.segments);
+	}
+};
 GEN.Geometry.API.booleanOperation = {
 	category : 'Transform',
 	menuTitle : 'Boolean',
