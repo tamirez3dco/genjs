@@ -404,7 +404,7 @@ GEN.Geometry.API.createCube = {
 };
 
 GEN.Geometry.API.createShape2D = {
-	category : 'Curve',
+	category : 'Surface',
 	menuTitle : 'Shape 2D',
 	tooltip : "Create a Shape on World-XY",
 	inputs : [{

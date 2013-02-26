@@ -72,14 +72,15 @@ Ext.define('GEN.ui.blockly.Panel', {
 		height : 20
 	},
 	dockedItems : [{
-		xtype : 'toolbar',
+		xtype : 'statusbar',
 		dock : 'top',
 		itemId : 'tbar1',
-		items : [{
-			xtype : 'button',
-			text : 'Dummy',
-			tooltip : 'Layout place holder'
-		}]
+		text: '<span style="color: green">Ready</span>',
+        iconCls: 'x-status-valid',
+        statusAlign: 'right',
+        defaultText: '<span style="color: green">Ready</span>',
+        busyText:'<span style="color: orange">Evaluating...</span>',
+		items : []
 	}, {
 		xtype : 'toolbar',
 		dock : 'top',
@@ -184,11 +185,11 @@ Ext.define('GEN.ui.blockly.Panel', {
 		Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, Blockly.Xml.textToDom(this.xml));
 	},
 	initLanguageMenus : function() {
-		this.getComponent('tbar1').removeAll();
+		//this.getComponent('tbar1').removeAll();
 		this.getComponent('tbar2').removeAll();
 
 		var tbar = this.getComponent(this.langCategories['Variables'].tbarId);
-		tbar.add(this.buildCategoryMenu('Variables', this.variablesMenu()));
+		tbar.insert(0,this.buildCategoryMenu('Variables', this.variablesMenu()));
 
 		var tree = Blockly.Toolbox.buildTree_();
 		_.each(_.keys(tree), function(cat) {
@@ -205,7 +206,10 @@ Ext.define('GEN.ui.blockly.Panel', {
 				menuItems.push(menuItem);
 			}, this);
 			var menu = this.buildCategoryMenu(catName, menuItems);
-			tbar.add([menu]);
+			var count = tbar.items.getCount();
+			console.log(count);
+			var position = this.langCategories[catName].tbarId == 'tbar1' ? count-2:count;
+			tbar.insert(position, menu);
 		}, this);
 	},
 	variablesMenu : function() {
@@ -356,6 +360,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		Session.set('cleanCode', this.cleanCode);
 	},
 	execCode : function(code) {
+		this.getComponent('tbar1').showBusy();	
 		if(this.useWorker == true) {
 			this.runWorker(code);
 		} else {
@@ -366,6 +371,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		console.log('execution result');
 		console.log(result);
 		Session.set('renderableBlocks', result);
+		this.getComponent('tbar1').clearStatus({useDefaults:true});	
 	},
 	initWorker : function() {
 		//not sure we need this here, need to check scope.
