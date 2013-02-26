@@ -416,11 +416,11 @@ THREE.Geometry.prototype.scale = function(vec) {
 
 
 
+
+
 /*
  * Abstract curve
  */
-
-
 THREE.Curve.prototype.translate = function ( vec ) {
 	if (vec==null) return null;
 	var matrix = new THREE.Matrix4();
@@ -445,7 +445,6 @@ THREE.Curve.prototype.getPointsByDistance = function ( distance ) {
 /*
  * Ellipse
  */
-
 THREE.EllipseCurve3 = function ( origin, xRadius, yRadius,
 							aStartAngle, aEndAngle,
 							aClockwise, frame ) {
@@ -500,11 +499,9 @@ THREE.EllipseCurve3.prototype.applyMatrix = function(matrix){
 /*
  * Line
  */
-
 THREE.LineCurve3.prototype.clone = function(){
 	return new THREE.LineCurve3(this.v1.clone(), this.v2.clone());
 };
-
 
 THREE.LineCurve3.prototype.applyMatrix = function(matrix){
 	this.v1.applyMatrix4(matrix);
@@ -514,8 +511,6 @@ THREE.LineCurve3.prototype.applyMatrix = function(matrix){
 /*
  * Spline
  */
-
-
 THREE.SplineCurve3.prototype.clone = function(){
 	var np = [];
 	for(var i=0; i<this.points.length; i++){
@@ -523,7 +518,6 @@ THREE.SplineCurve3.prototype.clone = function(){
 	}
 	return new THREE.SplineCurve3(np);
 };
-
 
 THREE.SplineCurve3.prototype.applyMatrix = function(matrix){
 	for(var i=0; i<this.points.length; i++){

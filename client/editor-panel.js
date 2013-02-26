@@ -121,6 +121,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 					return;
 				self.xml = program.xml;
 				xml = Blockly.Xml.textToDom(program.xml);
+				console.log(xml);
 				Blockly.mainWorkspace.clear();
 				//TODO: prevent 'blocklyWorkspaceChange' event here.
 				Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, xml);
@@ -306,6 +307,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 			return;
 		this.xml = xml;
 
+		console.log(xml);
 		var program = Session.get("currentProgram");
 		if(_.isUndefined(program)) {
 			console.log('create new program');
@@ -336,7 +338,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		if(code == this.tracedCode)
 			return;
 		this.tracedCode = code;
-		console.log(code);
+		//console.log(code);
 
 		try {
 			//GEN.debug.traceOn = false;

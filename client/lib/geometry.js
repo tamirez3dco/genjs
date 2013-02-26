@@ -51,12 +51,10 @@ GEN.Runner.encodeRenderables = function(blocks) {
 }
 
 GEN.Debugger = function() {
-	this.tracedValues = [];
 	this.tracedBlocks = {};
-	this.traceOn = false;
 };
+
 GEN.Debugger.prototype.trace = function(value, blockId) {
-	this.tracedValues.push(value);
 	if(_.isUndefined(this.tracedBlocks[blockId])) {
 		this.tracedBlocks[blockId] = [value];
 	} else {
@@ -64,14 +62,16 @@ GEN.Debugger.prototype.trace = function(value, blockId) {
 	}
 	return value;
 }
+
 GEN.Debugger.prototype.start = function() {
-	this.tracedValues = [];
 	this.tracedBlocks = {};
 }
+
 GEN.Debugger.prototype.stop = function() {
-
 }
-
+/*
+ *
+ */
 GEN.Geometry = function() {
 };
 //API creation utilities
@@ -203,29 +203,29 @@ GEN.Geometry.API.createPoint = {
 	}
 };
 /*
-GEN.Geometry.API.createCircle = {
-	category : 'Curve',
-	menuTitle : 'Circle',
-	tooltip : "Create a circle",
-	inputs : [{
-		name : 'origin',
-		type : GEN.types.Vector,
-		defaultVal : GEN.Geometry.generateCodeForFunction('createPoint', {
-			x : 0,
-			y : 0,
-			z : 0
-		})
-	}, {
-		name : 'radius',
-		defaultVal : 20
-	}],
-	outputType : GEN.types.Curve,
-	fn : function(args) {
-		var c = new toxi.geom.Circle(args.origin, args.radius);
-		return c;
-	}
-};
-*/
+ GEN.Geometry.API.createCircle = {
+ category : 'Curve',
+ menuTitle : 'Circle',
+ tooltip : "Create a circle",
+ inputs : [{
+ name : 'origin',
+ type : GEN.types.Vector,
+ defaultVal : GEN.Geometry.generateCodeForFunction('createPoint', {
+ x : 0,
+ y : 0,
+ z : 0
+ })
+ }, {
+ name : 'radius',
+ defaultVal : 20
+ }],
+ outputType : GEN.types.Curve,
+ fn : function(args) {
+ var c = new toxi.geom.Circle(args.origin, args.radius);
+ return c;
+ }
+ };
+ */
 GEN.Geometry.API.createCircleThree = {
 	category : 'Curve',
 	menuTitle : 'Circle',
@@ -280,7 +280,6 @@ GEN.Geometry.API.createLine = {
 	}
 };
 
-
 GEN.Geometry.API.createSpline = {
 	category : 'Curve',
 	menuTitle : 'Spline',
@@ -291,7 +290,9 @@ GEN.Geometry.API.createSpline = {
 	}],
 	outputType : GEN.types.Curve,
 	fn : function(args) {
-		var points = _.map(args.points, function(p){return p.toTHREE()});
+		var points = _.map(args.points, function(p) {
+			return p.toTHREE()
+		});
 		var c = new THREE.SplineCurve3(points);
 		return c;
 	}
@@ -395,7 +396,6 @@ GEN.Geometry.API.createCube = {
 	}
 };
 
-
 GEN.Geometry.API.createShape2D = {
 	category : 'Curve',
 	menuTitle : 'Shape 2D',
@@ -407,16 +407,16 @@ GEN.Geometry.API.createShape2D = {
 	}],
 	outputType : GEN.types.Curve,
 	fn : function(args) {
-		if (args.points.length < 3) return "";
+		if(args.points.length < 3)
+			return "";
 		var points2D = [];
-		for (var i = 0 ; i < args.points.length ; i++){
-			points2D.push(new THREE.Vector2(args.points[i].x,args.points[i].y));
-			
+		for(var i = 0; i < args.points.length; i++) {
+			points2D.push(new THREE.Vector2(args.points[i].x, args.points[i].y));
+
 		}
 		return new THREE.Shape(points2D);
 	}
 };
-
 
 GEN.Geometry.API.createParametricSurface = {
 	category : 'Mesh',
@@ -514,21 +514,47 @@ GEN.Geometry.API.Extrude = {
 	menuTitle : 'Extrude Shape',
 	tooltip : "Extrudes a Shape 2D",
 	inputs : [{
-		name : 'Shape',
+		name : 'shape',
 		type : GEN.types.Shape,
 	}, {
-		name : 'extr',
+		name : 'height',
 		type : Number,
 		defaultVal : 20
 	}],
 	outputType : GEN.types.Geometry,
 
 	fn : function(args) {
-		
-	if (args.Shape == null) return "";
-	var extrusionSettings = { amount: args.extr, bevelEnabled: false };
-	
-	return new THREE.ExtrudeGeometry( args.Shape, extrusionSettings );		
+
+		if(args.shape == null)
+			return "";
+		var extrusionSettings = {
+			amount : args.height,
+			bevelEnabled : false
+		};
+
+		return new THREE.ExtrudeGeometry(args.shape, extrusionSettings);
+	}
+};
+
+GEN.Geometry.API.divideCurveLength = {
+	category : 'Curve',
+	menuTitle : 'Divide Curve (length)',
+	tooltip : "Divide a curve by length",
+	inputs : [{
+		name : 'curve',
+		type : GEN.types.Curve,
+	}, {
+		name : 'length',
+		type : Number,
+		defaultVal : 0.5
+	}],
+	outputType : Array,
+
+	fn : function(args) {
+		if(args.curve == null)
+			return "";
+
+		return args.curve.getPointsByDistance(args.length);
 	}
 };
 
@@ -580,7 +606,7 @@ GEN.Geometry.API.scale = {
 	fn : function(args) {
 		var vec = args.vecOrFactor;
 		if(_.isNumber(vec)) {
-			vec = this.createPoint(vec,vec,vec);
+			vec = this.createPoint(vec, vec, vec);
 		}
 
 		if(args.geometry instanceof THREE.Geometry || args.geometry instanceof THREE.Curve) {

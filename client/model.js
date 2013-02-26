@@ -53,8 +53,8 @@ Ext.define('GEN.store.Programs', {
 
 	constructor : function() {
 		this.callParent();
+		this.loadInitialData();
 		this.observer = this.createObserver();
-		//console.log(this.observer);
 	},
 	addSave : function(records) {
 		var record = records[0];
@@ -68,12 +68,14 @@ Ext.define('GEN.store.Programs', {
 		return newRecords;
 	},
 	//TODO: use "observe" collection here instead of this naive way.
+	
 	createObserver : function() {
 		var self = this;
 
 		var handle = Meteor.autorun(function() {
 			//console.log('autorun...');
 			var programs = Programs.find();
+			
 			//console.log(programs);
 			//This strange thing convert a Meteor cursor to an array, no toArray or something??
 			var data = programs.map(function(program) {
@@ -88,5 +90,29 @@ Ext.define('GEN.store.Programs', {
 		});
 		return handle;
 
-	}
+	},
+	loadInitialData: function() {
+		var self = this;
+		var programs = Programs.find();
+		var data = programs.map(function(program) {
+			return program;
+		});
+		self.loadData(data);
+	},
+	/*
+	createObserver : function() {
+		var self = this;
+		var handle = Meteor.autorun(function() {
+			var programs = Programs.find();
+			programs.observeChanges({
+				added: function(id, fields){
+					fields._id = id;
+					self.add([fields]);
+				},
+				//changed: 
+			});
+		});
+		return handle;
+	}	
+	*/
 });
