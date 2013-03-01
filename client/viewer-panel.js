@@ -1,358 +1,415 @@
 Ext.define('GEN.ui.three.Panel', {
-	extend : 'Ext.panel.Panel',
-	alias : 'widget.three-panel',
-	id : 'threePanel',
-	shapeColorNormal : 0xff0000,
-	shapeColorSelected : 0x0000ff,
-	lineColorNormal : 0xff00ff,
-	lineColorSelected : 0x00ff00,
-	meshFaceColorNormal : 0xff00ff,
-	meshEdgeColorNormal : 0x220022,
-	meshFaceColorSelected : 0x00ff00,
-	meshEdgeColorSelected : 0x002200,
-	geometries : {},
-	selectedBlock : -1,
-	renderOnlySelected : false,
-	initializedScene : false,
-	code : '',
+    extend:'Ext.panel.Panel',
+    alias:'widget.three-panel',
+    id:'threePanel',
+    shapeColorNormal:0xff0000,
+    shapeColorSelected:0x0000ff,
+    lineColorNormal:0xff00ff,
+    lineColorSelected:0x00ff00,
+    meshFaceColorNormal:0xff00ff,
+    meshEdgeColorNormal:0x220022,
+    meshFaceColorSelected:0x00ff00,
+    meshEdgeColorSelected:0x002200,
+    geometries:{},
+    _blocks:{},
+    selectedBlock:-1,
+    renderOnlySelected:false,
+    initializedScene:false,
+    code:'',
 
-	tbar : {
-		xtype : 'toolbar',
-		items : [{
-			text : 'Only Selected',
-			enableToggle : true,
-			cls : 'x-btn-default-small',
-			toggleHandler : function() {
-				Ext.getCmp('threePanel').renderOnlySelected = this.pressed;
-				Ext.getCmp('threePanel').reRenderScene();
-			}
-		}, {
-			text : 'Hide Wireframe',
-			enableToggle : true,
-			cls : 'x-btn-default-small',
-			toggleHandler : function() {
-				var viewer = Ext.getCmp('threePanel');
-				if(this.pressed) {
-					viewer.meshMaterial = {
-						normal : viewer.createCleanMaterial(viewer.meshFaceColorNormal,1),
-						selected : viewer.createCleanMaterial(viewer.meshFaceColorSelected,1)
-					};
-				} else {
-					viewer.meshMaterial = {
-						normal : viewer.createWiredMaterial(viewer.meshFaceColorNormal, viewer.meshEdgeColorNormal),
-						selected : viewer.createWiredMaterial(viewer.meshFaceColorSelected, viewer.meshEdgeColorSelected)
-					};
-				}
-				Ext.getCmp('threePanel').reRenderScene();
-			}
-		}, {
-			text : 'Disable',
-			enableToggle : true,
-			cls : 'x-btn-default-small',
-			toggleHandler : function() {
-				Ext.getCmp('threePanel').disableAnimation = this.pressed;
-				if(this.pressed == false) {
-					Ext.getCmp('threePanel').startAnimate();
-				}
-			}
-		}]
-	},
-	initComponent : function() {
-		this.callParent();
-		this.createDefaultMaterials();
-		this.on({
-			'afterlayout' : {
-				fn : this.afterInitialLayout,
-				single : true,
-				scope : this
-			}
-		});
-		this.initProgramChangeHandler();
-		this.initSelectionChangeHandler();
-	},
-	afterInitialLayout : function() {
-		this.threeContainer = Ext.core.DomHelper.append(this.body, {
-			tag : 'div',
-			id : 'viewer3d-container',
-		});
-		this.initScene();
-		this.renderScene();
-		this.startAnimate();
-		this.on({
-			'resize' : {
-				fn : this.onResize,
-				scope : this
-			},
-		});
-	},
-	onResize : function() {
-		var w = this.body.getWidth();
-		var h = this.body.getHeight();
-		this.camera.aspect = w / h;
-		this.camera.updateProjectionMatrix();
-		this.renderer.setSize(w, h);
-		this.renderScene();
-	},
-	initProgramChangeHandler : function() {
-		var self = this;
-		Meteor.autorun(function() {
-			try {
-				var blocks = Session.get("renderableBlocks");
-				console.log(blocks);
-				self.blocks = blocks;
-				if(_.isUndefined(blocks))
-					return;
-				self.reRenderScene();
-			} catch(err) {
-				console.log(err);
-			}
-		});
-	},
-	initSelectionChangeHandler : function() {
-		var self = this;
-		Meteor.autorun(function() {
-			try {
-				var blockId = Session.get("selectedBlock");
-				if(_.isUndefined(blockId))
-					return;
-				if(self.initializedScene !== true)
-					return;
+    tbar : {
+        xtype : 'toolbar',
+        items : [
+            {
+                text:'Only Selected',
+                enableToggle:true,
+                cls:'x-btn-default-small',
+                toggleHandler:function () {
+                    Ext.getCmp('threePanel').renderOnlySelected = this.pressed;
+                    Ext.getCmp('threePanel').reRenderScene();
+                }
+            },
+            {
+                text:'Show Wireframe',
+                enableToggle:true,
+                cls:'x-btn-default-small',
+                toggleHandler:function () {
+                    var viewer = Ext.getCmp('threePanel');
+                    viewer.meshMaterial = this.pressed ? {
+                        normal:viewer.createWiredMaterial(viewer.meshFaceColorNormal, viewer.meshEdgeColorNormal),
+                        selected:viewer.createWiredMaterial(viewer.meshFaceColorSelected, viewer.meshEdgeColorSelected)
+                    } : {
+                        normal:viewer.createCleanMaterial(viewer.meshFaceColorNormal, 1),
+                        selected:viewer.createCleanMaterial(viewer.meshFaceColorSelected, 1)
+                    };
+                    Ext.getCmp('threePanel').reRenderScene();
+                }
+            },
+            {
+                text:'Disable',
+                enableToggle:true,
+                cls:'x-btn-default-small',
+                toggleHandler:function () {
+                    Ext.getCmp('threePanel').disableAnimation = this.pressed;
+                    if (this.pressed == false) {
+                        Ext.getCmp('threePanel').startAnimate();
+                    }
+                }
+            }
+        ]
+    },
+    initComponent:function () {
+        this.callParent();
+        this.createDefaultMaterials();
+        this.on({
+            'afterlayout':{
+                fn:this.afterInitialLayout,
+                single:true,
+                scope:this
+            }
+        });
+        this.initProgramChangeHandler();
+        this.initCodeChangeHandler();
+        this.initSelectionChangeHandler();
+    },
+    afterInitialLayout:function () {
+        this.threeContainer = Ext.core.DomHelper.append(this.body, {
+            tag:'div',
+            id:'viewer3d-container'
+        });
+        this.initScene();
+        this.renderScene();
+        this.startAnimate();
+        this.on({
+            'resize':{
+                fn:this.onLocalResize,
+                scope:this
+            }
+        });
+    },
+    onLocalResize:function () {
+        var w = this.body.getWidth();
+        var h = this.body.getHeight();
+        this.camera.aspect = w / h;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(w, h);
+        this.renderScene();
+    },
+    initCodeChangeHandler:function () {
+        var self = this;
+        Meteor.autorun(function () {
+            try {
+                var blocks = Session.get("renderableBlocks");
+                //console.log(blocks);
+                self.blocks = blocks;
+                //self.setRenderableBlocks(blocks);
+                if (_.isUndefined(blocks))
+                    return;
+                self.resetScene();
+                self.setRenderableBlocks(blocks);
+                self.reRenderScene();
+            } catch (err) {
+                console.log(err);
+            }
+        });
+    },
+    initProgramChangeHandler:function () {
+        var self = this;
+        Meteor.autorun(function () {
+            try {
+                var programId = Session.get("currentProgram");
+                //console.log('kkkkkkkkkk');
+                if (programId != self.programId) {
+                    self.programId = programId;
+                    self.selectedBlock = -1;
+                    self.resetScene();
+                    self._blocks = {};
+                    self.renderScene();
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        });
+    },
+    initSelectionChangeHandler:function () {
+        var self = this;
+        Meteor.autorun(function () {
+            try {
+                var blockId = Session.get("selectedBlock");
+                if (_.isUndefined(blockId))
+                    return;
+                if (self.initializedScene !== true)
+                    return;
 
-				if(self.renderOnlySelected) {
-					self.selectedBlock = blockId;
-					self.reRenderScene();
-				} else {
-					self.clearSelectionColor();
-					self.selectedBlock = blockId;
-					self.colorSelection();
-					self.renderScene();
-				}
-			} catch(err) {
-				console.log(err);
-			}
-		});
-	},
-	//Scene initializations
-	createAxis : function() {
-		axis = new THREE.AxisHelper(50);
-		axis.position.set(0, 0, 0);
-		this.scene.add(axis);
-	},
-	createGrid : function() {
-		var size = 200, step = 10;
-		var geometry = new THREE.Geometry();
-		var material = new THREE.LineBasicMaterial({
-			vertexColors : THREE.VertexColors
-		});
-		var color1 = new THREE.Color(0x444444), color2 = new THREE.Color(0x888888);
+                if (self.renderOnlySelected) {
+                    self.selectedBlock = blockId;
+                    self.reRenderScene();
+                } else {
+                    self.clearSelectionColor();
+                    self.selectedBlock = blockId;
+                    self.colorSelection();
+                    self.renderScene();
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        });
+    },
+    //Scene initializations
+    createAxis:function () {
+        var axis = new THREE.AxisHelper(50);
+        axis.position.set(0, 0, 0);
+        this.scene.add(axis);
+    },
+    createGrid:function () {
+        var size = 200, step = 10;
+        var geometry = new THREE.Geometry();
+        var material = new THREE.LineBasicMaterial({
+            vertexColors:THREE.VertexColors
+        });
+        var color1 = new THREE.Color(0x444444), color2 = new THREE.Color(0x888888);
 
-		for(var i = -size; i <= size; i += step) {
-			geometry.vertices.push(new THREE.Vector3(-size, i, 0));
-			geometry.vertices.push(new THREE.Vector3(size, i, 0));
-			geometry.vertices.push(new THREE.Vector3(i, -size, 0));
-			geometry.vertices.push(new THREE.Vector3(i, size, 0));
-			var color = i === 0 ? color1 : color2;
-			geometry.colors.push(color, color, color, color);
-		}
+        for (var i = -size; i <= size; i += step) {
+            geometry.vertices.push(new THREE.Vector3(-size, i, 0));
+            geometry.vertices.push(new THREE.Vector3(size, i, 0));
+            geometry.vertices.push(new THREE.Vector3(i, -size, 0));
+            geometry.vertices.push(new THREE.Vector3(i, size, 0));
+            var color = i === 0 ? color1 : color2;
+            geometry.colors.push(color, color, color, color);
+        }
 
-		var grid = new THREE.Line(geometry, material, THREE.LinePieces);
-		this.scene.add(grid);
-	},
-	createDefaultMaterials : function() {
-		this.lineMaterial = {};
-		this.lineMaterial['normal'] = new THREE.LineBasicMaterial({
-			color : this.lineColorNormal,
-		});
-		this.lineMaterial['selected'] = new THREE.LineBasicMaterial({
-			color : this.lineColorSelected,
-		});
+        var grid = new THREE.Line(geometry, material, THREE.LinePieces);
+        this.scene.add(grid);
+    },
+    createDefaultMaterials:function () {
+        this.lineMaterial = {};
+        this.lineMaterial['normal'] = new THREE.LineBasicMaterial({
+            color:this.lineColorNormal
+        });
+        this.lineMaterial['selected'] = new THREE.LineBasicMaterial({
+            color:this.lineColorSelected
+        });
+        this.shapeMaterial = {
+            normal:this.createCleanMaterial(this.shapeColorNormal, this.meshEdgeColorNormal),
+            selected:this.createCleanMaterial(this.shapeColorSelected, this.meshEdgeColorSelected)
+        };
+        this.meshMaterial = {
+            normal:this.createCleanMaterial(this.meshFaceColorNormal, this.meshEdgeColorNormal),
+            selected:this.createCleanMaterial(this.meshFaceColorSelected, this.meshEdgeColorSelected)
+        };
+    },
+    createWiredMaterial:function (faceColor, wireColor) {
+        return [new THREE.MeshLambertMaterial({
+            color:faceColor,
+            opacity:0.8,
+            transparent:true
+        }), new THREE.MeshBasicMaterial({
+            color:wireColor,
+            opacity:0.5,
+            wireframe:true
+        })];
+    },
+    createCleanMaterial:function (faceColor, opacity) {
+        return [new THREE.MeshLambertMaterial({
+            shading: THREE.SmoothShading,
+            color:faceColor,
+            opacity:opacity,
+            side: THREE.DoubleSide
+            //doubleSided: true
+        })];
+    },
+    initCamera:function (w, h) {
+        this.camera = new THREE.PerspectiveCamera(70, w / h, 1, 1000);
+        this.camera.position.x = 10;
+        this.camera.position.y = -200;
+        this.camera.position.z = 100;
+    },
+    initLights:function () {
+        var light1 = new THREE.PointLight(0xffffff);
+        light1.position.set(-50, -100, 100);
+        var light2 = new THREE.PointLight(0xffffff);
+        light2.position.set(50, 100, -100);
+        this.scene.add(light1);
+        this.scene.add(light2);
+    },
+    initScene:function () {
+        var w = this.body.getWidth();
+        var h = this.body.getHeight();
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setSize(w, h);
+        this.threeContainer.appendChild(this.renderer.domElement);
+        this.initCamera(w, h);
 
-		this.shapeMaterial = {
-			normal : this.createWiredMaterial(this.shapeColorNormal, this.meshEdgeColorNormal),
-			selected : this.createWiredMaterial(this.shapeColorSelected, this.meshEdgeColorSelected)
-		};
-		this.meshMaterial = {
-			normal : this.createWiredMaterial(this.meshFaceColorNormal, this.meshEdgeColorNormal),
-			selected : this.createWiredMaterial(this.meshFaceColorSelected, this.meshEdgeColorSelected)
-		};
-	},
-	createWiredMaterial : function(faceColor, wireColor) {
-		return [new THREE.MeshLambertMaterial({
-			color : faceColor,
-			opacity : 0.8,
-			transparent : true
-		}), new THREE.MeshBasicMaterial({
-			color : wireColor,
-			opacity : 0.5,
-			wireframe : true
-		})];
-	},
-	createCleanMaterial : function(faceColor, opacity) {
-		return [new THREE.MeshLambertMaterial({
-			color : faceColor,
-			opacity : opacity,
-			transparent : true
-		})];
-	},
-	initCamera : function(w, h) {
-		this.camera = new THREE.PerspectiveCamera(70, w / h, 1, 1000);
-		this.camera.position.x = 10;
-		this.camera.position.y = -200;
-		this.camera.position.z = 100;
-	},
-	initLights : function() {
-		var light1 = new THREE.PointLight(0xffffff);
-		light1.position.set(-50, -100, 100);
-		var light2 = new THREE.PointLight(0xffffff);
-		light2.position.set(50, 100, -100);
-		this.scene.add(light1);
-		this.scene.add(light2);
-	},
-	initScene : function() {
-		var w = this.body.getWidth();
-		var h = this.body.getHeight();
-		this.renderer = new THREE.WebGLRenderer();
-		this.renderer.setSize(w, h);
-		this.threeContainer.appendChild(this.renderer.domElement);
-		this.initCamera(w, h)
+        this.scene = new THREE.Scene();
+        this.controls = new THREE.OrbitControls(this.camera, this.threeContainer);
+        this.controls.addEventListener('change', this.renderScene);
+        this.initLights();
+        this.createGrid();
+        this.createAxis();
+        this.initParticleSystem();
+        this.initializedScene = true;
+    },
+    initParticleSystem:function () {
+        var pMaterial = new THREE.ParticleBasicMaterial({
+            color:0x00FF00,
+            size:2,
+            sizeAttenuation:true
+        });
+        var points = new THREE.Geometry();
+        this.particleSystem = new THREE.ParticleSystem(points, pMaterial);
+        this.scene.add(this.particleSystem);
+    },
+    resetParticleSystem:function () {
+        this.scene.remove(this.particleSystem);
+        this.initParticleSystem();
+    },
+    resetScene2:function () {
+        this.resetParticleSystem();
 
-		this.scene = new THREE.Scene();
-		this.controls = new THREE.OrbitControls(this.camera, this.threeContainer);
-		this.controls.addEventListener('change', this.renderScene);
-		this.initLights();
-		this.createGrid();
-		this.createAxis();
-		this.initParticleSystem();
-		this.initializedScene = true;
-	},
-	initParticleSystem : function() {
-		var pMaterial = new THREE.ParticleBasicMaterial({
-			color : 0x00FF00,
-			size : 2,
-			sizeAttenuation : true,
-		});
-		var points = new THREE.Geometry();
-		this.particleSystem = new THREE.ParticleSystem(points, pMaterial);
-		this.scene.add(this.particleSystem);
-	},
-	resetParticleSystem : function() {
-		this.scene.remove(this.particleSystem);
-		this.initParticleSystem();
-	},
-	resetScene : function() {
-		this.resetParticleSystem();
+        _.each(_.keys(this.geometries), function (blockId) {
+            _.each(this.geometries[blockId], function (geometry) {
+                this.scene.remove(geometry);
+            }, this);
+        }, this);
 
-		_.each(_.keys(this.geometries), function(blockId) {
-			_.each(this.geometries[blockId], function(geometry) {
-				this.scene.remove(geometry);
-			}, this);
-		}, this);
+        this.geometries = {};
+    },
+    resetScene:function () {
+        this.resetParticleSystem();
+        var blocksIds = _.keys(this._blocks);
+        _.each(blocksIds, function (id) {
+            var values = this._blocks[id].values;
+            _.each(values, function (val) {
+                //if(val.visible == true) {
+                this.scene.remove(val.rendered);
+                val.visible = false;
+                //}
+            }, this);
+        }, this);
+    },
+    addToScene:function (renderable) {
+        this.scene.add(renderable);
+        this.geometries.push(renderable);
+    },
+    addGeometries:function () {
+        var blocksIds = _.keys(this._blocks);
+        _.each(blocksIds, function (id) {
+            if ((this.renderOnlySelected == true) && (id != this.selectedBlock))
+                return;
+            var values = this._blocks[id].values;
+            _.each(values, function (val) {
+                val.visible = true;
+                var rendered = null;
+                if (val.decoded == undefined) {
+                    val.decoded = THREE.Geometry.decode(val.coded);
+                }
+                delete val.rendered;
+                    var decoded = val.decoded;
+                    var geometry = decoded.geometry;
 
-		this.geometries = {};
-	},
-	addToScene : function(renderable) {
-		this.scene.add(renderable);
-		this.geometries.push(renderable);
-	},
-	addGeometries : function() {
-		var blocksIds = _.keys(this.blocks);
-		_.each(blocksIds, function(id) {
-			if((this.renderOnlySelected == true) && (id != this.selectedBlock))
-				return;
-			var values = this.blocks[id];
-			if(_.isArray(values) && values.length == 1 && _.isArray(values[0])) {
-				values = values[0];
-			}
-			_.each(values, function(val) {
-				var decoded = THREE.Geometry.decode(val);
-				var geometry = decoded.geometry;
-				var rendered = null;
+                    if (decoded.render_type == "Point") {
+                        this.particleSystem.geometry.vertices.push(geometry.vertices[0]);
+                        return;
+                    } else if (decoded.render_type == "Line") {
+                        rendered = new THREE.Line(geometry, this.lineMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
+                    } else if (decoded.render_type == "Shape") {
+                        rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.shapeMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
+                    } else if (decoded.render_type == "Mesh") {
+                        rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
 
-				if(decoded.render_type == "Point") {
-					this.particleSystem.geometry.vertices.push(geometry.vertices[0]);
-					return;
-				} else if(decoded.render_type == "Line") {
-					rendered = new THREE.Line(geometry, this.lineMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
-				} else if(decoded.render_type == "Shape") {
-					rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.shapeMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
-				} else if(decoded.render_type == "Mesh") {
-					rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
-				}
+                    }
+                    rendered.children[0].doubleSided=true;
+                //rendered.children[0].
 
-				if(this.geometries[id]) {
-					this.geometries[id].push(rendered);
-				} else {
-					this.geometries[id] = [rendered];
-				}
-				this.scene.add(rendered);
+                    val.rendered = rendered;
 
-			}, this);
-		}, this);
-	},
-	setRenderableBlocks : function(blocks) {
-		var blocksIds = _.keys(blocks);
-		_.each(blocksIds, function(id) {
-			var values = blocks[id];
-			if(_.isArray(values) && values.length == 1 && _.isArray(values[0])) {
-				values = values[0];
-			}
-			_.each(values, function(val) {
+                this.scene.add(rendered);
 
-			}, this);
-		}, this);
-	},
-	clearSelectionColor : function() {
-		if(this.selectedBlock == -1)
-			return;
-		if(_.isUndefined(this.geometries[this.selectedBlock]))
-			return;
-		_.each(this.geometries[this.selectedBlock], function(rendered) {
-			//console.log(rendered)
-			if(rendered.material instanceof THREE.LineBasicMaterial) {
-				rendered.material = this.lineMaterial['normal'];
-			} else {
-				rendered.children[0].material = this.meshMaterial['normal'][0];
-				rendered.children[1].material = this.meshMaterial['normal'][1];
-			}
-		}, this);
-	},
-	colorSelection : function() {
-		if(this.selectedBlock == -1)
-			return;
-		if(_.isUndefined(this.geometries[this.selectedBlock]))
-			return;
-		_.each(this.geometries[this.selectedBlock], function(rendered) {
-			//console.log(rendered)
-			if(rendered.material instanceof THREE.LineBasicMaterial) {
-				rendered.material = this.lineMaterial['selected'];
-			} else {
-				rendered.children[0].material = this.meshMaterial['selected'][0];
-				rendered.children[1].material = this.meshMaterial['selected'][1];
-			}
-		}, this);
-	},
-	reRenderScene : function() {
-		if(this.initializedScene !== true)
-			return;
-		this.resetScene();
-		this.addGeometries();
-		this.renderScene();
-	},
-	renderScene : function() {
-		var self = Ext.getCmp('threePanel');
-		self.renderer.render(self.scene, self.camera);
-	},
-	startAnimate : function() {
-		var self = this;
-		//return;
-		var animate = function() {
-			if(self.disableAnimation)
-				return;
-			requestAnimationFrame(animate);
-			self.controls.update();
-		};
-		animate();
-	}
+            }, this);
+        }, this);
+    },
+    createRenderableObject:function () {
+
+    },
+    setRenderableBlocks:function (blocks) {
+        this._blocks = {};
+        var blocksIds = _.keys(blocks);
+        _.each(blocksIds, function (id) {
+            var values = blocks[id];
+            if (_.isArray(values) && values.length == 1 && _.isArray(values[0])) {
+                values = values[0];
+            }
+            if (values.length == 0)
+                return;
+            this._blocks[id] = {
+                values:[]
+            };
+            _.each(values, function (val) {
+                this._blocks[id].values.push({
+                    coded:val
+                });
+            }, this);
+        }, this);
+        console.log(this._blocks);
+    },
+    clearSelectionColor:function () {
+        if (this.selectedBlock == -1)
+            return;
+        if (_.isUndefined(this._blocks[this.selectedBlock]))
+            return;
+        _.each(this._blocks[this.selectedBlock].values, function (val) {
+            //console.log(rendered)
+            var rendered = val.rendered;
+            if (rendered.material instanceof THREE.LineBasicMaterial) {
+                rendered.material = this.lineMaterial['normal'];
+            } else {
+                for(var i=0;i<rendered.children.length;i++){
+                    rendered.children[i].material = this.meshMaterial['normal'][i];
+                }
+            }
+        }, this);
+    },
+    colorSelection:function () {
+        if (this.selectedBlock == -1)
+            return;
+        if (_.isUndefined(this._blocks[this.selectedBlock]))
+            return;
+        _.each(this._blocks[this.selectedBlock].values, function (val) {
+            //console.log(rendered)
+            var rendered = val.rendered;
+            if (rendered.material instanceof THREE.LineBasicMaterial) {
+                rendered.material = this.lineMaterial['selected'];
+            } else {
+                for(var i=0;i<rendered.children.length;i++){
+                    rendered.children[i].material = this.meshMaterial['selected'][i];
+                }
+            }
+            this.scene.remove(rendered);
+            this.scene.add(rendered);
+        }, this);
+    },
+    reRenderScene:function () {
+        if (this.initializedScene !== true)
+            return;
+        this.resetScene();
+        this.addGeometries();
+        this.renderScene();
+    },
+    renderScene:function () {
+        var self = Ext.getCmp('threePanel');
+        self.renderer.render(self.scene, self.camera);
+    },
+    startAnimate:function () {
+        var self = this;
+        //return;
+        var animate = function () {
+            if (self.disableAnimation)
+                return;
+            requestAnimationFrame(animate);
+            self.controls.update();
+        };
+        animate();
+    }
 });
 
 //////////

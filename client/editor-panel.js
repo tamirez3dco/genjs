@@ -65,7 +65,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 			position : 40,
 			title : 'Transform',
 			tbarId : 'tbar2'
-		},
+		}
 	},
 	emptyMenuItem : {
 		xtype : 'displayfield',
@@ -143,7 +143,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		this.initWorkspaceEvents();
 		this.on({
 			'resize' : {
-				fn : this.onResize
+				fn : this.onLocalResize
 			}
 		});
 	},
@@ -183,7 +183,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 		});
 
 	},
-	onResize : function() {
+	onLocalResize : function() {
 		this.body.dom.removeChild(this.blocklyWrapper);
 		this.injectBlockly();
 		this.initWorkspaceEvents();
@@ -244,7 +244,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 			listeners : {
 				'mousedown' : {
 					element : 'el',
-					fn : handler,
+					fn : handler
 				}
 			}
 		};
@@ -258,7 +258,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 			menu : {
 				//showSeparator: false,
 				id : category + '-menu',
-				items : items,
+				items : items
 			}
 		};
 	},
@@ -289,11 +289,11 @@ Ext.define('GEN.ui.blockly.Panel', {
 	onMouseWheel : function(e) {
 		return;
 		var dw = e.getWheelDelta();
-		if(dw > 0) {
-			this.scale /= 0.95;
-		} else {
-			this.scale *= 0.95;
-		}
+        if (dw <= 0) {
+            this.scale *= 0.95;
+        } else {
+            this.scale /= 0.95;
+        }
 		Blockly.scale = this.scale;
 		var t = Blockly.mainWorkspace.getCanvas().getAttribute('transform').split(' ');
 		var scale = 'scale(' + this.scale + ',' + this.scale + ')';
@@ -334,6 +334,7 @@ Ext.define('GEN.ui.blockly.Panel', {
 			});
 		}
 		this.xmlChanged();
+
 	},
 	xmlChanged : function() {
 		try {
@@ -402,5 +403,5 @@ Ext.define('GEN.ui.blockly.Panel', {
 		console.log("Worker sent message");
 		result = JSON.parse(event.data);
 		this.getExecutionResult(result);
-	},
+	}
 });
