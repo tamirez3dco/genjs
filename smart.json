@@ -1,0 +1,10 @@
+{
+    "meteor":{
+        "branch":"master"
+    },
+    "packages":{
+        "my-meteor-ace":{
+            "path":"/Users/amit/genjs/software/Package/my-meteor-ace"
+        }
+    }
+}

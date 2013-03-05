@@ -318,7 +318,7 @@ Ext.define('GEN.ui.three.Panel', {
                         rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
 
                     }
-                    rendered.children[0].doubleSided=true;
+                    //rendered.children[0].doubleSided=true;
                 //rendered.children[0].
 
                     val.rendered = rendered;

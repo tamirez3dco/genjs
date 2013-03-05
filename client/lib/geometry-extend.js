@@ -378,7 +378,7 @@ THREE.Geometry.prototype.encode = function(precision, render_type) {
 
 	var vco = [];
 	for(var i = 0; i < vertices.length; i++) {
-		vco.push(vertices[i].x.toFixed(precision), vertices[i].y.toFixed(precision), vertices[i].z.toFixed(precision));
+		vco.push(vertices[i].x, vertices[i].y, vertices[i].z);
 	}
 
 	var fco = [];
@@ -386,7 +386,10 @@ THREE.Geometry.prototype.encode = function(precision, render_type) {
 		var f = [faces[i].a, faces[i].b, faces[i].c];
 		if(faces[i].d)
 			f.push(faces[i].d);
+
 		fco.push(f);
+        var fc = [faces[i].normal.x, faces[i].normal.y, faces[i].normal.z, faces[i].centroid.x, faces[i].centroid.y, faces[i].centroid.z];
+        fco.push(fc);
 	}
 
 	var encoded = {
@@ -410,18 +413,22 @@ THREE.Geometry.prototype.encode2 = function(precision, render_type) {
 
 THREE.Geometry.decode = function(json) {
 	var geometry = new THREE.Geometry();
-	var f3 = function(g, i1, i2, i3) {
+	var f3 = function(i1, i2, i3) {
 		//unlike toxiclibs, a face in three.js are indices related to the vertices array
-		g.faces.push(new THREE.Face3(i1, i2, i3));
+		return new THREE.Face3(i1, i2, i3);
 	};
-	var f4 = function(g, i1, i2, i3, i4) {
+	var f4 = function( i1, i2, i3, i4) {
 		//unlike toxiclibs, a face in three.js are indices related to the vertices array
-		g.faces.push(new THREE.Face4(i1, i2, i3, i4));
+		return new THREE.Face4(i1, i2, i3, i4);
 	};
 	var v3 = function(g, x, y, z) {
 		var threeV = new THREE.Vector3(x, y, z);
 		g.vertices.push(threeV);
 	};
+    var sv3 = function( x, y, z) {
+        return new THREE.Vector3(x, y, z);
+
+    };
 	//var coded = JSON.parse(str);//str.split("#");
 	var coded = json.data;
 
@@ -432,17 +439,23 @@ THREE.Geometry.decode = function(json) {
 	}
 
 	var faces = coded.f;
-	for(var i = 0; i < faces.length; i++) {
-		vcs = faces[i];
+	for(var i = 0; i < faces.length; i+=2) {
+		var vcs = faces[i];
+        var f;
 		if(vcs.length == 3) {
-			f3(geometry, vcs[0], vcs[1], vcs[2]);
+			f = f3( vcs[0], vcs[1], vcs[2]);
 		} else {
-			f4(geometry, vcs[0], vcs[1], vcs[2], vcs[3]);
+			f = f4( vcs[0], vcs[1], vcs[2], vcs[3]);
 		}
+        var more = faces[i+1];
+        f.normal = sv3(more[0], more[1], more[2]);
+        f.centroid = sv3(more[3], more[4], more[5]);
+        //console.log(f);
+        geometry.faces.push(f);
 	}
 
-	geometry.computeCentroids();
-	geometry.computeFaceNormals();
+	//geometry.computeCentroids();
+	//geometry.computeFaceNormals();
 	geometry.computeVertexNormals();
 
 	return {

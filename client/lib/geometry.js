@@ -8,70 +8,6 @@ GEN.types = {
     Vector:String,
     Shape:String
 }
-
-GEN.Runner = {};
-GEN.Runner.init = function () {
-    GEN.debug = new GEN.Debugger();
-    GEN.Geometry.initGlobal();
-    GEN.memoize.USAGE_COUNTER = 0;
-};
-/*
- This is a test
- */
-GEN.Runner.run = function (code) {
-    GEN.debug.start();
-    var fn = new Function(code);
-    fn();
-    GEN.debug.stop();
-    var renderableBlocks = GEN.Runner.encodeRenderables(GEN.debug.tracedBlocks);
-    if (GEN.Geometry.MEMOIZE) {
-        GEN.memoize.clearUnused(5);
-        GEN.memoize.USAGE_COUNTER += 1;
-    }
-    return renderableBlocks;
-};
-GEN.Runner.encodeRenderables = function (blocks) {
-    var blocksIds = _.keys(blocks);
-    var renderableBlocks = {};
-
-    _.each(blocksIds, function (id) {
-        renderableBlocks[id] = [];
-        var values = blocks[id];
-        if (_.isArray(values) && values.length == 1 && _.isArray(values[0])) {
-            values = values[0];
-        }
-        _.each(values, function (val) {
-            if (val == null)
-                return;
-            if (val.toRenderable) {
-                var geometry = val.toRenderable();
-                var encoded = geometry.encode(5, val.RENDER_TYPE);
-                renderableBlocks[id].push(encoded);
-            }
-        });
-    });
-    return renderableBlocks;
-};
-
-GEN.Debugger = function () {
-    this.tracedBlocks = {};
-};
-
-GEN.Debugger.prototype.trace = function (value, blockId) {
-    if (_.isUndefined(this.tracedBlocks[blockId])) {
-        this.tracedBlocks[blockId] = [value];
-    } else {
-        this.tracedBlocks[blockId].push(value);
-    }
-    return value;
-}
-
-GEN.Debugger.prototype.start = function () {
-    this.tracedBlocks = {};
-}
-
-GEN.Debugger.prototype.stop = function () {
-}
 /*
  *
  */
@@ -80,7 +16,7 @@ GEN.Geometry = function () {
 //API creation utilities
 GEN.Geometry.GLOBAL_OBJECT_NAME = '_g';
 GEN.Geometry.UNMEMOIZED_PREFIX = '__';
-GEN.Geometry.MEMOIZE = true;
+GEN.Geometry.MEMOIZE = false;
 
 GEN.Geometry.initGlobal = function () {
     GEN.Geometry.exportAPI();

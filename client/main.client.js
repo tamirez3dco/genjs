@@ -32,7 +32,7 @@ Meteor.startup(function() {
 						margins : '5 0 0 0',
 						bodyPadding : 0,
 						width : '50%',
-						xtype : 'blockly-panel',
+						xtype : 'js-editor-panel',
 					}, {
 						title : 'Viewer',
 						region : 'center',
@@ -55,48 +55,6 @@ Meteor.startup(function() {
 					bodyPadding : 0,
 					xtype : 'programs-panel',
 					store : Ext.data.StoreManager.lookup('GEN.store.Programs'),
-				}, {
-					//title : '',
-					collapsible : true,
-					hideCollapseTool : true,
-					header : false,
-					region : 'south',
-					height : 220,
-					//minHeight : 75,
-					maxHeight : 400,
-					margins : "0 0 0 0",
-					bodyPadding : "0 0 10 0",
-					frame : false,
-					//layout: 'fit
-					layout : 'border',
-					defaults : {
-						frame : false,
-						margins : "0 0 0 0",
-						bodyPadding : 4,
-						split : true,
-						autoScroll : true,
-					},
-					items : [{
-						region : 'west',
-						margins : "0 0 0 0",
-						width : '40%',
-						title : 'Javascript Code',
-						xtype : 'jscode-panel',
-						//autoscroll: true,
-						data : {
-							code : 'No code generated'
-						}
-					}, {
-						region : 'center',
-						width : '30%',
-						//autoScroll: true,
-						title : 'Selected Values',
-						xtype : 'values-panel'
-					}, {
-						region : 'east',
-						width : '30%',
-						title : 'Output - stub'
-					}]
 				}, {
 					title : '<div style="float: left;"><span style="font-size: 20px; color: rgb(127,112,205)">genjs</span></div>',
 					region : 'north',
