@@ -7,7 +7,8 @@ Ext.define('GEN.ui.js-editor.Panel', {
     sliderToken: null,
     currentHoverToken: null,
     code: '',
-    disableUpdate: false,
+    externalChange: false,
+    sliderChange:false,
     tokens:[],
     langCategories:{
         'Variables':{
@@ -128,18 +129,18 @@ Ext.define('GEN.ui.js-editor.Panel', {
         var self = this;
         Meteor.autorun(function() {
             try {
-                console.log('nnnnnn');
+                //console.log('nnnnnn');
                 var current = Session.get("currentProgram");
                 if(_.isUndefined(current))
                     return;
                 program = Programs.findOne(current);
-                console.log(program);
+                //console.log(program);
                 if(_.isUndefined(program))
                     return;
                 if(program.code == self.code)
                     return;
                 self.code = program.code;
-                self.disableUpdate = true;
+                self.externalChange = true;
                 self.editor.setValue(program.code);
             } catch(err) {
                 console.log('Editor panel: Error while program changed' + err.message);
@@ -217,6 +218,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
                    var rangeObj = new Range(row, start, row, start + this.sliderToken.value.length);
                    this.sliderToken.value = newVal.toString();
                    console.log(rangeObj);
+                   this.sliderChange = true;
                    this.editorSession.replace(rangeObj, newVal.toString());
 
                },
@@ -235,10 +237,12 @@ Ext.define('GEN.ui.js-editor.Panel', {
             style:"width: 100%; height: 100%;"
         });
 
+        this.injectBlockly();
         ace.config.set("workerPath", "/ace");
         this.editor = ace.edit("ace-editor");
         this.editor.setTheme("ace/theme/monokai");
-
+        //TODO: not working
+        this.editor.setFontSize(30);
         this.editorSession = this.editor.getSession();
         this.editorSession.setMode("ace/mode/genjs");
         this.editorSession.setUseWorker(false);
@@ -261,7 +265,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
 
         this.currentHoverToken = this.cloneToken(token, position.row);
 
-        if (token.type != 'constant.numeric') {
+        if ((token==null) || (token.type != 'constant.numeric')) {
             this.overToken = false;
             if (!this.overSlider && this.sliderTooltip.isVisible() == true) {
                 var fn = Ext.Function.createDelayed(function () {
@@ -289,6 +293,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
 
     },
     cloneToken: function(token, row){
+        if (token==null) return null;
         return {
             start: (token.start == 0) ? 0 : token.start,
             row: row,
@@ -302,12 +307,18 @@ Ext.define('GEN.ui.js-editor.Panel', {
         //console.log(e);
         var code = this.editor.getValue();
         //Avoid the remove text operation that happens when the program code is set externally
-        if(this.disableUpdate) {
+        if(this.externalChange) {
             if (code!=this.code) {
-            //if(e.data.action != "insertText") {
                 return;
             }
-            this.disableUpdate = false;
+            this.externalChange = false;
+        }
+
+        if(this.sliderChange) {
+            if(e.data.action != "insertText") {
+                return;
+            }
+            this.sliderChange = false;
         }
 
         var session = this.editor.getSession();
@@ -351,6 +362,20 @@ Ext.define('GEN.ui.js-editor.Panel', {
             });
         }
 
+    },
+    execCode:function (code, tokens) {
+        this.getComponent('tbar1').showBusy();
+        if (this.useWorker == true) {
+            this.runWorker(code, tokens);
+        } else {
+            this.getExecutionResult(GEN.Runner.run(code, tokens));
+        }
+    },
+    getExecutionResult:function (result) {
+        //console.log('execution result');
+        //console.log(result);
+        Session.set('renderableBlocks', result);
+        this.getComponent('tbar1').clearStatus({useDefaults:true});
     },
     initLanguageMenus:function () {
         this.getComponent('tbar1').remove(this.getComponent('tbar1').getComponent('tbar1-dummy-item'));
@@ -425,25 +450,42 @@ Ext.define('GEN.ui.js-editor.Panel', {
             }
         };
     },
-    blockFactory:function (cat, op, tbar, initFn) {
-        return function (e, item, eOpts) {
-            console.log(op);
+    injectBlockly : function() {
+        this.blocklyWrapper = Ext.core.DomHelper.append(this.body, {
+            tag : 'div',
+            id : 'blockly-inner',
+            style : 'width: 0px; height: 0px;'
+        });
+        Blockly.inject(this.blocklyWrapper, {
+            path : '/blockly/',
+            //rtl: true,
+            showToolbox : false
+        });
+    },
+    blockFactory : function(cat, op, tbar, initFn) {
+        var self = this;
+        return function(e, item, eOpts) {
+            var eventXY = e.getXY();
+            var browserEvent = e.browserEvent;
+            tbar.getComponent(cat).menu.hide();
+            var block = new Blockly.Block(Blockly.mainWorkspace, op);
+            initFn && initFn(block);
+            var func = Blockly.JavaScript[block.type];
+            var code = (func.call(block))[0];
+            console.log(code);
+            //var cursorPos = self.editor.getCursorPosition();
+            self.insertAtCursor(code);
         }
     },
-    execCode:function (code, tokens) {
-        this.getComponent('tbar1').showBusy();
-        if (this.useWorker == true) {
-            this.runWorker(code, tokens);
-        } else {
-            this.getExecutionResult(GEN.Runner.run(code, tokens));
-        }
+    insertAtCursor : function(code) {
+        var cursorPos = this.editor.getCursorPosition();
+        this.editorSession.insert(cursorPos, code);
     },
-    getExecutionResult:function (result) {
-        console.log('execution result');
-        console.log(result);
-        Session.set('renderableBlocks', result);
-        this.getComponent('tbar1').clearStatus({useDefaults:true});
-    }
+    getBlockWindowXY : function(block) {
+        var thisXY = this.body.getXY();
+        var blockXY = Blockly.getAbsoluteXY_(block.getSvgRoot());
+        return [thisXY[0] + blockXY.x, thisXY[1] + blockXY.y]
+    },
 });
 
 

@@ -211,7 +211,7 @@ Ext.define('GEN.ui.three.Panel', {
     },
     createCleanMaterial:function (faceColor, opacity) {
         return [new THREE.MeshLambertMaterial({
-            shading: THREE.SmoothShading,
+            //shading: THREE.SmoothShading,
             color:faceColor,
             opacity:opacity,
             side: THREE.DoubleSide

@@ -105,11 +105,13 @@ GEN.Geometry.generateBlock = function (fnName, apiDef) {
 //Assumes **ONE** arguments object
 GEN.Geometry.generateCodeForFunction = function (fnName, argsObject) {
     var l = _.map(_.keys(argsObject), function (k) {
-        return ("   " + k + ': ' + argsObject[k]);
+        return ("" + k + ': ' + argsObject[k]);
     });
-    var argsStr = "{\n" + l.join(",\n") + "}";
+    var argsStr = "{" + l.join(", ") + "}";
 
-    var code = GEN.Geometry.GLOBAL_OBJECT_NAME + '.' + fnName + '(' + argsStr + ')';
+    //var code = GEN.Geometry.GLOBAL_OBJECT_NAME + '.' + fnName + '(' + argsStr + ')';
+    var code = fnName + '( ' + argsStr + ')';
+
     return code;
 };
 /////////////////////////////////////////////////////////////
@@ -155,7 +157,7 @@ GEN.Geometry.API.point = {
  inputs : [{
  name : 'origin',
  type : GEN.types.Vector,
- defaultVal : GEN.Geometry.generateCodeForFunction('createPoint', {
+ defaultVal : GEN.Geometry.generateCodeForFunction('point', {
  x : 0,
  y : 0,
  z : 0
@@ -179,7 +181,7 @@ GEN.Geometry.API.circle = {
         {
             name:'origin',
             type:GEN.types.Vector,
-            defaultVal:GEN.Geometry.generateCodeForFunction('createPoint', {
+            defaultVal:GEN.Geometry.generateCodeForFunction('point', {
                 x:0,
                 y:0,
                 z:0
@@ -197,7 +199,7 @@ GEN.Geometry.API.circle = {
     }
 };
 
-GEN.Geometry.API.createLine = {
+GEN.Geometry.API.line = {
     category:'Curve',
     menuTitle:'Line',
     tooltip:"Create a line",
@@ -205,7 +207,7 @@ GEN.Geometry.API.createLine = {
         {
             name:'start',
             type:GEN.types.Vector,
-            defaultVal:GEN.Geometry.generateCodeForFunction('createPoint', {
+            defaultVal:GEN.Geometry.generateCodeForFunction('point', {
                 x:0,
                 y:0,
                 z:0
@@ -214,7 +216,7 @@ GEN.Geometry.API.createLine = {
         {
             name:'end',
             type:GEN.types.Vector,
-            defaultVal:GEN.Geometry.generateCodeForFunction('createPoint', {
+            defaultVal:GEN.Geometry.generateCodeForFunction('point', {
                 x:20,
                 y:20,
                 z:20
@@ -231,7 +233,7 @@ GEN.Geometry.API.createLine = {
     }
 };
 
-GEN.Geometry.API.createSpline = {
+GEN.Geometry.API.spline = {
     category:'Curve',
     menuTitle:'Spline',
     tooltip:"Create a spline",
@@ -262,7 +264,7 @@ GEN.Geometry.API.createSpline = {
     }
 };
 
-GEN.Geometry.API.createSphere = {
+GEN.Geometry.API.sphere = {
     category:'Surface',
     menuTitle:'Sphere',
     tooltip:"Create a sphere",
@@ -270,7 +272,7 @@ GEN.Geometry.API.createSphere = {
         {
             name:'origin',
             type:GEN.types.Vector,
-            defaultVal:GEN.Geometry.generateCodeForFunction('createPoint', {
+            defaultVal:GEN.Geometry.generateCodeForFunction('point', {
                 x:0,
                 y:0,
                 z:0
@@ -290,7 +292,7 @@ GEN.Geometry.API.createSphere = {
 };
 
 //TODO: add font selection, bevel?
-GEN.Geometry.API.createTextGeo = {
+GEN.Geometry.API.textMesh = {
     category:'Mesh',
     menuTitle:'Text Mesh',
     tooltip:"Create a text mesh",
@@ -333,7 +335,7 @@ GEN.Geometry.API.createTextGeo = {
     }
 };
 
-GEN.Geometry.API.createCube = {
+GEN.Geometry.API.cube = {
     category:'Surface',
     menuTitle:'Cube',
     tooltip:"Create a cube",
@@ -341,7 +343,7 @@ GEN.Geometry.API.createCube = {
         {
             name:'origin',
             type:GEN.types.Vector,
-            defaultVal:GEN.Geometry.generateCodeForFunction('createPoint', {
+            defaultVal:GEN.Geometry.generateCodeForFunction('point', {
                 x:0,
                 y:0,
                 z:0
@@ -363,7 +365,7 @@ GEN.Geometry.API.createCube = {
     outputType:GEN.types.Mesh,
 
     fn:function (args) {
-        var c = new toxi.geom.AABB(args.origin, this.createPoint({
+        var c = new toxi.geom.AABB(args.origin, this.point({
             x:args.width,
             y:args.depth,
             z:args.height
@@ -372,7 +374,7 @@ GEN.Geometry.API.createCube = {
     }
 };
 
-GEN.Geometry.API.createShape2D = {
+GEN.Geometry.API.shape = {
     category:'Surface',
     menuTitle:'Shape 2D',
     tooltip:"Create a Shape on World-XY",
@@ -396,7 +398,7 @@ GEN.Geometry.API.createShape2D = {
     }
 };
 
-GEN.Geometry.API.createParametricSurface = {
+GEN.Geometry.API.parametricSurface = {
     category:'Mesh',
     menuTitle:'Parametric Mesh',
     blockTitle:false,
@@ -430,7 +432,7 @@ GEN.Geometry.API.createParametricSurface = {
     }
 };
 
-GEN.Geometry.API.createPipe = {
+GEN.Geometry.API.pipe = {
     category:'Mesh',
     menuTitle:'Pipe',
     tooltip:"Create a pipe around a curve",
@@ -476,7 +478,7 @@ GEN.Geometry.API.move = {
         {
             name:'translation',
             type:GEN.types.Vector,
-            defaultVal:GEN.Geometry.generateCodeForFunction('createPoint', {
+            defaultVal:GEN.Geometry.generateCodeForFunction('point', {
                 x:0,
                 y:0,
                 z:0
@@ -505,7 +507,7 @@ GEN.Geometry.API.move = {
     }
 };
 
-GEN.Geometry.API.Extrude = {
+GEN.Geometry.API.extrude = {
     category:'Mesh',
     menuTitle:'Extrude Shape',
     tooltip:"Extrudes a Shape 2D",
@@ -585,7 +587,7 @@ GEN.Geometry.API.divideCurveSegments = {
         return args.curve.getPoints(args.segments);
     }
 };
-GEN.Geometry.API.booleanOperation = {
+GEN.Geometry.API.meshBoolean = {
     category:'Transform',
     menuTitle:'Boolean',
     blockTitle:false,
@@ -631,7 +633,7 @@ GEN.Geometry.API.scale = {
             name:'vecOrFactor',
             title:'vector',
             type:GEN.types.Vector,
-            defaultVal:GEN.Geometry.generateCodeForFunction('createPoint', {
+            defaultVal:GEN.Geometry.generateCodeForFunction('point', {
                 x:2,
                 y:2,
                 z:2
@@ -644,7 +646,7 @@ GEN.Geometry.API.scale = {
     fn:function (args) {
         var vec = args.vecOrFactor;
         if (_.isNumber(vec)) {
-            vec = this.createPoint(vec, vec, vec);
+            vec = this.point(vec, vec, vec);
         }
 
         if (args.geometry instanceof THREE.Geometry || args.geometry instanceof THREE.Curve) {

@@ -45,7 +45,7 @@ Ext.define('GEN.ui.programs.Panel', {
 	listeners : {
 		'edit' : {
 			fn : function(editor, e) {
-				console.log(e);
+				//console.log(e);
 				d = e.record.getData();
 				fields = {}
 				fields[e.field] = e.value;
