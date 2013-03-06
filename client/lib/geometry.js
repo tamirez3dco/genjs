@@ -16,7 +16,7 @@ GEN.Geometry = function () {
 //API creation utilities
 GEN.Geometry.GLOBAL_OBJECT_NAME = '_g';
 GEN.Geometry.UNMEMOIZED_PREFIX = '__';
-GEN.Geometry.MEMOIZE = false;
+GEN.Geometry.MEMOIZE = true;
 
 GEN.Geometry.initGlobal = function () {
     GEN.Geometry.exportAPI();

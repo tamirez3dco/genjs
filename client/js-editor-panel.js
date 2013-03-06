@@ -163,9 +163,12 @@ Ext.define('GEN.ui.js-editor.Panel', {
         var tooltipConfig = {
             target:'ace-editor',
             anchorToTarget:false,
+            anchorOffset: 40,
+            defaultAlign: "t-b?",
+            anchorSize: 30,
             trackMouse:false,
             dismissDelay:4000,
-            mouseOffset:[-25, -15],
+            //mouseOffset:[-25, -15],
             anchor:'top',
 
             padding:"1 3 0 3",
@@ -217,7 +220,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
                    var start = this.sliderToken.start;
                    var rangeObj = new Range(row, start, row, start + this.sliderToken.value.length);
                    this.sliderToken.value = newVal.toString();
-                   console.log(rangeObj);
+                   //console.log(rangeObj);
                    this.sliderChange = true;
                    this.editorSession.replace(rangeObj, newVal.toString());
 
@@ -283,14 +286,43 @@ Ext.define('GEN.ui.js-editor.Panel', {
                 this.sliderTooltip.hide();
             }
             if (this.sliderTooltip.isVisible() == false) {
+                //console.log(ace);
+                //console.log(this.editor.renderer);
+                //console.log( this.sliderToken);
                 this.sliderToken = this.cloneToken(token, position.row);
+                console.log( 'slider token');
+                console.log( this.sliderToken);
+                var anchorPos = this.tokenAnchorPos(this.sliderToken);
+
                 this.dynamicSlider.setValue(parseFloat(token.value));
-                this.sliderTooltip.show();
+                this.sliderTooltip.showAt(anchorPos);
             }
         }
     },
     tokensEqual: function(tok1, tok2){
 
+    },
+    tokenAnchorPos: function(token){
+        var box = this.tokenBox(token);
+        var anchorPos = [box[0]+(box[2]/2)-60, box[1]+box[3]+4];
+        return anchorPos;
+    },
+    tokenBox: function(token){
+        var el = this.tokenEl(token);
+        var elXY = Ext.fly(el).getXY();
+        return [elXY[0], elXY[1], Ext.fly(el).getWidth(), Ext.fly(el).getHeight()];
+    },
+    tokenEl: function(token){
+        var screenPos = this.editorSession.documentToScreenPosition(token.row, token.start);
+        var lines = Ext.query('.ace_line');
+        var myLine = lines[screenPos.row];
+        var elements = _.filter(myLine.childNodes, function(el) {
+            if(el.nodeType==Node.TEXT_NODE) return true;
+            return !Ext.fly(el).hasCls('ace_indent-guide');
+        });
+
+        var myEl = elements[token.index];
+        return myEl;
     },
     cloneToken: function(token, row){
         if (token==null) return null;
@@ -332,6 +364,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
         var row = 0;
         while (row < rowCount) {
             var rowTokens = session.getTokens(row);
+            //console.log(rowTokens);
             tokens = tokens.concat(rowTokens);
             row += 1;
         }
@@ -480,6 +513,10 @@ Ext.define('GEN.ui.js-editor.Panel', {
     insertAtCursor : function(code) {
         var cursorPos = this.editor.getCursorPosition();
         this.editorSession.insert(cursorPos, code);
+    },
+    getInnerXY: function(xy) {
+        var thisXY = this.body.getXY();
+
     },
     getBlockWindowXY : function(block) {
         var thisXY = this.body.getXY();
