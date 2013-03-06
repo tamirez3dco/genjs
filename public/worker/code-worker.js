@@ -6,6 +6,7 @@ importScripts('/worker/csg.js');
 importScripts('/worker/math_functions.js');
 importScripts('/worker/optimer_bold.typeface.js');
 importScripts('/worker/optimer_regular.typeface.js');
+importScripts('/worker/runner.js');
 importScripts('/worker/geometry-extend.js');
 importScripts('/worker/geometry.js');
 
@@ -21,10 +22,10 @@ onconnect = function(event) {
 	});
 }
 listenForMessage = function(event, port) {
-	var code = event.data;
-	
+	var code = event.data.code;
+    var tokens = event.data.tokens;
 	try {
-		var renderableBlocks = GEN.Runner.run(code);
+		var renderableBlocks = GEN.Runner.run(code, tokens);
 		port.postMessage(JSON.stringify(renderableBlocks));
 	} catch (err) {
 		port.postMessage(JSON.stringify(err));

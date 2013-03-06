@@ -5,6 +5,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
     overSlider:false,
     overToken:false,
     sliderToken: null,
+    useWorker : true,
     currentHoverToken: null,
     code: '',
     externalChange: false,
@@ -118,6 +119,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
         this.sliderTooltip = Ext.create('Ext.tip.ToolTip', tooltipConfig);
     },
     onInitialLayout:function () {
+        this.initWorker();
         this.initEditor();
         this.initLanguageMenus();
         this.initTooltip();
@@ -276,7 +278,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
                        this.sliderToken=null;
                        this.sliderTooltip.hide();
                     }
-                }, 1000, this);
+                }, 300, this);
                 fn();
             }
         } else {
@@ -523,6 +525,31 @@ Ext.define('GEN.ui.js-editor.Panel', {
         var blockXY = Blockly.getAbsoluteXY_(block.getSvgRoot());
         return [thisXY[0] + blockXY.x, thisXY[1] + blockXY.y]
     },
+    initWorker : function() {
+        //not sure we need this here, need to check scope.
+        var self = this;
+        try {
+            this.worker = new SharedWorker('/worker/code-worker.js');
+            this.worker.port.addEventListener("message", function(event) {
+                self.getWorkerMessage(event);
+            }, false);
+
+            this.worker.port.start();
+        } catch(err) {
+            this.useWorker = false;
+        }
+    },
+    runWorker : function(code, tokens) {
+        console.log("Execute Code");
+        console.log(code);
+        console.log('sending');
+        this.worker.port.postMessage({code: code, tokens: tokens});
+    },
+    getWorkerMessage : function(event) {
+        console.log("Worker sent message");
+        result = JSON.parse(event.data);
+        this.getExecutionResult(result);
+    }
 });
 
 
