@@ -2,6 +2,12 @@ Ext.define('GEN.ui.js-editor.Panel', {
     extend:'Ext.panel.Panel',
     alias:'widget.js-editor-panel',
     varList:['item'],
+    overSlider:false,
+    overToken:false,
+    sliderToken: null,
+    currentHoverToken: null,
+    mmmm: false,
+    tokens:[],
     langCategories:{
         'Variables':{
             position:10,
@@ -103,39 +109,200 @@ Ext.define('GEN.ui.js-editor.Panel', {
                 single:true
             }
         });
+        var tooltipConfig = {
+            target:'ace-editor',
+            html:'A very simple tooltip'
+        };
+        this.sliderTooltip = Ext.create('Ext.tip.ToolTip', tooltipConfig);
     },
     onInitialLayout:function () {
+        this.initEditor();
+        this.initLanguageMenus();
+        this.initTooltip();
+        this.onCodeChange();
+    },
+    initTooltip:function () {
+        var sliderConfig = {
+            //xtype:'slider',
+            hideLabel:true,
+            width:120,
+            increment:1,
+            minValue:0,
+            maxValue:100,
+            useTips: false,
+            margin: 0,
+            /*tipText:function (thumb) {
+                //return Ext.String.format('<b>{0}% complete</b>', thumb.value);
+                return Ext.String.format('{0}', thumb.value);
+            }*/
+        };
+        this.dynamicSlider = Ext.create('Ext.slider.Single', sliderConfig);
+
+        var tooltipConfig = {
+            target:'ace-editor',
+            //html:'A very simple tooltip',
+            anchorToTarget:false,
+            trackMouse:false,
+            dismissDelay:4000,
+            mouseOffset:[-25, -15],
+            anchor:'top',
+
+            padding:"1 3 0 3",
+            bodyPadding:0,
+            items: this.dynamicSlider,
+            autoHide:false
+
+        };
+        this.sliderTooltip = Ext.create('Ext.tip.ToolTip', tooltipConfig);
+        this.sliderTooltip.on({
+            'beforeshow':{
+                fn:function () {
+                    //console.log('try');
+                    return (this.overToken || this.overSlider);
+                },
+                scope:this
+            },
+            show: {
+                fn:function () {
+                    //this.sliderToken = this.currentHoverToken;
+                },
+                scope:this
+            },
+            'afterrender':{
+                fn:function () {
+                    console.log('render');
+                    console.log(this.sliderTooltip.getEl())
+                    //Ext.fly(this.sliderTooltip.body).on({
+                    this.sliderTooltip.getEl().on({
+                        'mouseover':{
+                            fn:function () {
+                                this.overSlider = true;
+                            },
+                            scope:this
+
+                        },
+                        'mouseout':{
+                            fn:function () {
+                                this.overSlider = false;
+                            },
+                            scope:this
+                        },
+                    });
+
+                },
+                once:true,
+                scope:this
+            },
+        });
+
+        this.dynamicSlider.on({
+           'change' : {
+               fn: function(slider,newVal){
+                   var Range = ace.require('ace/range').Range;
+                   var row = this.sliderToken.row;
+                   var start = this.sliderToken.start;
+                   var rangeObj = new Range(row, start, row, start + this.sliderToken.value.length);
+                   this.sliderToken.value = newVal.toString();
+                   console.log(rangeObj);
+                   this.editorSession.replace(rangeObj, newVal.toString());
+
+               },
+               scope: this,
+               buffer: 50
+
+           }
+        });
+
+        Ext.QuickTips.init();
+    },
+    initEditor:function () {
         this.editor = Ext.core.DomHelper.append(this.body, {
             tag:'div',
             id:'ace-editor',
             style:"width: 100%; height: 100%;"
         });
-        this.initLanguageMenus();
+
         ace.config.set("workerPath", "/ace");
         this.editor = ace.edit("ace-editor");
         this.editor.setTheme("ace/theme/monokai");
-        var session=this.editor.getSession();
-        session.setMode("ace/mode/genjs");
-        //this.editor.setValue("_g.createPoint({x: 20,y: 20,z: 20});");
-        this.editor.setValue("foo();");
+
+        this.editorSession = this.editor.getSession();
+        this.editorSession.setMode("ace/mode/genjs");
+
+        this.editor.setValue("var p = point( {x: 20,y: 20,z: 0}); \ncircle( {origin: p, radius:15});");
+        //this.editor.setValue("var i = 21;");
+
         var self = this;
-        session.on('change', function(e){self.onCodeChange(e);});
+        this.editorSession.on('change', function (e) {
+            self.onCodeChange(e);
+        });
+        this.editor.on('mousemove', function (e) {
+            self.onMouseMove(e);
+        });
     },
+
+    onMouseMove:function (e) {
+        var position = e.getDocumentPosition();
+        var token = this.editor.session.getTokenAt(position.row, position.column);
+
+        this.currentHoverToken = this.cloneToken(token, position.row);
+
+        if (token.type != 'constant.numeric') {
+            this.overToken = false;
+            if (!this.overSlider && this.sliderTooltip.isVisible() == true) {
+                var fn = Ext.Function.createDelayed(function () {
+                    if ((!this.overToken && !this.overSlider && this.sliderTooltip.isVisible() == true)) {
+                       this.sliderToken=null;
+                       this.sliderTooltip.hide();
+                    }
+                }, 1000, this);
+                fn();
+            }
+        } else {
+            this.overToken = true;
+            var curToken = this.cloneToken(token, position.row);
+            if(this.sliderToken && (curToken.index != this.sliderToken.index)){
+                this.sliderTooltip.hide();
+            }
+            if (this.sliderTooltip.isVisible() == false) {
+                this.sliderToken = this.cloneToken(token, position.row);
+                this.dynamicSlider.setValue(parseFloat(token.value));
+                this.sliderTooltip.show();
+            }
+        }
+        //console.log('current tokens');
+        //console.log(this.currentHoverToken);
+        //console.log(this.sliderToken);
+
+    },
+    tokensEqual: function(tok1, tok2){
+
+    },
+    cloneToken: function(token, row){
+        return {
+            start: (token.start == 0) ? 0 : token.start,
+            row: row,
+            index: token.index,
+            type: token.type,
+            value: token.value
+        };
+    },
+
     onCodeChange:function (e) {
         //console.log(e);
         var session = this.editor.getSession();
         var annotations = session.getAnnotations();
 
         var hasError = _.contains(_.pluck(annotations, 'type'), 'error');
-        if(hasError) return;
+        if (hasError) return;
 
         var rowCount = session.getLength();
         var tokens = [];
         var row = 0;
-        while(row<rowCount) {
+        while (row < rowCount) {
             var rowTokens = session.getTokens(row);
             tokens = tokens.concat(rowTokens);
-            row+=1;
+            row += 1;
         }
 
         var code = this.editor.getValue();
@@ -220,15 +387,15 @@ Ext.define('GEN.ui.js-editor.Panel', {
             console.log(op);
         }
     },
-    execCode : function(code, tokens) {
+    execCode:function (code, tokens) {
         this.getComponent('tbar1').showBusy();
-        if(this.useWorker == true) {
+        if (this.useWorker == true) {
             this.runWorker(code, tokens);
         } else {
             this.getExecutionResult(GEN.Runner.run(code, tokens));
         }
     },
-    getExecutionResult : function(result) {
+    getExecutionResult:function (result) {
         console.log('execution result');
         console.log(result);
         Session.set('renderableBlocks', result);

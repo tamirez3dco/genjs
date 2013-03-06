@@ -19,7 +19,7 @@ GEN.Runner.init = function () {
         } else {
             GEN.Runner.tracedTokens[tokenIndex].push(res);
         }
-        console.log(res);
+
         return res;
     }
 };

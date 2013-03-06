@@ -29,9 +29,11 @@ GEN.Geometry.exportAPI = function () {
         var apiDef = GEN.Geometry.API[fnName];
         GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName] = apiDef.fn;
         if (GEN.Geometry.MEMOIZE) {
-            GEN.Geometry.prototype[fnName] = GEN.memoize(GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName]);
+            //GEN.Geometry.prototype[fnName] = GEN.memoize(GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName]);
+            GEN.global[fnName] = GEN.memoize(GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName]);
         } else {
-            GEN.Geometry.prototype[fnName] = GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName];
+            //GEN.Geometry.prototype[fnName] = GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName];
+            GEN.global[fnName] = GEN.Geometry.prototype[GEN.Geometry.UNMEMOIZED_PREFIX + fnName];
         }
     });
 };
@@ -114,7 +116,7 @@ GEN.Geometry.generateCodeForFunction = function (fnName, argsObject) {
 //API functions
 GEN.Geometry.API = {};
 
-GEN.Geometry.API.createPoint = {
+GEN.Geometry.API.point = {
     category:'Vector',
     menuTitle:'Point',
     //blockTitle: - default menu title
@@ -169,7 +171,7 @@ GEN.Geometry.API.createPoint = {
  }
  };
  */
-GEN.Geometry.API.createCircleThree = {
+GEN.Geometry.API.circle = {
     category:'Curve',
     menuTitle:'Circle',
     tooltip:"Create a circle",
