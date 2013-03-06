@@ -6,7 +6,8 @@ Ext.define('GEN.ui.js-editor.Panel', {
     overToken:false,
     sliderToken: null,
     currentHoverToken: null,
-    mmmm: false,
+    code: '',
+    disableUpdate: false,
     tokens:[],
     langCategories:{
         'Variables':{
@@ -120,6 +121,30 @@ Ext.define('GEN.ui.js-editor.Panel', {
         this.initLanguageMenus();
         this.initTooltip();
         this.onCodeChange();
+        this.initProgramChangeHandler();
+    },
+    //This happens when the selected program changed locally, or when the xml changed remotely
+    initProgramChangeHandler : function() {
+        var self = this;
+        Meteor.autorun(function() {
+            try {
+                console.log('nnnnnn');
+                var current = Session.get("currentProgram");
+                if(_.isUndefined(current))
+                    return;
+                program = Programs.findOne(current);
+                console.log(program);
+                if(_.isUndefined(program))
+                    return;
+                if(program.code == self.code)
+                    return;
+                self.code = program.code;
+                self.disableUpdate = true;
+                self.editor.setValue(program.code);
+            } catch(err) {
+                console.log('Editor panel: Error while program changed' + err.message);
+            }
+        });
     },
     initTooltip:function () {
         var sliderConfig = {
@@ -131,16 +156,11 @@ Ext.define('GEN.ui.js-editor.Panel', {
             maxValue:100,
             useTips: false,
             margin: 0,
-            /*tipText:function (thumb) {
-                //return Ext.String.format('<b>{0}% complete</b>', thumb.value);
-                return Ext.String.format('{0}', thumb.value);
-            }*/
         };
         this.dynamicSlider = Ext.create('Ext.slider.Single', sliderConfig);
 
         var tooltipConfig = {
             target:'ace-editor',
-            //html:'A very simple tooltip',
             anchorToTarget:false,
             trackMouse:false,
             dismissDelay:4000,
@@ -157,14 +177,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
         this.sliderTooltip.on({
             'beforeshow':{
                 fn:function () {
-                    //console.log('try');
                     return (this.overToken || this.overSlider);
-                },
-                scope:this
-            },
-            show: {
-                fn:function () {
-                    //this.sliderToken = this.currentHoverToken;
                 },
                 scope:this
             },
@@ -172,7 +185,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
                 fn:function () {
                     console.log('render');
                     console.log(this.sliderTooltip.getEl())
-                    //Ext.fly(this.sliderTooltip.body).on({
+
                     this.sliderTooltip.getEl().on({
                         'mouseover':{
                             fn:function () {
@@ -208,7 +221,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
 
                },
                scope: this,
-               buffer: 50
+               buffer: 20
 
            }
         });
@@ -228,8 +241,9 @@ Ext.define('GEN.ui.js-editor.Panel', {
 
         this.editorSession = this.editor.getSession();
         this.editorSession.setMode("ace/mode/genjs");
-
-        this.editor.setValue("var p = point( {x: 20,y: 20,z: 0}); \ncircle( {origin: p, radius:15});");
+        this.editorSession.setUseWorker(false);
+        this.code="var p = point( {x: 20,y: 20,z: 0});\ncircle( {origin: p, radius:15});";
+        this.editor.setValue(this.code);
         //this.editor.setValue("var i = 21;");
 
         var self = this;
@@ -270,10 +284,6 @@ Ext.define('GEN.ui.js-editor.Panel', {
                 this.sliderTooltip.show();
             }
         }
-        //console.log('current tokens');
-        //console.log(this.currentHoverToken);
-        //console.log(this.sliderToken);
-
     },
     tokensEqual: function(tok1, tok2){
 
@@ -290,6 +300,16 @@ Ext.define('GEN.ui.js-editor.Panel', {
 
     onCodeChange:function (e) {
         //console.log(e);
+        var code = this.editor.getValue();
+        //Avoid the remove text operation that happens when the program code is set externally
+        if(this.disableUpdate) {
+            if (code!=this.code) {
+            //if(e.data.action != "insertText") {
+                return;
+            }
+            this.disableUpdate = false;
+        }
+
         var session = this.editor.getSession();
         var annotations = session.getAnnotations();
 
@@ -305,10 +325,33 @@ Ext.define('GEN.ui.js-editor.Panel', {
             row += 1;
         }
 
-        var code = this.editor.getValue();
+        this.updateProgram(code);
         this.execCode(code, tokens);
     },
 
+    updateProgram: function(code){
+        if (this.code == code) return;
+
+        this.code=code;
+        //return;
+        var program = Session.get("currentProgram");
+        if(_.isUndefined(program)) {
+            console.log('create new program');
+            program = Programs.insert({
+                name : 'New Program',
+                code : code
+            });
+            Session.set("currentProgram", program);
+        } else {
+            console.log('update program');
+            Programs.update(program, {
+                $set : {
+                    code : code
+                }
+            });
+        }
+
+    },
     initLanguageMenus:function () {
         this.getComponent('tbar1').remove(this.getComponent('tbar1').getComponent('tbar1-dummy-item'));
         this.getComponent('tbar2').removeAll();

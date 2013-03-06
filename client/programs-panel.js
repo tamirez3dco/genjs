@@ -104,7 +104,7 @@ Ext.define('GEN.ui.programs.Panel', {
 	onNewProgram : function() {
 		var programs = this.store.addSave([{
 			name : 'New Program',
-			xml : '<xml></xml>',
+			code : "var p = point( {x: 20,y: 20,z: 0});\ncircle( {origin: p, radius:15});",
 		}]);
 		console.log('onNewProgram');
 		console.log(programs);
@@ -112,6 +112,7 @@ Ext.define('GEN.ui.programs.Panel', {
 		console.log(this.getPlugin('cellEditing'));
 		var p = this.getPlugin('cellEditing');
 		p.startEdit(programs[0], this.columns[0]);
-		Session.set("currentProgram", programs[0]._id);
+        console.log(programs[0]);
+		Session.set("currentProgram", programs[0].data._id);
 	}
 });

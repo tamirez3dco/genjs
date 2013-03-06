@@ -8,7 +8,7 @@ Ext.define('GEN.model.Program', {
 		name : 'name',
 		type : 'string'
 	}, {
-		name : 'xml',
+		name : 'code',
 		type : 'string'
 	}],
 	constructor : function() {
