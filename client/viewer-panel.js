@@ -196,7 +196,7 @@ Ext.define('GEN.ui.three.Panel', {
             selected:this.createCleanMaterial(this.shapeColorSelected, this.meshEdgeColorSelected)
         };
         this.meshMaterial = {
-            normal:this.createCleanMaterial(this.meshFaceColorNormal, this.meshEdgeColorNormal),
+            normal:this.createCleanMaterial(this.meshFaceColorNormal, 0.2),
             selected:this.createCleanMaterial(this.meshFaceColorSelected, this.meshEdgeColorSelected)
         };
     },
@@ -216,7 +216,8 @@ Ext.define('GEN.ui.three.Panel', {
             //shading: THREE.SmoothShading,
             color:faceColor,
             opacity:opacity,
-            side: THREE.DoubleSide
+            side: THREE.DoubleSide,
+            transparent:true
             //doubleSided: true
         })];
     },
@@ -320,7 +321,7 @@ Ext.define('GEN.ui.three.Panel', {
                         rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[this.isTokenActive(id) ? 'selected' : 'normal']);
 
                     }
-                   
+
                     val.rendered = rendered;
 
                 this.scene.add(rendered);

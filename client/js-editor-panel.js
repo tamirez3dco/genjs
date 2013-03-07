@@ -11,63 +11,65 @@ Ext.define('GEN.ui.js-editor.Panel', {
     externalChange: false,
     sliderChange:false,
     tokens:[],
+    skippedCode : null,
+    skippedTokens : null,
     running: false,
     lastCursorPosition: null,
     langCategories:{
         'Variables':{
             position:10,
             title:'Variables',
-            tbarId:'tbar1'
+            tbarId:'tbar2'
         },
         'Control':{
             position:30,
             title:'Control',
-            tbarId:'tbar1'
+            tbarId:'tbar2'
         },
         'Lists':{
             position:40,
             title:'Lists',
-            tbarId:'tbar1'
+            tbarId:'tbar2'
         },
         'Logic':{
             position:50,
             title:'Logic',
-            tbarId:'tbar1'
+            tbarId:'tbar2'
         },
         'Math':{
             position:20,
             title:'Math',
-            tbarId:'tbar1'
+            tbarId:'tbar2'
         },
         'Text':{
             position:60,
             title:'Text',
-            tbarId:'tbar1'
+            tbarId:'tbar2'
         },
         'Mesh':{
             position:30,
             title:'Mesh',
-            tbarId:'tbar2'
+            tbarId:'tbar1'
         },
         'Surface':{
             position:25,
             title:'Surface',
-            tbarId:'tbar2'
+            tbarId:'tbar1'
         },
         'Curve':{
             position:20,
             title:'Curve',
-            tbarId:'tbar2'
+            tbarId:'tbar1'
         },
         'Vector':{
             position:10,
             title:'Vector',
-            tbarId:'tbar2'
+            tbarId:'tbar1'
         },
         'Transform':{
             position:40,
             title:'Transform',
-            tbarId:'tbar2'
+            tbarId:'tbar1'
         }
     },
     emptyMenuItem:{
@@ -97,6 +99,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
             xtype:'toolbar',
             dock:'top',
             itemId:'tbar2',
+            hidden: true,
             items:[
                 {
                     xtype:'button',
@@ -218,21 +221,11 @@ Ext.define('GEN.ui.js-editor.Panel', {
 
         this.dynamicSlider.on({
            'change' : {
-               fn: function(slider,newVal){
-                   var Range = ace.require('ace/range').Range;
-                   var row = this.sliderToken.row;
-                   var start = this.sliderToken.start;
-                   var rangeObj = new Range(row, start, row, start + this.sliderToken.value.length);
-                   this.sliderToken.value = newVal.toString();
-                   //console.log(rangeObj);
-                   this.sliderChange = true;
-                   this.editorSession.replace(rangeObj, newVal.toString());
-
-               },
+               fn: this.onSliderChange,
                scope: this,
                buffer: 20
+           },
 
-           }
         });
 
         Ext.QuickTips.init();
@@ -249,14 +242,13 @@ Ext.define('GEN.ui.js-editor.Panel', {
         this.editor = ace.edit("ace-editor");
         this.editor.setTheme("ace/theme/monokai");
         //TODO: not working
-        this.editor.setFontSize(30);
+        this.editor.setFontSize(20);
         this.editorSession = this.editor.getSession();
         this.editorSession.setMode("ace/mode/genjs");
         this.editorSession.setUseWorker(false);
-        console.log(this.editor.selection);
+
         this.code="var p = point( {x: 20,y: 20,z: 0});\ncircle( {origin: p, radius:15});";
         this.editor.setValue(this.code);
-        //this.editor.setValue("var i = 21;");
 
         var self = this;
         this.editorSession.on('change', function (e) {
@@ -270,7 +262,16 @@ Ext.define('GEN.ui.js-editor.Panel', {
             self.onChangeCursor(e);
         });
     },
+    onSliderChange: function(slider,newVal){
+        var Range = ace.require('ace/range').Range;
+        var row = this.sliderToken.row;
+        var start = this.sliderToken.start;
+        var rangeObj = new Range(row, start, row, start + this.sliderToken.value.length);
+        this.sliderToken.value = newVal.toString();
 
+        this.sliderChange = true;
+        this.editorSession.replace(rangeObj, newVal.toString());
+    },
     onMouseMove:function (e) {
         var position = e.getDocumentPosition();
         var token = this.editor.session.getTokenAt(position.row, position.column);
@@ -448,6 +449,55 @@ Ext.define('GEN.ui.js-editor.Panel', {
         Session.set('renderableBlocks', result.data);
         this.getComponent('tbar1').clearStatus({useDefaults:true});
     },
+    insertAtCursor : function(code) {
+        var cursorPos = this.editor.getCursorPosition();
+        this.editorSession.insert(cursorPos, code);
+    },
+    getInnerXY: function(xy) {
+        var thisXY = this.body.getXY();
+
+    },
+    getBlockWindowXY : function(block) {
+        var thisXY = this.body.getXY();
+        var blockXY = Blockly.getAbsoluteXY_(block.getSvgRoot());
+        return [thisXY[0] + blockXY.x, thisXY[1] + blockXY.y]
+    },
+    initWorker : function() {
+        //not sure we need this here, need to check scope.
+        var self = this;
+        try {
+            this.worker = new SharedWorker('/worker/code-worker.js');
+            this.worker.port.addEventListener("message", function(event) {
+                self.getWorkerMessage(event);
+            }, false);
+
+            this.worker.port.start();
+        } catch(err) {
+            this.useWorker = false;
+        }
+    },
+    runWorker : function(code, tokens) {
+        console.log("Execute Code");
+        console.log(code);
+        console.log('sending');
+        if(this.running) {
+            this.skippedCode = code;
+            this.skippedTokens = tokens;
+            return;
+        }
+        this.running = true;
+        this.worker.port.postMessage({code: code, tokens: tokens});
+    },
+    getWorkerMessage : function(event) {
+        this.running = false;
+        if(this.skippedCode != null){
+            this.runWorker(this.skippedCode, this.skippedTokens);
+            this.skippedCode=null;
+            this.skippedTokens = null;
+        }
+        console.log("Worker sent message");
+        this.getExecutionResult(event.data);
+    },
     initLanguageMenus:function () {
         this.getComponent('tbar1').remove(this.getComponent('tbar1').getComponent('tbar1-dummy-item'));
         this.getComponent('tbar2').removeAll();
@@ -548,48 +598,6 @@ Ext.define('GEN.ui.js-editor.Panel', {
             self.insertAtCursor(code);
         }
     },
-    insertAtCursor : function(code) {
-        var cursorPos = this.editor.getCursorPosition();
-        this.editorSession.insert(cursorPos, code);
-    },
-    getInnerXY: function(xy) {
-        var thisXY = this.body.getXY();
-
-    },
-    getBlockWindowXY : function(block) {
-        var thisXY = this.body.getXY();
-        var blockXY = Blockly.getAbsoluteXY_(block.getSvgRoot());
-        return [thisXY[0] + blockXY.x, thisXY[1] + blockXY.y]
-    },
-    initWorker : function() {
-        //not sure we need this here, need to check scope.
-        var self = this;
-        try {
-            this.worker = new SharedWorker('/worker/code-worker.js');
-            this.worker.port.addEventListener("message", function(event) {
-                self.getWorkerMessage(event);
-            }, false);
-
-            this.worker.port.start();
-        } catch(err) {
-            this.useWorker = false;
-        }
-    },
-    runWorker : function(code, tokens) {
-        console.log("Execute Code");
-        console.log(code);
-        console.log('sending');
-        if(this.running) return;
-        this.running = true;
-        this.worker.port.postMessage({code: code, tokens: tokens});
-    },
-    getWorkerMessage : function(event) {
-        this.running = false;
-        console.log("Worker sent message");
-        //result = JSON.parse(event.data);
-
-        this.getExecutionResult(event.data);
-    }
 });
 
 
