@@ -13,6 +13,7 @@ Ext.define('GEN.ui.three.Panel', {
     geometries:{},
     _blocks:{},
     selectedBlock:-1,
+    activeTokens: -1,
     renderOnlySelected:false,
     initializedScene:false,
     code:'',
@@ -98,7 +99,7 @@ Ext.define('GEN.ui.three.Panel', {
     initCodeChangeHandler:function () {
         var self = this;
         Meteor.autorun(function () {
-            try {
+        //    try {
                 var blocks = Session.get("renderableBlocks");
                 //console.log(blocks);
                 self.blocks = blocks;
@@ -108,9 +109,9 @@ Ext.define('GEN.ui.three.Panel', {
                 self.resetScene();
                 self.setRenderableBlocks(blocks);
                 self.reRenderScene();
-            } catch (err) {
-                console.log(err);
-            }
+           /* } catch (err) {
+               console.log(err);
+            }*/
         });
     },
     initProgramChangeHandler:function () {
@@ -121,7 +122,7 @@ Ext.define('GEN.ui.three.Panel', {
                 //console.log('kkkkkkkkkk');
                 if (programId != self.programId) {
                     self.programId = programId;
-                    self.selectedBlock = -1;
+                    self.activeTokens = -1;
                     self.resetScene();
                     self._blocks = {};
                     self.renderScene();
@@ -135,18 +136,19 @@ Ext.define('GEN.ui.three.Panel', {
         var self = this;
         Meteor.autorun(function () {
             try {
-                var blockId = Session.get("selectedBlock");
-                if (_.isUndefined(blockId))
+                var activeTokens = Session.get("activeTokens");
+                console.log('hmm');
+                if (_.isUndefined(activeTokens))
                     return;
                 if (self.initializedScene !== true)
                     return;
 
                 if (self.renderOnlySelected) {
-                    self.selectedBlock = blockId;
+                    self.activeTokens = activeTokens;
                     self.reRenderScene();
                 } else {
                     self.clearSelectionColor();
-                    self.selectedBlock = blockId;
+                    self.activeTokens = activeTokens;
                     self.colorSelection();
                     self.renderScene();
                 }
@@ -294,7 +296,7 @@ Ext.define('GEN.ui.three.Panel', {
     addGeometries:function () {
         var blocksIds = _.keys(this._blocks);
         _.each(blocksIds, function (id) {
-            if ((this.renderOnlySelected == true) && (id != this.selectedBlock))
+            if ((this.renderOnlySelected == true) && (!this.isTokenActive(id)))
                 return;
             var values = this._blocks[id].values;
             _.each(values, function (val) {
@@ -311,22 +313,24 @@ Ext.define('GEN.ui.three.Panel', {
                         this.particleSystem.geometry.vertices.push(geometry.vertices[0]);
                         return;
                     } else if (decoded.render_type == "Line") {
-                        rendered = new THREE.Line(geometry, this.lineMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
+                        rendered = new THREE.Line(geometry, this.lineMaterial[this.isTokenActive(id) ? 'selected' : 'normal']);
                     } else if (decoded.render_type == "Shape") {
-                        rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.shapeMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
+                        rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.shapeMaterial[this.isTokenActive(id) ? 'selected' : 'normal']);
                     } else if (decoded.render_type == "Mesh") {
-                        rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[id == this.selectedBlock ? 'selected' : 'normal']);
+                        rendered = THREE.SceneUtils.createMultiMaterialObject(geometry, this.meshMaterial[this.isTokenActive(id) ? 'selected' : 'normal']);
 
                     }
-                    //rendered.children[0].doubleSided=true;
-                //rendered.children[0].
-
+                   
                     val.rendered = rendered;
 
                 this.scene.add(rendered);
 
             }, this);
         }, this);
+    },
+    isTokenActive: function(id){
+        id=parseInt(id);
+        return ((this.activeTokens!=-1) && (_.contains(this.activeTokens, id)));
     },
     createRenderableObject:function () {
 
@@ -353,42 +357,54 @@ Ext.define('GEN.ui.three.Panel', {
         console.log(this._blocks);
     },
     clearSelectionColor:function () {
-        if (this.selectedBlock == -1)
+        if (this.activeTokens == -1)
             return;
-        if (_.isUndefined(this._blocks[this.selectedBlock]))
-            return;
-        _.each(this._blocks[this.selectedBlock].values, function (val) {
-            //console.log(rendered)
-            var rendered = val.rendered;
-            if (rendered.material instanceof THREE.LineBasicMaterial) {
-                rendered.material = this.lineMaterial['normal'];
-            } else {
-                for(var i=0;i<rendered.children.length;i++){
-                    rendered.children[i].material = this.meshMaterial['normal'][i];
+
+        _.each(this.activeTokens, function(token){
+            if (_.isUndefined(this._blocks[token]))
+                return;
+            _.each(this._blocks[token].values, function (val) {
+                //console.log(rendered)
+                if(_.isUndefined( val.rendered))
+                    return;
+                var rendered = val.rendered;
+                if (rendered.material instanceof THREE.LineBasicMaterial) {
+                    rendered.material = this.lineMaterial['normal'];
+                } else {
+                    for(var i=0;i<rendered.children.length;i++){
+                        rendered.children[i].material = this.meshMaterial['normal'][i];
+                    }
                 }
-            }
-        }, this);
+            }, this);
+
+        },this);
     },
     colorSelection:function () {
-        if (this.selectedBlock == -1)
+        if (this.activeTokens == -1)
             return;
-        if (_.isUndefined(this._blocks[this.selectedBlock]))
-            return;
-        _.each(this._blocks[this.selectedBlock].values, function (val) {
-            //console.log(rendered)
-            var rendered = val.rendered;
-            if (rendered.material instanceof THREE.LineBasicMaterial) {
-                rendered.material = this.lineMaterial['selected'];
-            } else {
-                for(var i=0;i<rendered.children.length;i++){
-                    rendered.children[i].material = this.meshMaterial['selected'][i];
+
+        _.each(this.activeTokens, function(token){
+            if (_.isUndefined(this._blocks[token]))
+                return;
+            _.each(this._blocks[token].values, function (val) {
+                //console.log(rendered)
+                if(_.isUndefined( val.rendered))
+                    return;
+                var rendered = val.rendered;
+
+                if (rendered.material instanceof THREE.LineBasicMaterial) {
+                    rendered.material = this.lineMaterial['selected'];
+                } else {
+                    for(var i=0;i<rendered.children.length;i++){
+                        rendered.children[i].material = this.meshMaterial['selected'][i];
+                    }
                 }
-            }
-            this.scene.remove(rendered);
-            this.scene.add(rendered);
-        }, this);
+                this.scene.remove(rendered);
+                this.scene.add(rendered);
+            }, this);
+        },this);
     },
-    reRenderScene:function () {
+    reRenderScene : function () {
         if (this.initializedScene !== true)
             return;
         this.resetScene();

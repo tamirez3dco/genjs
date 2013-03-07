@@ -11,6 +11,7 @@ importScripts('/worker/geometry-extend.js');
 importScripts('/worker/geometry.js');
 
 GEN.Runner.init();
+running=false;
 
 var ports = [];
 onconnect = function(event) {
@@ -22,12 +23,17 @@ onconnect = function(event) {
 	});
 }
 listenForMessage = function(event, port) {
+    if(running==true){
+        port.postMessage({error: 'busy'});
+    }
+    running=true;
 	var code = event.data.code;
     var tokens = event.data.tokens;
 	try {
 		var renderableBlocks = GEN.Runner.run(code, tokens);
-		port.postMessage(JSON.stringify(renderableBlocks));
+		port.postMessage({data: renderableBlocks});
 	} catch (err) {
-		port.postMessage(JSON.stringify(err));
+		port.postMessage({error: err});
 	}
+    running=false;
 }

@@ -11,6 +11,8 @@ Ext.define('GEN.ui.js-editor.Panel', {
     externalChange: false,
     sliderChange:false,
     tokens:[],
+    running: false,
+    lastCursorPosition: null,
     langCategories:{
         'Variables':{
             position:10,
@@ -251,6 +253,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
         this.editorSession = this.editor.getSession();
         this.editorSession.setMode("ace/mode/genjs");
         this.editorSession.setUseWorker(false);
+        console.log(this.editor.selection);
         this.code="var p = point( {x: 20,y: 20,z: 0});\ncircle( {origin: p, radius:15});";
         this.editor.setValue(this.code);
         //this.editor.setValue("var i = 21;");
@@ -259,8 +262,12 @@ Ext.define('GEN.ui.js-editor.Panel', {
         this.editorSession.on('change', function (e) {
             self.onCodeChange(e);
         });
+
         this.editor.on('mousemove', function (e) {
             self.onMouseMove(e);
+        });
+        this.editor.selection.on('changeCursor', function (e) {
+            self.onChangeCursor(e);
         });
     },
 
@@ -336,7 +343,34 @@ Ext.define('GEN.ui.js-editor.Panel', {
             value: token.value
         };
     },
+    onChangeCursor: function(e){
+        var pos = this.editor.getCursorPosition();
+        if(pos.row == this.lastCursorPosition)
+            return;
+        this.lastCursorPosition = pos.row;
+        Session.set('activeLine', pos.row);
+        console.log(pos);
 
+        var rowCount = this.editorSession.getLength();
+        var tokens = [];
+        var row = 0;
+        var index = 0;
+        var tokens = [];
+        while (row < rowCount) {
+            var rowTokens = this.editorSession.getTokens(row);
+            if(row==pos.row) {
+                tokens = _.map(rowTokens, function(t,i){
+                    console.log(t);
+                    return index+ i;
+                });
+            }
+
+            row++;
+            index+=rowTokens.length;
+        }
+        console.log(tokens);
+        Session.set('activeTokens', tokens);
+    },
     onCodeChange:function (e) {
         //console.log(e);
         var code = this.editor.getValue();
@@ -407,9 +441,11 @@ Ext.define('GEN.ui.js-editor.Panel', {
         }
     },
     getExecutionResult:function (result) {
-        //console.log('execution result');
-        //console.log(result);
-        Session.set('renderableBlocks', result);
+        console.log('execution result');
+        console.log(result);
+
+        if(result.error) return;
+        Session.set('renderableBlocks', result.data);
         this.getComponent('tbar1').clearStatus({useDefaults:true});
     },
     initLanguageMenus:function () {
@@ -543,12 +579,16 @@ Ext.define('GEN.ui.js-editor.Panel', {
         console.log("Execute Code");
         console.log(code);
         console.log('sending');
+        if(this.running) return;
+        this.running = true;
         this.worker.port.postMessage({code: code, tokens: tokens});
     },
     getWorkerMessage : function(event) {
+        this.running = false;
         console.log("Worker sent message");
-        result = JSON.parse(event.data);
-        this.getExecutionResult(result);
+        //result = JSON.parse(event.data);
+
+        this.getExecutionResult(event.data);
     }
 });
 
