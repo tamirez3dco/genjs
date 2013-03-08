@@ -5,7 +5,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
     overSlider:false,
     overToken:false,
     sliderToken: null,
-    useWorker : true,
+    useWorker : false,
     currentHoverToken: null,
     code: '',
     externalChange: false,
@@ -438,7 +438,8 @@ Ext.define('GEN.ui.js-editor.Panel', {
         if (this.useWorker == true) {
             this.runWorker(code, tokens);
         } else {
-            this.getExecutionResult(GEN.Runner.run(code, tokens));
+            var res = GEN.Runner.run(code, tokens);
+            this.getExecutionResult({data: res});
         }
     },
     getExecutionResult:function (result) {
@@ -449,19 +450,7 @@ Ext.define('GEN.ui.js-editor.Panel', {
         Session.set('renderableBlocks', result.data);
         this.getComponent('tbar1').clearStatus({useDefaults:true});
     },
-    insertAtCursor : function(code) {
-        var cursorPos = this.editor.getCursorPosition();
-        this.editorSession.insert(cursorPos, code);
-    },
-    getInnerXY: function(xy) {
-        var thisXY = this.body.getXY();
 
-    },
-    getBlockWindowXY : function(block) {
-        var thisXY = this.body.getXY();
-        var blockXY = Blockly.getAbsoluteXY_(block.getSvgRoot());
-        return [thisXY[0] + blockXY.x, thisXY[1] + blockXY.y]
-    },
     initWorker : function() {
         //not sure we need this here, need to check scope.
         var self = this;
@@ -497,6 +486,19 @@ Ext.define('GEN.ui.js-editor.Panel', {
         }
         console.log("Worker sent message");
         this.getExecutionResult(event.data);
+    },
+    insertAtCursor : function(code) {
+        var cursorPos = this.editor.getCursorPosition();
+        this.editorSession.insert(cursorPos, code);
+    },
+    getInnerXY: function(xy) {
+        var thisXY = this.body.getXY();
+
+    },
+    getBlockWindowXY : function(block) {
+        var thisXY = this.body.getXY();
+        var blockXY = Blockly.getAbsoluteXY_(block.getSvgRoot());
+        return [thisXY[0] + blockXY.x, thisXY[1] + blockXY.y]
     },
     initLanguageMenus:function () {
         this.getComponent('tbar1').remove(this.getComponent('tbar1').getComponent('tbar1-dummy-item'));

@@ -54,9 +54,15 @@ GEN.Runner.wrap = function(tokens) {
     while(index<tokens.length){
         var token=tokens[index];
         if(token.type=='function.invocation'){
+            if(tokens[index+1].value.length==1) {
             var wrappedFuncName = token.value + '.myCall('+index+',';
             wrappedCode += wrappedFuncName;
             index+=2;
+            } else {
+                var wrappedFuncName = token.value + '.myCall('+index+',{';
+                wrappedCode += wrappedFuncName;
+                index+=2;
+            }
         } else {
             wrappedCode += token.value;
             index+=1;
